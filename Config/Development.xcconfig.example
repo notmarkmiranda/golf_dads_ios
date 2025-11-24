@@ -1,0 +1,13 @@
+// Development Environment Configuration
+// Copy this file to Development.xcconfig and fill in your values
+// Development.xcconfig is gitignored for security
+
+// API Configuration
+API_BASE_URL = http:/​/localhost:3000/api
+
+// Google OAuth Configuration
+// Get your client ID from: https://console.cloud.google.com/apis/credentials
+GOOGLE_CLIENT_ID = your-dev-client-id.apps.googleusercontent.com
+
+// Bundle Identifier for Development
+DEVELOPMENT_BUNDLE_ID = com.golfdads.GolfDads.dev

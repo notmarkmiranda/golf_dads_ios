@@ -1,0 +1,13 @@
+// Production Environment Configuration
+// Copy this file to Production.xcconfig and fill in your values
+// Production.xcconfig is gitignored for security
+
+// API Configuration
+API_BASE_URL = https://your-production-api.onrender.com/api
+
+// Google OAuth Configuration
+// Get your client ID from: https://console.cloud.google.com/apis/credentials
+GOOGLE_CLIENT_ID = your-prod-client-id.apps.googleusercontent.com
+
+// Bundle Identifier for Production
+PRODUCTION_BUNDLE_ID = com.golfdads.GolfDads
