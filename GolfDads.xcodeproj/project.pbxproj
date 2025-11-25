@@ -6,6 +6,16 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		335BE6E22ED51D8E009F0F2F /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 335BE6E12ED51D8E009F0F2F /* GoogleSignIn */; };
+		335BE6E42ED51D8E009F0F2F /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 335BE6E32ED51D8E009F0F2F /* GoogleSignInSwift */; };
+		335BE6E72ED51DC7009F0F2F /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 335BE6E62ED51DC7009F0F2F /* KeychainAccess */; };
+		335BE6ED2ED51E73009F0F2F /* InlineSnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 335BE6EC2ED51E73009F0F2F /* InlineSnapshotTesting */; };
+		335BE6EF2ED51E73009F0F2F /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 335BE6EE2ED51E73009F0F2F /* SnapshotTesting */; };
+		335BE6F12ED51E73009F0F2F /* SnapshotTestingCustomDump in Frameworks */ = {isa = PBXBuildFile; productRef = 335BE6F02ED51E73009F0F2F /* SnapshotTestingCustomDump */; };
+		335BE6F82ED53ACB009F0F2F /* ViewInspector in Frameworks */ = {isa = PBXBuildFile; productRef = 335BE6F72ED53ACB009F0F2F /* ViewInspector */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		334FF93D2ED5196F00C5EE18 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +62,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				335BE6E22ED51D8E009F0F2F /* GoogleSignIn in Frameworks */,
+				335BE6E42ED51D8E009F0F2F /* GoogleSignInSwift in Frameworks */,
+				335BE6E72ED51DC7009F0F2F /* KeychainAccess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,6 +72,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				335BE6F12ED51E73009F0F2F /* SnapshotTestingCustomDump in Frameworks */,
+				335BE6ED2ED51E73009F0F2F /* InlineSnapshotTesting in Frameworks */,
+				335BE6EF2ED51E73009F0F2F /* SnapshotTesting in Frameworks */,
+				335BE6F82ED53ACB009F0F2F /* ViewInspector in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +129,9 @@
 			);
 			name = GolfDads;
 			packageProductDependencies = (
+				335BE6E12ED51D8E009F0F2F /* GoogleSignIn */,
+				335BE6E32ED51D8E009F0F2F /* GoogleSignInSwift */,
+				335BE6E62ED51DC7009F0F2F /* KeychainAccess */,
 			);
 			productName = GolfDads;
 			productReference = 334FF92F2ED5196D00C5EE18 /* GolfDads.app */;
@@ -135,6 +155,10 @@
 			);
 			name = GolfDadsTests;
 			packageProductDependencies = (
+				335BE6EC2ED51E73009F0F2F /* InlineSnapshotTesting */,
+				335BE6EE2ED51E73009F0F2F /* SnapshotTesting */,
+				335BE6F02ED51E73009F0F2F /* SnapshotTestingCustomDump */,
+				335BE6F72ED53ACB009F0F2F /* ViewInspector */,
 			);
 			productName = GolfDadsTests;
 			productReference = 334FF93C2ED5196F00C5EE18 /* GolfDadsTests.xctest */;
@@ -195,6 +219,12 @@
 			);
 			mainGroup = 334FF9262ED5196D00C5EE18;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				335BE6E02ED51D8E009F0F2F /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				335BE6E52ED51DC7009F0F2F /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				335BE6EB2ED51E73009F0F2F /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+				335BE6F62ED53ACB009F0F2F /* XCRemoteSwiftPackageReference "ViewInspector" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 334FF9302ED5196D00C5EE18 /* Products */;
 			projectDirPath = "";
@@ -578,6 +608,79 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		335BE6E02ED51D8E009F0F2F /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		335BE6E52ED51DC7009F0F2F /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.2.2;
+			};
+		};
+		335BE6EB2ED51E73009F0F2F /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.17.0;
+			};
+		};
+		335BE6F62ED53ACB009F0F2F /* XCRemoteSwiftPackageReference "ViewInspector" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nalexn/ViewInspector";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.10.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		335BE6E12ED51D8E009F0F2F /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 335BE6E02ED51D8E009F0F2F /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		335BE6E32ED51D8E009F0F2F /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 335BE6E02ED51D8E009F0F2F /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		335BE6E62ED51DC7009F0F2F /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 335BE6E52ED51DC7009F0F2F /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		335BE6EC2ED51E73009F0F2F /* InlineSnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 335BE6EB2ED51E73009F0F2F /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = InlineSnapshotTesting;
+		};
+		335BE6EE2ED51E73009F0F2F /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 335BE6EB2ED51E73009F0F2F /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+		335BE6F02ED51E73009F0F2F /* SnapshotTestingCustomDump */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 335BE6EB2ED51E73009F0F2F /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTestingCustomDump;
+		};
+		335BE6F72ED53ACB009F0F2F /* ViewInspector */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 335BE6F62ED53ACB009F0F2F /* XCRemoteSwiftPackageReference "ViewInspector" */;
+			productName = ViewInspector;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 334FF9272ED5196D00C5EE18 /* Project object */;
 }
