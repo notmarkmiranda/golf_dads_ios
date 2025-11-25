@@ -15,6 +15,8 @@ protocol KeychainServiceProtocol {
     func getRefreshToken() -> String?
     func deleteRefreshToken() throws
     func clearAll() throws
+    var hasToken: Bool { get }
+    var hasRefreshToken: Bool { get }
 }
 
 /// Service for securely storing authentication tokens in the keychain
