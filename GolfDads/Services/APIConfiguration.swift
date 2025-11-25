@@ -96,32 +96,32 @@ struct APIConfiguration {
         var path: String {
             switch self {
             // Authentication
-            case .signup: return "/signup"
-            case .login: return "/login"
-            case .googleSignIn: return "/auth/google"
-            case .currentUser: return "/users/current"
+            case .signup: return "/v1/auth/signup"
+            case .login: return "/v1/auth/login"
+            case .googleSignIn: return "/v1/auth/google"
+            case .currentUser: return "/v1/users/current"
 
             // Users
-            case .users: return "/users"
-            case .user(let id): return "/users/\(id)"
+            case .users: return "/v1/users"
+            case .user(let id): return "/v1/users/\(id)"
 
             // Groups
-            case .groups: return "/groups"
-            case .group(let id): return "/groups/\(id)"
-            case .groupMembers(let groupId): return "/groups/\(groupId)/members"
-            case .joinGroup(let groupId): return "/groups/\(groupId)/join"
-            case .leaveGroup(let groupId): return "/groups/\(groupId)/leave"
+            case .groups: return "/v1/groups"
+            case .group(let id): return "/v1/groups/\(id)"
+            case .groupMembers(let groupId): return "/v1/groups/\(groupId)/members"
+            case .joinGroup(let groupId): return "/v1/groups/\(groupId)/join"
+            case .leaveGroup(let groupId): return "/v1/groups/\(groupId)/leave"
 
             // Tee Time Postings
-            case .teeTimePostings: return "/tee_time_postings"
-            case .teeTimePosting(let id): return "/tee_time_postings/\(id)"
-            case .myTeeTimePostings: return "/tee_time_postings/my_postings"
-            case .groupTeeTimePostings(let groupId): return "/groups/\(groupId)/tee_time_postings"
+            case .teeTimePostings: return "/v1/tee_time_postings"
+            case .teeTimePosting(let id): return "/v1/tee_time_postings/\(id)"
+            case .myTeeTimePostings: return "/v1/tee_time_postings/my_postings"
+            case .groupTeeTimePostings(let groupId): return "/v1/groups/\(groupId)/tee_time_postings"
 
             // Reservations
-            case .reservations: return "/reservations"
-            case .reservation(let id): return "/reservations/\(id)"
-            case .myReservations: return "/reservations/my_reservations"
+            case .reservations: return "/v1/reservations"
+            case .reservation(let id): return "/v1/reservations/\(id)"
+            case .myReservations: return "/v1/reservations/my_reservations"
             }
         }
 

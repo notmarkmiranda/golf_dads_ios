@@ -14,11 +14,19 @@ struct AuthenticationResponse: Codable {
 /// User data returned from authentication
 struct AuthenticatedUser: Codable {
     let id: Int
-    let emailAddress: String
+    let email: String
     let name: String
     let avatarUrl: String?
     let provider: String?
-    let admin: Bool
+
+    // Custom decoding key mapping
+    enum CodingKeys: String, CodingKey {
+        case id
+        case email
+        case name
+        case avatarUrl = "avatar_url"
+        case provider
+    }
 }
 
 /// Protocol for authentication operations
@@ -52,18 +60,24 @@ class AuthenticationService: AuthenticationServiceProtocol {
 
     /// Sign up a new user with email and password
     func signUp(email: String, password: String, name: String) async throws -> AuthenticationResponse {
-        struct SignUpRequest: Encodable {
-            let emailAddress: String
+        struct UserParams: Encodable {
+            let email: String
             let password: String
             let passwordConfirmation: String
             let name: String
         }
 
+        struct SignUpRequest: Encodable {
+            let user: UserParams
+        }
+
         let request = SignUpRequest(
-            emailAddress: email,
-            password: password,
-            passwordConfirmation: password,
-            name: name
+            user: UserParams(
+                email: email,
+                password: password,
+                passwordConfirmation: password,
+                name: name
+            )
         )
 
         let response: AuthenticationResponse = try await networkService.post(
@@ -83,12 +97,12 @@ class AuthenticationService: AuthenticationServiceProtocol {
     /// Log in an existing user with email and password
     func login(email: String, password: String) async throws -> AuthenticationResponse {
         struct LoginRequest: Encodable {
-            let emailAddress: String
+            let email: String
             let password: String
         }
 
         let request = LoginRequest(
-            emailAddress: email,
+            email: email,
             password: password
         )
 

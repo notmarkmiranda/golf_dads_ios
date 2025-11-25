@@ -65,22 +65,17 @@ struct TestLoginView: View {
                     Section("Current User") {
                         if let user = currentUser {
                             Text("ID: \(user.id)")
-                            Text("Email: \(user.emailAddress)")
+                            Text("Email: \(user.email)")
                             Text("Name: \(user.name)")
                             if let avatar = user.avatarUrl {
                                 Text("Avatar: \(avatar)")
                                     .font(.caption)
                             }
                             Text("Provider: \(user.provider ?? "N/A")")
-                            Text("Admin: \(user.admin ? "Yes" : "No")")
                         }
 
-                        Button("Get Current User") {
-                            Task {
-                                await getCurrentUser()
-                            }
-                        }
-                        .disabled(isLoading)
+                        // Note: "Get Current User" endpoint doesn't exist in API yet
+                        // User info is already available from login/signup response
 
                         Button("Logout") {
                             logout()

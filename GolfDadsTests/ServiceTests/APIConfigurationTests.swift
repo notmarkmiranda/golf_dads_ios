@@ -25,35 +25,35 @@ final class APIConfigurationTests: XCTestCase {
 
     func testEndpointPaths() {
         // Authentication endpoints
-        XCTAssertEqual(APIConfiguration.Endpoint.signup.path, "/signup")
-        XCTAssertEqual(APIConfiguration.Endpoint.login.path, "/login")
-        XCTAssertEqual(APIConfiguration.Endpoint.googleSignIn.path, "/auth/google")
-        XCTAssertEqual(APIConfiguration.Endpoint.currentUser.path, "/users/current")
+        XCTAssertEqual(APIConfiguration.Endpoint.signup.path, "/v1/auth/signup")
+        XCTAssertEqual(APIConfiguration.Endpoint.login.path, "/v1/auth/login")
+        XCTAssertEqual(APIConfiguration.Endpoint.googleSignIn.path, "/v1/auth/google")
+        XCTAssertEqual(APIConfiguration.Endpoint.currentUser.path, "/v1/users/current")
 
         // User endpoints
-        XCTAssertEqual(APIConfiguration.Endpoint.users.path, "/users")
-        XCTAssertEqual(APIConfiguration.Endpoint.user(id: 123).path, "/users/123")
+        XCTAssertEqual(APIConfiguration.Endpoint.users.path, "/v1/users")
+        XCTAssertEqual(APIConfiguration.Endpoint.user(id: 123).path, "/v1/users/123")
 
         // Group endpoints
-        XCTAssertEqual(APIConfiguration.Endpoint.groups.path, "/groups")
-        XCTAssertEqual(APIConfiguration.Endpoint.group(id: 456).path, "/groups/456")
-        XCTAssertEqual(APIConfiguration.Endpoint.groupMembers(groupId: 789).path, "/groups/789/members")
-        XCTAssertEqual(APIConfiguration.Endpoint.joinGroup(groupId: 111).path, "/groups/111/join")
-        XCTAssertEqual(APIConfiguration.Endpoint.leaveGroup(groupId: 222).path, "/groups/222/leave")
+        XCTAssertEqual(APIConfiguration.Endpoint.groups.path, "/v1/groups")
+        XCTAssertEqual(APIConfiguration.Endpoint.group(id: 456).path, "/v1/groups/456")
+        XCTAssertEqual(APIConfiguration.Endpoint.groupMembers(groupId: 789).path, "/v1/groups/789/members")
+        XCTAssertEqual(APIConfiguration.Endpoint.joinGroup(groupId: 111).path, "/v1/groups/111/join")
+        XCTAssertEqual(APIConfiguration.Endpoint.leaveGroup(groupId: 222).path, "/v1/groups/222/leave")
 
         // Tee Time Posting endpoints
-        XCTAssertEqual(APIConfiguration.Endpoint.teeTimePostings.path, "/tee_time_postings")
-        XCTAssertEqual(APIConfiguration.Endpoint.teeTimePosting(id: 333).path, "/tee_time_postings/333")
-        XCTAssertEqual(APIConfiguration.Endpoint.myTeeTimePostings.path, "/tee_time_postings/my_postings")
+        XCTAssertEqual(APIConfiguration.Endpoint.teeTimePostings.path, "/v1/tee_time_postings")
+        XCTAssertEqual(APIConfiguration.Endpoint.teeTimePosting(id: 333).path, "/v1/tee_time_postings/333")
+        XCTAssertEqual(APIConfiguration.Endpoint.myTeeTimePostings.path, "/v1/tee_time_postings/my_postings")
         XCTAssertEqual(
             APIConfiguration.Endpoint.groupTeeTimePostings(groupId: 444).path,
-            "/groups/444/tee_time_postings"
+            "/v1/groups/444/tee_time_postings"
         )
 
         // Reservation endpoints
-        XCTAssertEqual(APIConfiguration.Endpoint.reservations.path, "/reservations")
-        XCTAssertEqual(APIConfiguration.Endpoint.reservation(id: 555).path, "/reservations/555")
-        XCTAssertEqual(APIConfiguration.Endpoint.myReservations.path, "/reservations/my_reservations")
+        XCTAssertEqual(APIConfiguration.Endpoint.reservations.path, "/v1/reservations")
+        XCTAssertEqual(APIConfiguration.Endpoint.reservation(id: 555).path, "/v1/reservations/555")
+        XCTAssertEqual(APIConfiguration.Endpoint.myReservations.path, "/v1/reservations/my_reservations")
     }
 
     func testFullURLConstruction() {

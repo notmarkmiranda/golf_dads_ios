@@ -63,7 +63,7 @@ final class AuthenticationServiceTests: XCTestCase {
         XCTAssertEqual(mockKeychainService.getToken(), expectedToken)
 
         // Verify correct endpoint was called
-        XCTAssertEqual(mockNetworkService.lastEndpoint?.path, "/signup")
+        XCTAssertEqual(mockNetworkService.lastEndpoint?.path, "/v1/auth/signup")
         XCTAssertEqual(mockNetworkService.lastMethod, .post)
         XCTAssertEqual(mockNetworkService.lastRequiresAuth, false)
     }
@@ -118,7 +118,7 @@ final class AuthenticationServiceTests: XCTestCase {
         XCTAssertEqual(mockKeychainService.getToken(), expectedToken)
 
         // Verify correct endpoint
-        XCTAssertEqual(mockNetworkService.lastEndpoint?.path, "/login")
+        XCTAssertEqual(mockNetworkService.lastEndpoint?.path, "/v1/auth/login")
         XCTAssertEqual(mockNetworkService.lastMethod, .post)
         XCTAssertEqual(mockNetworkService.lastRequiresAuth, false)
     }
@@ -177,7 +177,7 @@ final class AuthenticationServiceTests: XCTestCase {
         XCTAssertEqual(mockKeychainService.getToken(), expectedToken)
 
         // Verify correct endpoint
-        XCTAssertEqual(mockNetworkService.lastEndpoint?.path, "/auth/google")
+        XCTAssertEqual(mockNetworkService.lastEndpoint?.path, "/v1/auth/google")
         XCTAssertEqual(mockNetworkService.lastMethod, .post)
         XCTAssertEqual(mockNetworkService.lastRequiresAuth, false)
     }
@@ -207,7 +207,7 @@ final class AuthenticationServiceTests: XCTestCase {
         XCTAssertTrue(user.admin)
 
         // Verify correct endpoint
-        XCTAssertEqual(mockNetworkService.lastEndpoint?.path, "/users/current")
+        XCTAssertEqual(mockNetworkService.lastEndpoint?.path, "/v1/users/current")
         XCTAssertEqual(mockNetworkService.lastMethod, .get)
         XCTAssertEqual(mockNetworkService.lastRequiresAuth, true)
     }
