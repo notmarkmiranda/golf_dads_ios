@@ -11,7 +11,9 @@ import SwiftUI
 struct GolfDadsApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            // Temporary: Using TestLoginView for authentication testing
+            // TODO: Replace with proper RootView after Phase 4 is complete
+            TestLoginView()
         }
     }
 }
