@@ -155,16 +155,21 @@ enum APIError: LocalizedError {
             return "No internet connection"
         case .timeout:
             return "Request timed out"
-        case .unauthorized:
-            return "Please log in again"
+        case .unauthorized(let message):
+            return message ?? "Please log in again"
         case .forbidden:
             return "Permission denied"
         case .notFound:
             return "Not found"
-        case .validationError:
+        case .validationError(let errors):
+            if let firstField = errors.keys.first,
+               let firstErrorArray = errors[firstField],
+               let firstError = firstErrorArray.first {
+                return "\(firstField): \(firstError)"
+            }
             return "Please check your input"
-        case .serverError:
-            return "Server error"
+        case .serverError(_, let message):
+            return message ?? "Server error"
         default:
             return "Something went wrong"
         }

@@ -154,16 +154,20 @@ private extension APIConfiguration.Environment {
         switch self {
         case .development:
             // For iOS Simulator, localhost works
-            // For physical device testing, use your Mac's IP address
             #if targetEnvironment(simulator)
             return "http://localhost:3000/api"
             #else
-            // Use ngrok or your Mac's local IP for device testing
-            return "http://192.168.1.100:3000/api" // Change to your Mac's IP
+            // Physical devices default to production for easy testing
+            // To test against local Rails API on your Mac:
+            //   1. Find your Mac's local IP: ifconfig | grep "inet "
+            //   2. Add API_BASE_URL=http://YOUR_IP:3000/api to Development.xcconfig
+            //   3. Rebuild the app
+            // Or use ngrok: ngrok http 3000, then use the ngrok URL
+            return "https://golf-dads-api.onrender.com/api"
             #endif
         case .production:
-            // Update this with your production API URL
-            return "https://your-production-api.onrender.com/api"
+            // Production Render deployment
+            return "https://golf-dads-api.onrender.com/api"
         }
     }
 }

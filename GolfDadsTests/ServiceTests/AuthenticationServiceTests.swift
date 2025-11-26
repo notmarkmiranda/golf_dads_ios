@@ -42,11 +42,10 @@ final class AuthenticationServiceTests: XCTestCase {
             token: expectedToken,
             user: AuthenticatedUser(
                 id: 1,
-                emailAddress: email,
+                email: email,
                 name: name,
                 avatarUrl: nil,
-                provider: "email",
-                admin: false
+                provider: "email"
             )
         )
         mockNetworkService.mockResponse = mockResponse
@@ -56,7 +55,7 @@ final class AuthenticationServiceTests: XCTestCase {
 
         // Then
         XCTAssertEqual(response.token, expectedToken)
-        XCTAssertEqual(response.user.emailAddress, email)
+        XCTAssertEqual(response.user.email, email)
         XCTAssertEqual(response.user.name, name)
 
         // Verify token was saved to keychain
@@ -97,11 +96,10 @@ final class AuthenticationServiceTests: XCTestCase {
             token: expectedToken,
             user: AuthenticatedUser(
                 id: 2,
-                emailAddress: email,
+                email: email,
                 name: "Existing User",
                 avatarUrl: "https://example.com/avatar.jpg",
-                provider: "email",
-                admin: false
+                provider: "email"
             )
         )
         mockNetworkService.mockResponse = mockResponse
@@ -111,7 +109,7 @@ final class AuthenticationServiceTests: XCTestCase {
 
         // Then
         XCTAssertEqual(response.token, expectedToken)
-        XCTAssertEqual(response.user.emailAddress, email)
+        XCTAssertEqual(response.user.email, email)
         XCTAssertEqual(response.user.avatarUrl, "https://example.com/avatar.jpg")
 
         // Verify token was saved
@@ -156,11 +154,10 @@ final class AuthenticationServiceTests: XCTestCase {
             token: expectedToken,
             user: AuthenticatedUser(
                 id: 3,
-                emailAddress: "google@example.com",
+                email: "google@example.com",
                 name: "Google User",
                 avatarUrl: "https://lh3.googleusercontent.com/avatar",
-                provider: "google",
-                admin: false
+                provider: "google"
             )
         )
         mockNetworkService.mockResponse = mockResponse
@@ -190,11 +187,10 @@ final class AuthenticationServiceTests: XCTestCase {
 
         let mockUser = AuthenticatedUser(
             id: 1,
-            emailAddress: "current@example.com",
+            email: "current@example.com",
             name: "Current User",
             avatarUrl: nil,
-            provider: "email",
-            admin: true
+            provider: "email"
         )
         mockNetworkService.mockResponse = mockUser
 
@@ -203,8 +199,7 @@ final class AuthenticationServiceTests: XCTestCase {
 
         // Then
         XCTAssertEqual(user.id, 1)
-        XCTAssertEqual(user.emailAddress, "current@example.com")
-        XCTAssertTrue(user.admin)
+        XCTAssertEqual(user.email, "current@example.com")
 
         // Verify correct endpoint
         XCTAssertEqual(mockNetworkService.lastEndpoint?.path, "/v1/users/current")

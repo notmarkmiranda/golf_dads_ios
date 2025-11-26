@@ -36,6 +36,9 @@ protocol AuthenticationServiceProtocol {
     func googleSignIn(idToken: String) async throws -> AuthenticationResponse
     func getCurrentUser() async throws -> AuthenticatedUser
     func logout() throws
+
+    var isLoggedIn: Bool { get }
+    var currentToken: String? { get }
 }
 
 /// Service for handling user authentication

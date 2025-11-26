@@ -3,7 +3,7 @@
 // Production.xcconfig is gitignored for security
 
 // API Configuration
-API_BASE_URL = https://your-production-api.onrender.com/api
+API_BASE_URL = https://golf-dads-api.onrender.com/api
 
 // Google OAuth Configuration
 // Get your client ID from: https://console.cloud.google.com/apis/credentials
