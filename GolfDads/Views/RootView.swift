@@ -86,14 +86,11 @@ struct MainTabView: View {
                 Label("Groups", systemImage: "person.3.fill")
             }
 
-            // Tee Times Tab
-            NavigationView {
-                Text("Tee Times")
-                    .navigationTitle("Tee Times")
-            }
-            .tabItem {
-                Label("Tee Times", systemImage: "calendar")
-            }
+            // Browse Tab
+            BrowseView()
+                .tabItem {
+                    Label("Browse", systemImage: "flag")
+                }
 
             // Profile Tab
             NavigationView {
