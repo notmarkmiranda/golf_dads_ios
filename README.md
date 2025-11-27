@@ -84,12 +84,19 @@ This iOS app allows golfers to:
 
 **Phase 5: Main Features - IN PROGRESS**
 - ✅ TeeTimeService - Complete service for tee time CRUD operations
+- ✅ ReservationService - Complete service for reservation management
 - ✅ BrowseView - Browse and discover public tee time postings
   - Loading, error, and empty states
   - Pull-to-refresh functionality
   - Course info, date/time, available spots
   - Public/private and past indicators
-- ⏳ TeeTimeDetailView - View and reserve specific tee times
+  - Navigation to detail view
+- ✅ TeeTimeDetailView - View and reserve specific tee times
+  - Detailed information display
+  - Spot picker (1-4 spots)
+  - Reserve button with loading/success states
+  - Smart handling of past/full tee times
+  - Success alert with auto-dismiss
 - ⏳ Create tee time posting flow
 - ⏳ User's tee time postings management
 - ⏳ Groups features
@@ -133,6 +140,15 @@ This iOS app allows golfers to:
   - Loading, error, and empty states
   - Course name, date/time, available spots
   - Public/private and past indicators
+  - Tap to view details
+- **Tee Time Details & Reservations** - Complete booking flow
+  - Full tee time information display
+  - Visual indicators for status (public/private, past)
+  - Spot picker with segmented control (1-4 spots)
+  - Reserve button with loading states
+  - Success confirmation with alert
+  - Smart handling of edge cases (past tee times, fully booked)
+  - Tested and working with production API ✅
 - User profile display with name and email
 - Logout functionality
 
