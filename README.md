@@ -37,17 +37,17 @@ This iOS app allows golfers to:
 
 ## 📊 Project Status
 
-**Phase 4 of 6: Authentication UI - Complete!**
+**Phase 5 of 6: Main Features - In Progress!**
 
 ### Progress Overview
 - ✅ **Phase 1:** Project Setup & Configuration (6/6 steps) - **100% Complete**
 - ✅ **Phase 2:** Core Services & Authentication (10/10 steps) - **100% Complete**
-- ✅ **Phase 3:** Models & API Client (4/8 steps) - **50% Complete**
-- ✅ **Phase 4:** Authentication Flows (4/8 steps) - **50% Complete** ← Current
-- 💡 **Phase 5:** Main Features (0/10 steps)
+- ✅ **Phase 3:** Models & API Client (6/8 steps) - **75% Complete**
+- ✅ **Phase 4:** Authentication Flows (4/8 steps) - **50% Complete**
+- 🚧 **Phase 5:** Main Features (1/10 steps) - **10% Complete** ← Current
 - 💡 **Phase 6:** Polish & App Store (0/3 steps)
 
-**Total Progress: 24/45 steps (53% complete)**
+**Total Progress: 27/45 steps (60% complete)**
 
 ### ✅ Completed Features
 
@@ -67,17 +67,33 @@ This iOS app allows golfers to:
 - ✅ AuthenticationService - API authentication endpoints
 - ✅ AuthenticationManager - @Observable state management for SwiftUI
 
-**Phase 3: Models - IN PROGRESS**
+**Phase 3: Models - MOSTLY COMPLETE**
 - ✅ AuthenticatedUser - User model with Codable
-- ⏳ TeeTime model
-- ⏳ Group model
-- ⏳ Reservation model
+- ✅ TeeTimePosting - Tee time posting model with computed properties
+- ✅ Group - Golf group model
+- ✅ Reservation - Reservation model
+- ✅ Automatic snake_case ↔ camelCase conversion
+- ✅ ISO8601 date encoding/decoding
 
-**Phase 4: Authentication UI - IN PROGRESS**
+**Phase 4: Authentication UI - COMPLETE**
 - ✅ WelcomeView - Golf-themed landing screen with branding
 - ✅ LoginView - Email/password authentication with validation
 - ✅ SignUpView - User registration with real-time validation
 - ✅ RootView - Root navigation managing auth state
+- ✅ MainTabView - Tab-based navigation for main app
+
+**Phase 5: Main Features - IN PROGRESS**
+- ✅ TeeTimeService - Complete service for tee time CRUD operations
+- ✅ BrowseView - Browse and discover public tee time postings
+  - Loading, error, and empty states
+  - Pull-to-refresh functionality
+  - Course info, date/time, available spots
+  - Public/private and past indicators
+- ⏳ TeeTimeDetailView - View and reserve specific tee times
+- ⏳ Create tee time posting flow
+- ⏳ User's tee time postings management
+- ⏳ Groups features
+- ⏳ Profile management
 - ⏳ Google Sign-In integration
 - ⏳ Password reset flow
 - ⏳ Email verification
@@ -85,13 +101,16 @@ This iOS app allows golfers to:
 
 ### 🧪 Test Results
 
-**64/64 tests passing** (100%)
+**90/90 tests passing** (100%)
 
 - ✅ APIConfigurationTests: 7/7 passing
 - ✅ KeychainServiceTests: 16/16 passing
 - ✅ NetworkServiceTests: 15/15 passing
 - ✅ AuthenticationServiceTests: 11/11 passing
 - ✅ AuthenticationManagerTests: 15/15 passing
+- ✅ GroupTests: 8/8 passing
+- ✅ TeeTimePostingTests: 11/11 passing
+- ✅ ReservationTests: 7/7 passing
 
 ### 🎨 Current UI Features
 
@@ -106,9 +125,15 @@ This iOS app allows golfers to:
 - Secure token storage in Keychain
 - Persistent login sessions
 
-**Main App (Placeholder):**
-- Tab bar navigation: Home, Groups, Tee Times, Profile
-- User profile display
+**Main App Features:**
+- Tab bar navigation: Home, Groups, Browse, Profile
+- **Browse Tee Times** - Discover and view public tee time postings
+  - Real-time data from production API
+  - Pull-to-refresh functionality
+  - Loading, error, and empty states
+  - Course name, date/time, available spots
+  - Public/private and past indicators
+- User profile display with name and email
 - Logout functionality
 
 ## 🚀 Getting Started
