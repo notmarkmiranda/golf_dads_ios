@@ -40,7 +40,7 @@ class TeeTimeService: TeeTimeServiceProtocol {
             endpoint: .teeTimePostings,
             method: .get,
             body: nil as String?,
-            requiresAuth: false
+            requiresAuth: true
         )
     }
 
@@ -50,7 +50,7 @@ class TeeTimeService: TeeTimeServiceProtocol {
             endpoint: .teeTimePosting(id: id),
             method: .get,
             body: nil as String?,
-            requiresAuth: false
+            requiresAuth: true
         )
     }
 
