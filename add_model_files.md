@@ -1,79 +1,87 @@
-# Add Model Files to Xcode
+# ✅ COMPLETE - Model Files Added and Tested
 
-## ✅ MODELS CREATED
+## Models Successfully Created
 
-### New Model Files
+### Model Files (All Working ✅)
 
 1. **Group.swift**
    - Path: `GolfDads/Models/Group.swift`
    - Represents golf groups that users can join
    - Fields: id, name, description, ownerId, createdAt, updatedAt
+   - Status: ✅ 8/8 tests passing
 
 2. **TeeTimePosting.swift**
    - Path: `GolfDads/Models/TeeTimePosting.swift`
    - Represents tee time postings that users can browse and reserve
    - Fields: id, userId, groupId, teeTime, courseName, availableSpots, totalSpots, notes, createdAt, updatedAt
    - Computed properties: isPublic, isPast
+   - Status: ✅ 11/11 tests passing
 
 3. **Reservation.swift**
    - Path: `GolfDads/Models/Reservation.swift`
    - Represents user reservations for tee time postings
    - Fields: id, userId, teeTimePostingId, spotsReserved, createdAt, updatedAt
+   - Status: ✅ 7/7 tests passing
 
-### New Test Files
+### Test Files (All Passing ✅)
 
-1. **GroupTests.swift**
-   - Path: `GolfDadsTests/ModelTests/GroupTests.swift`
-   - 8 tests covering Codable, Equatable, Identifiable
+1. **GroupTests.swift** - 8 tests covering Codable, Equatable, Identifiable
+2. **TeeTimePostingTests.swift** - 11 tests covering Codable, computed properties, Equatable, Identifiable
+3. **ReservationTests.swift** - 7 tests covering Codable, Equatable, Identifiable
 
-2. **TeeTimePostingTests.swift**
-   - Path: `GolfDadsTests/ModelTests/TeeTimePostingTests.swift`
-   - 11 tests covering Codable, computed properties, Equatable, Identifiable
+## Final Test Results ✅
 
-3. **ReservationTests.swift**
-   - Path: `GolfDadsTests/ModelTests/ReservationTests.swift`
-   - 7 tests covering Codable, Equatable, Identifiable
+**90/90 tests passing (100%)**
 
-## Steps to Add to Xcode
+- GroupTests: 8/8 ✅
+- TeeTimePostingTests: 11/11 ✅
+- ReservationTests: 7/7 ✅
+- All existing tests: 64/64 ✅
 
-1. **Add Model Files:**
-   - Right-click "Models" group in Xcode
-   - "Add Files to GolfDads..."
-   - Select all 3 model files: Group.swift, TeeTimePosting.swift, Reservation.swift
-   - **Uncheck "Copy items if needed"**
-   - Select target: GolfDads
-   - Click "Add"
+## Implementation Notes
 
-2. **Add Test Files:**
-   - Right-click "GolfDadsTests/ModelTests" group (create if doesn't exist)
-   - "Add Files to GolfDads..."
-   - Select all 3 test files: GroupTests.swift, TeeTimePostingTests.swift, ReservationTests.swift
-   - **Uncheck "Copy items if needed"**
-   - Select target: GolfDadsTests
-   - Click "Add"
-
-3. **Run Tests:**
-   - Press Cmd+U to run all tests
-   - Verify all new model tests pass (26 new tests)
-
-## Model Features
-
-### All Models Include:
-- ✅ Codable conformance with snake_case to camelCase conversion
+### Key Features Implemented:
+- ✅ Automatic snake_case ↔ camelCase conversion via decoder/encoder strategies
+- ✅ ISO8601 date encoding/decoding
 - ✅ Identifiable conformance for SwiftUI lists
 - ✅ Equatable and Hashable conformance
-- ✅ Proper date parsing (ISO8601)
-- ✅ Comprehensive test coverage
+- ✅ Computed properties (isPublic, isPast) for TeeTimePosting
+- ✅ Full test coverage
 
-### TeeTimePosting Extras:
-- `isPublic` computed property - true when not restricted to a group
-- `isPast` computed property - true when tee time is in the past
+### Bug Fixes Applied:
+1. **SwiftUI.Group Conflict**: Fixed naming conflict between our Group model and SwiftUI's Group by using fully qualified name `SwiftUI.Group` in RootView
+2. **JSON Decoding**: Removed manual CodingKeys enums to allow decoder's `.convertFromSnakeCase` strategy to work automatically
 
-## Expected Test Results
+### Usage Example:
 
-After adding files and running tests:
-- **GroupTests**: 8 passing tests
-- **TeeTimePostingTests**: 11 passing tests
-- **ReservationTests**: 7 passing tests
-- **Total new tests**: 26 tests
-- **Total project tests**: 90 tests (64 existing + 26 new)
+```swift
+// Decoding from API
+let decoder = JSONDecoder()
+decoder.keyDecodingStrategy = .convertFromSnakeCase
+decoder.dateDecodingStrategy = .iso8601
+
+let groups = try decoder.decode([Group].self, from: jsonData)
+let postings = try decoder.decode([TeeTimePosting].self, from: jsonData)
+let reservations = try decoder.decode([Reservation].self, from: jsonData)
+
+// Using computed properties
+if posting.isPublic {
+    print("Public posting available to everyone")
+}
+
+if !posting.isPast {
+    print("Tee time is still upcoming")
+}
+```
+
+## Phase 3 Status: 75% Complete
+
+- ✅ Group model
+- ✅ TeeTimePosting model
+- ✅ Reservation model
+- ✅ AuthenticatedUser model (from previous session)
+- ⏳ API DTOs (if needed)
+- ⏳ APIClient service (if needed)
+- ⏳ Mock data for SwiftUI previews
+
+Ready to proceed to Phase 5: Main Features!
