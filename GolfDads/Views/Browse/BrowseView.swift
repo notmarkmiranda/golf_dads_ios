@@ -59,7 +59,9 @@ struct BrowseView: View {
                     .padding()
                 } else {
                     List(teeTimePostings) { posting in
-                        TeeTimePostingRow(posting: posting)
+                        NavigationLink(destination: TeeTimeDetailView(posting: posting)) {
+                            TeeTimePostingRow(posting: posting)
+                        }
                     }
                     .listStyle(.insetGrouped)
                     .refreshable {
