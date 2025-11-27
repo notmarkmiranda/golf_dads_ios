@@ -19,19 +19,6 @@ struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
     let createdAt: Date
     let updatedAt: Date
 
-    enum CodingKeys: String, CodingKey {
-        case id
-        case userId = "user_id"
-        case groupId = "group_id"
-        case teeTime = "tee_time"
-        case courseName = "course_name"
-        case availableSpots = "available_spots"
-        case totalSpots = "total_spots"
-        case notes
-        case createdAt = "created_at"
-        case updatedAt = "updated_at"
-    }
-
     // MARK: - Computed Properties
 
     /// Returns true if this is a public posting (not restricted to a group)

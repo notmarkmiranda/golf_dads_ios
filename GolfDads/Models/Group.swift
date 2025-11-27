@@ -14,13 +14,4 @@ struct Group: Codable, Identifiable, Equatable, Hashable {
     let ownerId: Int
     let createdAt: Date
     let updatedAt: Date
-
-    enum CodingKeys: String, CodingKey {
-        case id
-        case name
-        case description
-        case ownerId = "owner_id"
-        case createdAt = "created_at"
-        case updatedAt = "updated_at"
-    }
 }
