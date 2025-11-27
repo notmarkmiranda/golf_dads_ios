@@ -97,8 +97,21 @@ This iOS app allows golfers to:
   - Reserve button with loading/success states
   - Smart handling of past/full tee times
   - Success alert with auto-dismiss
-- ⏳ Create tee time posting flow
-- ⏳ User's tee time postings management
+- ✅ CreateTeeTimeView - Create new tee time postings
+  - Course name and tee time selection
+  - Available/total spots pickers
+  - Public/private visibility toggle
+  - Optional notes field
+  - Form validation and error handling
+  - Success confirmation with auto-dismiss
+- ✅ MyTeeTimesView - Manage user's tee time postings
+  - Display all user's postings
+  - Loading, error, and empty states
+  - Pull-to-refresh functionality
+  - Swipe-to-delete with confirmation
+  - Navigation to detail view
+  - Create button in toolbar
+  - Auto-refresh after creating new posting
 - ⏳ Groups features
 - ⏳ Profile management
 - ⏳ Google Sign-In integration
@@ -133,7 +146,23 @@ This iOS app allows golfers to:
 - Persistent login sessions
 
 **Main App Features:**
-- Tab bar navigation: Home, Groups, Browse, Profile
+- Tab bar navigation: My Tee Times, Groups, Browse, Profile
+- **My Tee Times** - Create and manage your tee time postings
+  - View all your posted tee times
+  - Create new tee time postings with form
+  - Swipe-to-delete with confirmation
+  - Pull-to-refresh functionality
+  - Loading, error, and empty states
+  - Auto-refresh after creating
+- **Create Tee Time** - Post new tee times
+  - Course name input with auto-capitalization
+  - Date/time picker for tee time
+  - Available spots picker (1-4)
+  - Optional total spots picker
+  - Public/private visibility toggle
+  - Optional notes field (multiline)
+  - Form validation
+  - Success confirmation with auto-dismiss
 - **Browse Tee Times** - Discover and view public tee time postings
   - Real-time data from production API
   - Pull-to-refresh functionality

@@ -45,37 +45,11 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
-            // Home Tab
-            NavigationView {
-                VStack(spacing: 20) {
-                    Text("Welcome to Golf Dads!")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-
-                    if let user = authManager.currentUser {
-                        Text("Hello, \(user.name)!")
-                            .font(.title2)
-                        Text(user.email)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-
-                    Spacer()
-
-                    Button("Logout") {
-                        Task {
-                            await authManager.logout()
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.red)
+            // Home Tab - My Tee Times
+            MyTeeTimesView()
+                .tabItem {
+                    Label("My Tee Times", systemImage: "calendar")
                 }
-                .padding()
-                .navigationTitle("Home")
-            }
-            .tabItem {
-                Label("Home", systemImage: "house.fill")
-            }
 
             // Groups Tab
             NavigationView {
