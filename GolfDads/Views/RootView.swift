@@ -14,7 +14,7 @@ struct RootView: View {
     @State private var showSignUp = false
 
     var body: some View {
-        Group {
+        SwiftUI.Group {
             if authManager.isAuthenticated {
                 // Main app content (for now, show a placeholder)
                 MainTabView(authManager: authManager)
