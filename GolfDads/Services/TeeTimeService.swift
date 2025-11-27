@@ -36,42 +36,66 @@ class TeeTimeService: TeeTimeServiceProtocol {
 
     /// Fetch all public tee time postings
     func getTeeTimePostings() async throws -> [TeeTimePosting] {
-        return try await networkService.request(
+        struct Response: Codable {
+            let teeTimePostings: [TeeTimePosting]
+        }
+
+        let response: Response = try await networkService.request(
             endpoint: .teeTimePostings,
             method: .get,
             body: nil as String?,
             requiresAuth: true
         )
+
+        return response.teeTimePostings
     }
 
     /// Fetch a specific tee time posting by ID
     func getTeeTimePosting(id: Int) async throws -> TeeTimePosting {
-        return try await networkService.request(
+        struct Response: Codable {
+            let teeTimePosting: TeeTimePosting
+        }
+
+        let response: Response = try await networkService.request(
             endpoint: .teeTimePosting(id: id),
             method: .get,
             body: nil as String?,
             requiresAuth: true
         )
+
+        return response.teeTimePosting
     }
 
     /// Fetch current user's tee time postings
     func getMyTeeTimePostings() async throws -> [TeeTimePosting] {
-        return try await networkService.request(
+        struct Response: Codable {
+            let teeTimePostings: [TeeTimePosting]
+        }
+
+        let response: Response = try await networkService.request(
             endpoint: .myTeeTimePostings,
             method: .get,
             body: nil as String?,
             requiresAuth: true
         )
+
+        return response.teeTimePostings
     }
 
     /// Fetch tee time postings for a specific group
     func getGroupTeeTimePostings(groupId: Int) async throws -> [TeeTimePosting] {
-        return try await networkService.request(
+        struct Response: Codable {
+            let teeTimePostings: [TeeTimePosting]
+        }
+
+        let response: Response = try await networkService.request(
             endpoint: .groupTeeTimePostings(groupId: groupId),
             method: .get,
             body: nil as String?,
             requiresAuth: true
         )
+
+        return response.teeTimePostings
     }
 
     /// Create a new tee time posting
@@ -107,12 +131,18 @@ class TeeTimeService: TeeTimeServiceProtocol {
             )
         )
 
-        return try await networkService.request(
+        struct Response: Codable {
+            let teeTimePosting: TeeTimePosting
+        }
+
+        let response: Response = try await networkService.request(
             endpoint: .teeTimePostings,
             method: .post,
             body: body,
             requiresAuth: true
         )
+
+        return response.teeTimePosting
     }
 
     /// Update available spots for a tee time posting
@@ -129,12 +159,18 @@ class TeeTimeService: TeeTimeServiceProtocol {
             teeTimePosting: .init(availableSpots: availableSpots)
         )
 
-        return try await networkService.request(
+        struct Response: Codable {
+            let teeTimePosting: TeeTimePosting
+        }
+
+        let response: Response = try await networkService.request(
             endpoint: .teeTimePosting(id: id),
             method: .patch,
             body: body,
             requiresAuth: true
         )
+
+        return response.teeTimePosting
     }
 
     /// Delete a tee time posting
