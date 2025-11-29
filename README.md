@@ -66,6 +66,7 @@ This iOS app allows golfers to:
 - ✅ NetworkService - HTTP client with URLSession
 - ✅ AuthenticationService - API authentication endpoints
 - ✅ AuthenticationManager - @Observable state management for SwiftUI
+- ✅ GroupInvitationService - Service for managing group invitations (send, accept, reject)
 
 **Phase 3: Models - MOSTLY COMPLETE**
 - ✅ AuthenticatedUser - User model with Codable
@@ -122,7 +123,7 @@ This iOS app allows golfers to:
 
 ### 🧪 Test Results
 
-**100/100 tests passing** (100%)
+**112/112 tests passing** (100%)
 
 - ✅ APIConfigurationTests: 7/7 passing
 - ✅ KeychainServiceTests: 16/16 passing
@@ -131,6 +132,7 @@ This iOS app allows golfers to:
 - ✅ AuthenticationManagerTests: 15/15 passing
 - ✅ GroupTests: 8/8 passing
 - ✅ GroupInvitationTests: 10/10 passing
+- ✅ GroupInvitationServiceTests: 12/12 passing
 - ✅ TeeTimePostingTests: 11/11 passing
 - ✅ ReservationTests: 7/7 passing
 
