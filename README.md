@@ -71,6 +71,7 @@ This iOS app allows golfers to:
 - ✅ AuthenticatedUser - User model with Codable
 - ✅ TeeTimePosting - Tee time posting model with computed properties
 - ✅ Group - Golf group model
+- ✅ GroupInvitation - Group invitation model with status enum (pending/accepted/rejected)
 - ✅ Reservation - Reservation model
 - ✅ Automatic snake_case ↔ camelCase conversion
 - ✅ ISO8601 date encoding/decoding
@@ -121,7 +122,7 @@ This iOS app allows golfers to:
 
 ### 🧪 Test Results
 
-**90/90 tests passing** (100%)
+**100/100 tests passing** (100%)
 
 - ✅ APIConfigurationTests: 7/7 passing
 - ✅ KeychainServiceTests: 16/16 passing
@@ -129,6 +130,7 @@ This iOS app allows golfers to:
 - ✅ AuthenticationServiceTests: 11/11 passing
 - ✅ AuthenticationManagerTests: 15/15 passing
 - ✅ GroupTests: 8/8 passing
+- ✅ GroupInvitationTests: 10/10 passing
 - ✅ TeeTimePostingTests: 11/11 passing
 - ✅ ReservationTests: 7/7 passing
 

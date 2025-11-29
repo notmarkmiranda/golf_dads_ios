@@ -93,6 +93,14 @@ struct APIConfiguration {
         case reservation(id: Int)
         case myReservations
 
+        // Group Invitations
+        case groupInvitations
+        case groupInvitation(id: Int)
+        case groupInvitationsList(groupId: Int)
+        case createGroupInvitation(groupId: Int)
+        case acceptInvitation(id: Int)
+        case rejectInvitation(id: Int)
+
         var path: String {
             switch self {
             // Authentication
@@ -122,6 +130,14 @@ struct APIConfiguration {
             case .reservations: return "/v1/reservations"
             case .reservation(let id): return "/v1/reservations/\(id)"
             case .myReservations: return "/v1/reservations/my_reservations"
+
+            // Group Invitations
+            case .groupInvitations: return "/v1/group_invitations"
+            case .groupInvitation(let id): return "/v1/group_invitations/\(id)"
+            case .groupInvitationsList(let groupId): return "/v1/groups/\(groupId)/invitations"
+            case .createGroupInvitation(let groupId): return "/v1/groups/\(groupId)/invitations"
+            case .acceptInvitation(let id): return "/v1/group_invitations/\(id)/accept"
+            case .rejectInvitation(let id): return "/v1/group_invitations/\(id)/reject"
             }
         }
 
