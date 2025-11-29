@@ -114,7 +114,15 @@ This iOS app allows golfers to:
   - Navigation to detail view
   - Create button in toolbar
   - Auto-refresh after creating new posting
-- ⏳ Groups features
+- ✅ Group Invitations - Complete invitation management system
+  - InvitationsView - View and manage pending invitations
+  - SendInvitationView - Send invitations by email
+  - Accept/Reject invitation buttons with loading states
+  - Success confirmations and error handling
+  - GroupDetailView integration with "Invite Members" button
+  - Loading, error, and empty states
+  - Pull-to-refresh functionality
+- ⏳ Groups features (additional features)
 - ⏳ Profile management
 - ⏳ Google Sign-In integration
 - ⏳ Password reset flow
