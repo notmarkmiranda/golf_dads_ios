@@ -67,19 +67,27 @@ class TeeTimeService: TeeTimeServiceProtocol {
     }
 
     /// Fetch current user's tee time postings
+    /// Note: The Rails API doesn't have a dedicated endpoint for user's postings,
+    /// so we fetch all postings and filter by user_id client-side
     func getMyTeeTimePostings() async throws -> [TeeTimePosting] {
-        struct Response: Codable {
-            let teeTimePostings: [TeeTimePosting]
+        // Get the current user's ID from keychain
+        let keychainService = KeychainService()
+        guard let token = keychainService.getToken() else {
+            throw APIError.unauthorized(message: "No authentication token found")
         }
 
-        let response: Response = try await networkService.request(
-            endpoint: .myTeeTimePostings,
-            method: .get,
-            body: nil as String?,
-            requiresAuth: true
-        )
+        // Decode JWT to get user_id (basic JWT decode without verification)
+        let parts = token.components(separatedBy: ".")
+        guard parts.count == 3,
+              let payloadData = Data(base64Encoded: parts[1].base64PaddedString()),
+              let payload = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any],
+              let userId = payload["user_id"] as? Int else {
+            throw APIError.unauthorized(message: "Invalid authentication token")
+        }
 
-        return response.teeTimePostings
+        // Fetch all tee time postings and filter by current user
+        let allPostings = try await getTeeTimePostings()
+        return allPostings.filter { $0.userId == userId }
     }
 
     /// Fetch tee time postings for a specific group
@@ -187,3 +195,22 @@ class TeeTimeService: TeeTimeServiceProtocol {
 // MARK: - Empty Response
 
 private struct EmptyResponse: Codable {}
+
+// MARK: - Base64 Helper
+
+private extension String {
+    /// Adds padding to base64url string to make it valid base64
+    func base64PaddedString() -> String {
+        var base64 = self
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+
+        let remainder = base64.count % 4
+        if remainder > 0 {
+            base64 = base64.padding(toLength: base64.count + 4 - remainder,
+                                    withPad: "=",
+                                    startingAt: 0)
+        }
+        return base64
+    }
+}

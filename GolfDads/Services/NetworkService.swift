@@ -187,7 +187,14 @@ class NetworkService: NetworkServiceProtocol {
 
         // 2xx status codes are success
         guard (200...299).contains(httpResponse.statusCode) else {
-            throw APIError.from(statusCode: httpResponse.statusCode, data: data)
+            let error = APIError.from(statusCode: httpResponse.statusCode, data: data)
+
+            // Post notification if unauthorized (token expired)
+            if case .unauthorized = error {
+                NotificationCenter.default.post(name: .unauthorizedErrorOccurred, object: nil)
+            }
+
+            throw error
         }
     }
 

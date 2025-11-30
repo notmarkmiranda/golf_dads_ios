@@ -31,12 +31,30 @@ class AuthenticationManager {
     // MARK: - Private Properties
 
     private let authService: AuthenticationServiceProtocol
+    private nonisolated(unsafe) var unauthorizedObserver: NSObjectProtocol?
 
     // MARK: - Initialization
 
     init(authService: AuthenticationServiceProtocol = AuthenticationService()) {
         self.authService = authService
         self.isAuthenticated = authService.isLoggedIn
+
+        // Listen for unauthorized errors (expired JWT)
+        unauthorizedObserver = NotificationCenter.default.addObserver(
+            forName: .unauthorizedErrorOccurred,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                await self?.handleUnauthorizedError()
+            }
+        }
+    }
+
+    deinit {
+        if let observer = unauthorizedObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
 
     // MARK: - Sign Up
@@ -152,6 +170,12 @@ class AuthenticationManager {
     }
 
     // MARK: - Private Helpers
+
+    /// Handle unauthorized errors by automatically logging out
+    private func handleUnauthorizedError() async {
+        print("🔒 JWT token expired - logging out automatically")
+        await logout()
+    }
 
     /// Convert errors to user-friendly messages
     private func handleError(_ error: Error) -> String {

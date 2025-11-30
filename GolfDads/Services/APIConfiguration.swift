@@ -81,6 +81,8 @@ struct APIConfiguration {
         case groupMembers(groupId: Int)
         case joinGroup(groupId: Int)
         case leaveGroup(groupId: Int)
+        case regenerateInviteCode(groupId: Int)
+        case joinWithInviteCode
 
         // Tee Time Postings
         case teeTimePostings
@@ -92,14 +94,6 @@ struct APIConfiguration {
         case reservations
         case reservation(id: Int)
         case myReservations
-
-        // Group Invitations
-        case groupInvitations
-        case groupInvitation(id: Int)
-        case groupInvitationsList(groupId: Int)
-        case createGroupInvitation(groupId: Int)
-        case acceptInvitation(id: Int)
-        case rejectInvitation(id: Int)
 
         var path: String {
             switch self {
@@ -119,6 +113,8 @@ struct APIConfiguration {
             case .groupMembers(let groupId): return "/v1/groups/\(groupId)/members"
             case .joinGroup(let groupId): return "/v1/groups/\(groupId)/join"
             case .leaveGroup(let groupId): return "/v1/groups/\(groupId)/leave"
+            case .regenerateInviteCode(let groupId): return "/v1/groups/\(groupId)/regenerate_code"
+            case .joinWithInviteCode: return "/v1/groups/join_with_code"
 
             // Tee Time Postings
             case .teeTimePostings: return "/v1/tee_time_postings"
@@ -130,14 +126,6 @@ struct APIConfiguration {
             case .reservations: return "/v1/reservations"
             case .reservation(let id): return "/v1/reservations/\(id)"
             case .myReservations: return "/v1/reservations/my_reservations"
-
-            // Group Invitations
-            case .groupInvitations: return "/v1/group_invitations"
-            case .groupInvitation(let id): return "/v1/group_invitations/\(id)"
-            case .groupInvitationsList(let groupId): return "/v1/groups/\(groupId)/invitations"
-            case .createGroupInvitation(let groupId): return "/v1/groups/\(groupId)/invitations"
-            case .acceptInvitation(let id): return "/v1/group_invitations/\(id)/accept"
-            case .rejectInvitation(let id): return "/v1/group_invitations/\(id)/reject"
             }
         }
 

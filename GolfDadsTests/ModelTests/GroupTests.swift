@@ -20,6 +20,7 @@ final class GroupTests: XCTestCase {
             "name": "Weekend Warriors",
             "description": "Golf every Saturday morning",
             "owner_id": 42,
+            "invite_code": "ABC12XYZ",
             "created_at": "2024-01-15T10:30:00Z",
             "updated_at": "2024-01-15T10:30:00Z"
         }
@@ -37,6 +38,7 @@ final class GroupTests: XCTestCase {
         XCTAssertEqual(group.name, "Weekend Warriors")
         XCTAssertEqual(group.description, "Golf every Saturday morning")
         XCTAssertEqual(group.ownerId, 42)
+        XCTAssertEqual(group.inviteCode, "ABC12XYZ")
         XCTAssertNotNil(group.createdAt)
         XCTAssertNotNil(group.updatedAt)
     }
@@ -49,6 +51,7 @@ final class GroupTests: XCTestCase {
             "name": "Morning Group",
             "description": null,
             "owner_id": 10,
+            "invite_code": "MORNING1",
             "created_at": "2024-01-15T10:30:00Z",
             "updated_at": "2024-01-15T10:30:00Z"
         }
@@ -77,6 +80,7 @@ final class GroupTests: XCTestCase {
                 "name": "Group One",
                 "description": "First group",
                 "owner_id": 1,
+                "invite_code": "GROUP001",
                 "created_at": "2024-01-15T10:30:00Z",
                 "updated_at": "2024-01-15T10:30:00Z"
             },
@@ -85,6 +89,7 @@ final class GroupTests: XCTestCase {
                 "name": "Group Two",
                 "description": null,
                 "owner_id": 2,
+                "invite_code": "GROUP002",
                 "created_at": "2024-01-16T10:30:00Z",
                 "updated_at": "2024-01-16T10:30:00Z"
             }
@@ -113,6 +118,7 @@ final class GroupTests: XCTestCase {
             name: "Test Group",
             description: "Test description",
             ownerId: 42,
+            inviteCode: "TEST1234",
             createdAt: Date(timeIntervalSince1970: 1705315800), // 2024-01-15T10:30:00Z
             updatedAt: Date(timeIntervalSince1970: 1705315800)
         )
@@ -139,6 +145,7 @@ final class GroupTests: XCTestCase {
             name: "Test Group",
             description: nil,
             ownerId: 42,
+            inviteCode: "TEST1234",
             createdAt: Date(),
             updatedAt: Date()
         )
@@ -165,6 +172,7 @@ final class GroupTests: XCTestCase {
             name: "Test Group",
             description: "Description",
             ownerId: 42,
+            inviteCode: "CODE1234",
             createdAt: date,
             updatedAt: date
         )
@@ -174,6 +182,7 @@ final class GroupTests: XCTestCase {
             name: "Test Group",
             description: "Description",
             ownerId: 42,
+            inviteCode: "CODE1234",
             createdAt: date,
             updatedAt: date
         )
@@ -183,6 +192,7 @@ final class GroupTests: XCTestCase {
             name: "Different Group",
             description: "Description",
             ownerId: 42,
+            inviteCode: "CODE5678",
             createdAt: date,
             updatedAt: date
         )
@@ -201,6 +211,7 @@ final class GroupTests: XCTestCase {
             name: "Test Group",
             description: nil,
             ownerId: 1,
+            inviteCode: "CODE123",
             createdAt: Date(),
             updatedAt: Date()
         )

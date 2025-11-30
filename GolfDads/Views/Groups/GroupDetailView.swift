@@ -16,7 +16,7 @@ struct GroupDetailView: View {
     @State private var teeTimePostings: [TeeTimePosting] = []
     @State private var isLoadingPostings = false
     @State private var errorMessage: String?
-    @State private var showInviteSheet = false
+    @State private var showCopiedMessage = false
 
     private let teeTimeService: TeeTimeServiceProtocol
 
@@ -50,6 +50,43 @@ struct GroupDetailView: View {
                 Text("About")
             }
 
+            // Invite Code Section
+            Section {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(group.inviteCode)
+                            .font(.system(.title2, design: .monospaced))
+                            .fontWeight(.semibold)
+
+                        if showCopiedMessage {
+                            Text("Copied!")
+                                .font(.caption)
+                                .foregroundStyle(.green)
+                        }
+                    }
+
+                    Spacer()
+
+                    Button {
+                        copyInviteCode()
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                            .labelStyle(.iconOnly)
+                    }
+                    .buttonStyle(.borderless)
+
+                    ShareLink(item: group.inviteCode) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                            .labelStyle(.iconOnly)
+                    }
+                    .buttonStyle(.borderless)
+                }
+            } header: {
+                Text("Invite Code")
+            } footer: {
+                Text("Share this code with others to invite them to the group")
+            }
+
             // Tee Time Postings Section
             Section {
                 if isLoadingPostings {
@@ -81,18 +118,6 @@ struct GroupDetailView: View {
         }
         .navigationTitle(group.name)
         .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    showInviteSheet = true
-                } label: {
-                    Label("Invite Members", systemImage: "person.badge.plus")
-                }
-            }
-        }
-        .sheet(isPresented: $showInviteSheet) {
-            SendInvitationView(group: group)
-        }
         .navigationDestination(for: TeeTimePosting.self) { posting in
             TeeTimeDetailView(posting: posting)
         }
@@ -129,6 +154,16 @@ struct GroupDetailView: View {
 
         isLoadingPostings = false
     }
+
+    private func copyInviteCode() {
+        UIPasteboard.general.string = group.inviteCode
+        showCopiedMessage = true
+
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            showCopiedMessage = false
+        }
+    }
 }
 
 // MARK: - Preview
@@ -141,6 +176,7 @@ struct GroupDetailView: View {
                 name: "Weekend Warriors",
                 description: "Saturday morning golf group",
                 ownerId: 1,
+                inviteCode: "ABC12XYZ",
                 createdAt: Date(),
                 updatedAt: Date()
             )

@@ -52,13 +52,10 @@ struct MainTabView: View {
                 }
 
             // Groups Tab
-            NavigationView {
-                Text("Groups")
-                    .navigationTitle("Groups")
-            }
-            .tabItem {
-                Label("Groups", systemImage: "person.3.fill")
-            }
+            GroupsView()
+                .tabItem {
+                    Label("Groups", systemImage: "person.3.fill")
+                }
 
             // Browse Tab
             BrowseView()
