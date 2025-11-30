@@ -136,14 +136,8 @@ struct GroupDetailView: View {
         errorMessage = nil
 
         do {
-            // Filter tee time postings for this group
-            let allPostings = try await teeTimeService.getTeeTimePostings()
-            teeTimePostings = allPostings.filter { posting in
-                // Check if the posting belongs to this group
-                // Note: This assumes TeeTimePosting has a groupIds property
-                // If not available, we'll need to update the model
-                true // Placeholder - will need to be updated based on API response
-            }
+            // Fetch tee time postings for this specific group
+            teeTimePostings = try await teeTimeService.getGroupTeeTimePostings(groupId: group.id)
         } catch {
             if let apiError = error as? APIError {
                 errorMessage = apiError.userMessage
