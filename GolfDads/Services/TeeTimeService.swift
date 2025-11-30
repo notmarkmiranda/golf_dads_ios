@@ -18,7 +18,7 @@ protocol TeeTimeServiceProtocol {
         availableSpots: Int,
         totalSpots: Int?,
         notes: String?,
-        groupId: Int?
+        groupIds: [Int]
     ) async throws -> TeeTimePosting
     func updateTeeTimePosting(id: Int, availableSpots: Int) async throws -> TeeTimePosting
     func deleteTeeTimePosting(id: Int) async throws
@@ -113,7 +113,7 @@ class TeeTimeService: TeeTimeServiceProtocol {
         availableSpots: Int,
         totalSpots: Int? = nil,
         notes: String? = nil,
-        groupId: Int? = nil
+        groupIds: [Int] = []
     ) async throws -> TeeTimePosting {
         struct TeeTimePostingRequest: Encodable {
             let teeTimePosting: TeeTimePostingData
@@ -124,7 +124,7 @@ class TeeTimeService: TeeTimeServiceProtocol {
                 let availableSpots: Int
                 let totalSpots: Int?
                 let notes: String?
-                let groupId: Int?
+                let groupIds: [Int]
             }
         }
 
@@ -135,7 +135,7 @@ class TeeTimeService: TeeTimeServiceProtocol {
                 availableSpots: availableSpots,
                 totalSpots: totalSpots,
                 notes: notes,
-                groupId: groupId
+                groupIds: groupIds
             )
         )
 

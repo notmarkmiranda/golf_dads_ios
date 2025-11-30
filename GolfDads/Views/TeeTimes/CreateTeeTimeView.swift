@@ -18,15 +18,23 @@ struct CreateTeeTimeView: View {
     @State private var notes: String = ""
     @State private var isPublic: Bool = true
     @State private var includeTotalSpots: Bool = true
+    @State private var selectedGroupIds: Set<Int> = []
+    @State private var availableGroups: [Group] = []
+    @State private var isLoadingGroups = false
 
     @State private var isCreating = false
     @State private var errorMessage: String?
     @State private var showSuccessAlert = false
 
     private let teeTimeService: TeeTimeServiceProtocol
+    private let groupService: GroupServiceProtocol
 
-    init(teeTimeService: TeeTimeServiceProtocol = TeeTimeService()) {
+    init(
+        teeTimeService: TeeTimeServiceProtocol = TeeTimeService(),
+        groupService: GroupServiceProtocol = GroupService()
+    ) {
         self.teeTimeService = teeTimeService
+        self.groupService = groupService
     }
 
     var body: some View {
@@ -67,11 +75,11 @@ struct CreateTeeTimeView: View {
                 }
 
                 // Visibility
-                Section("Visibility") {
+                Section {
                     Picker("Who can see this?", selection: $isPublic) {
                         Label("Public", systemImage: "globe")
                             .tag(true)
-                        Label("Private Group", systemImage: "lock.fill")
+                        Label("Private Groups", systemImage: "lock.fill")
                             .tag(false)
                     }
                     .pickerStyle(.segmented)
@@ -81,10 +89,51 @@ struct CreateTeeTimeView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                     } else {
-                        Text("Only group members can see this (group selection coming soon)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        if isLoadingGroups {
+                            ProgressView()
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        } else if availableGroups.isEmpty {
+                            Text("You don't have any groups yet. Create or join a group first.")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                        } else {
+                            ForEach(availableGroups) { group in
+                                HStack {
+                                    Button {
+                                        toggleGroupSelection(group.id)
+                                    } label: {
+                                        HStack {
+                                            Image(systemName: selectedGroupIds.contains(group.id) ? "checkmark.circle.fill" : "circle")
+                                                .foregroundColor(selectedGroupIds.contains(group.id) ? .blue : .gray)
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text(group.name)
+                                                    .foregroundColor(.primary)
+                                                if let description = group.description {
+                                                    Text(description)
+                                                        .font(.caption)
+                                                        .foregroundColor(.secondary)
+                                                }
+                                            }
+                                            Spacer()
+                                        }
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+
+                            if selectedGroupIds.isEmpty {
+                                Text("Select at least one group")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                            } else {
+                                Text("Selected \(selectedGroupIds.count) \(selectedGroupIds.count == 1 ? "group" : "groups")")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
                     }
+                } header: {
+                    Text("Visibility")
                 }
 
                 // Notes
@@ -140,29 +189,60 @@ struct CreateTeeTimeView: View {
             } message: {
                 Text("Your tee time at \(courseName) has been posted.")
             }
+            .task {
+                await loadGroups()
+            }
+            .onChange(of: isPublic) { _, newValue in
+                if !newValue {
+                    Task {
+                        await loadGroups()
+                    }
+                }
+            }
         }
     }
 
     // MARK: - Validation
 
     private var isFormValid: Bool {
-        !courseName.trimmingCharacters(in: .whitespaces).isEmpty
+        let hasCourseName = !courseName.trimmingCharacters(in: .whitespaces).isEmpty
+        let hasValidVisibility = isPublic || !selectedGroupIds.isEmpty
+        return hasCourseName && hasValidVisibility
     }
 
     // MARK: - Private Methods
+
+    private func loadGroups() async {
+        isLoadingGroups = true
+        do {
+            availableGroups = try await groupService.getGroups()
+        } catch {
+            // Silently fail - user will see empty state
+        }
+        isLoadingGroups = false
+    }
+
+    private func toggleGroupSelection(_ groupId: Int) {
+        if selectedGroupIds.contains(groupId) {
+            selectedGroupIds.remove(groupId)
+        } else {
+            selectedGroupIds.insert(groupId)
+        }
+    }
 
     private func createTeeTime() async {
         isCreating = true
         errorMessage = nil
 
         do {
+            let groupIds = isPublic ? [] : Array(selectedGroupIds)
             let _ = try await teeTimeService.createTeeTimePosting(
                 courseName: courseName.trimmingCharacters(in: .whitespaces),
                 teeTime: teeTime,
                 availableSpots: availableSpots,
                 totalSpots: includeTotalSpots ? totalSpots : nil,
                 notes: notes.trimmingCharacters(in: .whitespaces).isEmpty ? nil : notes.trimmingCharacters(in: .whitespaces),
-                groupId: nil // TODO: Add group selection
+                groupIds: groupIds
             )
             showSuccessAlert = true
         } catch {
