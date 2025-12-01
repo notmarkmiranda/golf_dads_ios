@@ -20,6 +20,7 @@ struct GroupDetailView: View {
     @State private var showRegenerateConfirmation = false
     @State private var isRegenerating = false
     @State private var regenerateErrorMessage: String?
+    @State private var showCreateTeeTime = false
 
     private let teeTimeService: TeeTimeServiceProtocol
     private let groupService: GroupServiceProtocol
@@ -159,7 +160,16 @@ struct GroupDetailView: View {
                     }
                 }
             } header: {
-                Text("Tee Times")
+                HStack {
+                    Text("Tee Times")
+                    Spacer()
+                    Button {
+                        showCreateTeeTime = true
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                    }
+                    .buttonStyle(.borderless)
+                }
             }
         }
         .navigationTitle(group.name)
@@ -186,6 +196,14 @@ struct GroupDetailView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("This will invalidate the current code. Anyone with the old code will no longer be able to join the group.")
+        }
+        .sheet(isPresented: $showCreateTeeTime) {
+            CreateTeeTimeView()
+                .onDisappear {
+                    Task {
+                        await loadGroupPostings()
+                    }
+                }
         }
     }
 
