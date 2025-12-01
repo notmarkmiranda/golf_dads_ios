@@ -108,6 +108,42 @@ struct TeeTimeDetailView: View {
                     }
                 }
 
+                // Reservations Section (only visible to posting owner)
+                if let reservations = posting.reservations, !reservations.isEmpty {
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("Reservations", systemImage: "person.2.fill")
+                            .font(.headline)
+
+                        ForEach(reservations) { reservation in
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(reservation.userEmail)
+                                        .font(.body)
+                                    Text("Reserved \(reservation.createdAt, style: .relative) ago")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+
+                                Spacer()
+
+                                Text("\(reservation.spotsReserved) \(reservation.spotsReserved == 1 ? "spot" : "spots")")
+                                    .font(.subheadline)
+                                    .foregroundColor(.blue)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(Color.blue.opacity(0.1))
+                                    .cornerRadius(8)
+                            }
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background(Color.secondary.opacity(0.05))
+                            .cornerRadius(8)
+                        }
+                    }
+                }
+
                 // Reservation Section
                 if !posting.isPast && posting.availableSpots > 0 {
                     Divider()

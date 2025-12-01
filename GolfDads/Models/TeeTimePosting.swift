@@ -7,6 +7,14 @@
 
 import Foundation
 
+/// Represents a reservation on a tee time posting (only visible to posting owner)
+struct ReservationInfo: Codable, Identifiable, Equatable, Hashable {
+    let id: Int
+    let userEmail: String
+    let spotsReserved: Int
+    let createdAt: Date
+}
+
 struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
     let id: Int
     let userId: Int
@@ -16,6 +24,7 @@ struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
     let availableSpots: Int
     let totalSpots: Int?
     let notes: String?
+    let reservations: [ReservationInfo]?  // Only present if user is posting owner
     let createdAt: Date
     let updatedAt: Date
 
@@ -32,6 +41,7 @@ struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
         availableSpots = try container.decode(Int.self, forKey: .availableSpots)
         totalSpots = try container.decodeIfPresent(Int.self, forKey: .totalSpots)
         notes = try container.decodeIfPresent(String.self, forKey: .notes)
+        reservations = try container.decodeIfPresent([ReservationInfo].self, forKey: .reservations)
         createdAt = try container.decode(Date.self, forKey: .createdAt)
         updatedAt = try container.decode(Date.self, forKey: .updatedAt)
     }
@@ -47,6 +57,7 @@ struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
         availableSpots: Int,
         totalSpots: Int?,
         notes: String?,
+        reservations: [ReservationInfo]? = nil,
         createdAt: Date,
         updatedAt: Date
     ) {
@@ -58,6 +69,7 @@ struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
         self.availableSpots = availableSpots
         self.totalSpots = totalSpots
         self.notes = notes
+        self.reservations = reservations
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
