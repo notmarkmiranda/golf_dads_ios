@@ -56,6 +56,25 @@ struct GroupDetailView: View {
                 Text("About")
             }
 
+            // Members Section
+            Section {
+                if group.memberNames.isEmpty {
+                    Text("No members yet")
+                        .foregroundStyle(.secondary)
+                        .font(.caption)
+                } else {
+                    ForEach(group.memberNames, id: \.self) { memberName in
+                        HStack {
+                            Image(systemName: "person.circle.fill")
+                                .foregroundStyle(.blue)
+                            Text(memberName)
+                        }
+                    }
+                }
+            } header: {
+                Text("Members (\(group.memberNames.count))")
+            }
+
             // Invite Code Section
             Section {
                 HStack {
@@ -241,6 +260,7 @@ struct GroupDetailView: View {
                 description: "Saturday morning golf group",
                 ownerId: 1,
                 inviteCode: "ABC12XYZ",
+                memberNames: ["john@example.com", "jane@example.com", "bob@example.com"],
                 createdAt: Date(),
                 updatedAt: Date()
             )

@@ -13,6 +13,7 @@ struct Group: Codable, Identifiable, Equatable, Hashable {
     let description: String?
     let ownerId: Int
     let inviteCode: String
+    let memberNames: [String]
     let createdAt: Date
     let updatedAt: Date
 }

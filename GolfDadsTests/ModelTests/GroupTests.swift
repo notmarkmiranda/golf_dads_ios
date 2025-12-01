@@ -21,6 +21,7 @@ final class GroupTests: XCTestCase {
             "description": "Golf every Saturday morning",
             "owner_id": 42,
             "invite_code": "ABC12XYZ",
+            "member_names": ["john@example.com", "jane@example.com"],
             "created_at": "2024-01-15T10:30:00Z",
             "updated_at": "2024-01-15T10:30:00Z"
         }
@@ -39,6 +40,7 @@ final class GroupTests: XCTestCase {
         XCTAssertEqual(group.description, "Golf every Saturday morning")
         XCTAssertEqual(group.ownerId, 42)
         XCTAssertEqual(group.inviteCode, "ABC12XYZ")
+        XCTAssertEqual(group.memberNames, ["john@example.com", "jane@example.com"])
         XCTAssertNotNil(group.createdAt)
         XCTAssertNotNil(group.updatedAt)
     }
@@ -52,6 +54,7 @@ final class GroupTests: XCTestCase {
             "description": null,
             "owner_id": 10,
             "invite_code": "MORNING1",
+            "member_names": [],
             "created_at": "2024-01-15T10:30:00Z",
             "updated_at": "2024-01-15T10:30:00Z"
         }
@@ -69,6 +72,7 @@ final class GroupTests: XCTestCase {
         XCTAssertEqual(group.name, "Morning Group")
         XCTAssertNil(group.description)
         XCTAssertEqual(group.ownerId, 10)
+        XCTAssertEqual(group.memberNames, [])
     }
 
     func testDecodeGroupArray() throws {
@@ -81,6 +85,7 @@ final class GroupTests: XCTestCase {
                 "description": "First group",
                 "owner_id": 1,
                 "invite_code": "GROUP001",
+                "member_names": ["user1@example.com"],
                 "created_at": "2024-01-15T10:30:00Z",
                 "updated_at": "2024-01-15T10:30:00Z"
             },
@@ -90,6 +95,7 @@ final class GroupTests: XCTestCase {
                 "description": null,
                 "owner_id": 2,
                 "invite_code": "GROUP002",
+                "member_names": [],
                 "created_at": "2024-01-16T10:30:00Z",
                 "updated_at": "2024-01-16T10:30:00Z"
             }
@@ -119,6 +125,7 @@ final class GroupTests: XCTestCase {
             description: "Test description",
             ownerId: 42,
             inviteCode: "TEST1234",
+            memberNames: ["test@example.com"],
             createdAt: Date(timeIntervalSince1970: 1705315800), // 2024-01-15T10:30:00Z
             updatedAt: Date(timeIntervalSince1970: 1705315800)
         )
@@ -146,6 +153,7 @@ final class GroupTests: XCTestCase {
             description: nil,
             ownerId: 42,
             inviteCode: "TEST1234",
+            memberNames: [],
             createdAt: Date(),
             updatedAt: Date()
         )
@@ -173,6 +181,7 @@ final class GroupTests: XCTestCase {
             description: "Description",
             ownerId: 42,
             inviteCode: "CODE1234",
+            memberNames: ["user@example.com"],
             createdAt: date,
             updatedAt: date
         )
@@ -183,6 +192,7 @@ final class GroupTests: XCTestCase {
             description: "Description",
             ownerId: 42,
             inviteCode: "CODE1234",
+            memberNames: ["user@example.com"],
             createdAt: date,
             updatedAt: date
         )
@@ -193,6 +203,7 @@ final class GroupTests: XCTestCase {
             description: "Description",
             ownerId: 42,
             inviteCode: "CODE5678",
+            memberNames: [],
             createdAt: date,
             updatedAt: date
         )
@@ -212,6 +223,7 @@ final class GroupTests: XCTestCase {
             description: nil,
             ownerId: 1,
             inviteCode: "CODE123",
+            memberNames: [],
             createdAt: Date(),
             updatedAt: Date()
         )
