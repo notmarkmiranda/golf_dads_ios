@@ -163,7 +163,7 @@ struct GroupDetailView: View {
             }
         }
         .navigationTitle(group.name)
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: TeeTimePosting.self) { posting in
             TeeTimeDetailView(posting: posting)
         }
