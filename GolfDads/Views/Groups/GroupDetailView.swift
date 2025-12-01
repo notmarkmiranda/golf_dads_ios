@@ -42,7 +42,7 @@ struct GroupDetailView: View {
     var body: some View {
         List {
             // Group Info Section
-            Section {
+            DisclosureGroup("About") {
                 VStack(alignment: .leading, spacing: 8) {
                     if let description = group.description {
                         Text(description)
@@ -53,16 +53,16 @@ struct GroupDetailView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-            } header: {
-                Text("About")
+                .padding(.vertical, 8)
             }
 
             // Members Section
-            Section {
+            DisclosureGroup("Members (\(group.memberNames.count))") {
                 if group.memberNames.isEmpty {
                     Text("No members yet")
                         .foregroundStyle(.secondary)
                         .font(.caption)
+                        .padding(.vertical, 8)
                 } else {
                     ForEach(group.memberNames, id: \.self) { memberName in
                         HStack {
@@ -70,10 +70,9 @@ struct GroupDetailView: View {
                                 .foregroundStyle(.blue)
                             Text(memberName)
                         }
+                        .padding(.vertical, 4)
                     }
                 }
-            } header: {
-                Text("Members (\(group.memberNames.count))")
             }
 
             // Invite Code Section
