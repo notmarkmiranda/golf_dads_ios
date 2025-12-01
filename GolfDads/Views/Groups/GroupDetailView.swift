@@ -11,23 +11,29 @@ struct GroupDetailView: View {
 
     // MARK: - Properties
 
-    let group: Group
+    @State private var group: Group
 
     @State private var teeTimePostings: [TeeTimePosting] = []
     @State private var isLoadingPostings = false
     @State private var errorMessage: String?
     @State private var showCopiedMessage = false
+    @State private var showRegenerateConfirmation = false
+    @State private var isRegenerating = false
+    @State private var regenerateErrorMessage: String?
 
     private let teeTimeService: TeeTimeServiceProtocol
+    private let groupService: GroupServiceProtocol
 
     // MARK: - Initialization
 
     init(
         group: Group,
-        teeTimeService: TeeTimeServiceProtocol = TeeTimeService()
+        teeTimeService: TeeTimeServiceProtocol = TeeTimeService(),
+        groupService: GroupServiceProtocol = GroupService()
     ) {
-        self.group = group
+        self._group = State(initialValue: group)
         self.teeTimeService = teeTimeService
+        self.groupService = groupService
     }
 
     // MARK: - Body
@@ -63,6 +69,12 @@ struct GroupDetailView: View {
                                 .font(.caption)
                                 .foregroundStyle(.green)
                         }
+
+                        if let errorMsg = regenerateErrorMessage {
+                            Text(errorMsg)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                        }
                     }
 
                     Spacer()
@@ -80,6 +92,21 @@ struct GroupDetailView: View {
                             .labelStyle(.iconOnly)
                     }
                     .buttonStyle(.borderless)
+
+                    Button {
+                        showRegenerateConfirmation = true
+                    } label: {
+                        if isRegenerating {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .controlSize(.small)
+                        } else {
+                            Label("Regenerate", systemImage: "arrow.clockwise")
+                                .labelStyle(.iconOnly)
+                        }
+                    }
+                    .buttonStyle(.borderless)
+                    .disabled(isRegenerating)
                 }
             } header: {
                 Text("Invite Code")
@@ -127,6 +154,20 @@ struct GroupDetailView: View {
         .task {
             await loadGroupPostings()
         }
+        .confirmationDialog(
+            "Regenerate Invite Code?",
+            isPresented: $showRegenerateConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Regenerate", role: .destructive) {
+                Task {
+                    await regenerateInviteCode()
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will invalidate the current code. Anyone with the old code will no longer be able to join the group.")
+        }
     }
 
     // MARK: - Methods
@@ -157,6 +198,35 @@ struct GroupDetailView: View {
             try? await Task.sleep(for: .seconds(2))
             showCopiedMessage = false
         }
+    }
+
+    private func regenerateInviteCode() async {
+        isRegenerating = true
+        regenerateErrorMessage = nil
+
+        do {
+            // Call the service to regenerate the invite code
+            let updatedGroup = try await groupService.regenerateInviteCode(groupId: group.id)
+
+            // Update the local group state with the new invite code
+            group = updatedGroup
+
+        } catch {
+            // Show error message
+            if let apiError = error as? APIError {
+                regenerateErrorMessage = apiError.userMessage
+            } else {
+                regenerateErrorMessage = "Failed to regenerate code"
+            }
+
+            // Clear error message after 3 seconds
+            Task {
+                try? await Task.sleep(for: .seconds(3))
+                regenerateErrorMessage = nil
+            }
+        }
+
+        isRegenerating = false
     }
 }
 

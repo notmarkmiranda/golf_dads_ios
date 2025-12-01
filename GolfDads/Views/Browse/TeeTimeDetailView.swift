@@ -227,7 +227,7 @@ struct TeeTimeDetailView: View {
             posting: TeeTimePosting(
                 id: 1,
                 userId: 1,
-                groupId: nil,
+                groupIds: [],
                 teeTime: Date().addingTimeInterval(86400),
                 courseName: "Pebble Beach Golf Links",
                 availableSpots: 2,
