@@ -99,6 +99,8 @@ This iOS app allows golfers to:
   - Reserve button with loading/success states
   - Smart handling of past/full tee times
   - Success alert with auto-dismiss
+  - Reservation details for posting owners (email, spots reserved, time)
+  - Privacy-preserved: only owners see reservation details
 - ✅ CreateTeeTimeView - Create new tee time postings
   - Course name and tee time selection
   - Available/total spots pickers
@@ -131,7 +133,7 @@ This iOS app allows golfers to:
 
 ### 🧪 Test Results
 
-**112/112 tests passing** (100%)
+**114/114 tests passing** (100%)
 
 - ✅ APIConfigurationTests: 7/7 passing
 - ✅ KeychainServiceTests: 16/16 passing
@@ -141,7 +143,7 @@ This iOS app allows golfers to:
 - ✅ GroupTests: 8/8 passing
 - ✅ GroupInvitationTests: 10/10 passing
 - ✅ GroupInvitationServiceTests: 12/12 passing
-- ✅ TeeTimePostingTests: 11/11 passing
+- ✅ TeeTimePostingTests: 12/12 passing (includes reservation decoding tests)
 - ✅ ReservationTests: 7/7 passing
 
 ### 🎨 Current UI Features
@@ -189,6 +191,11 @@ This iOS app allows golfers to:
   - Reserve button with loading states
   - Success confirmation with alert
   - Smart handling of edge cases (past tee times, fully booked)
+  - Reservation management for posting owners:
+    - View who reserved spots (email address)
+    - See number of spots each person reserved
+    - View reservation timestamps
+    - Privacy preserved: only owners see reservation details
   - Tested and working with production API ✅
 - User profile display with name and email
 - Logout functionality
