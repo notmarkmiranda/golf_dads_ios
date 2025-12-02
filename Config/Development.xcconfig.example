@@ -7,7 +7,8 @@ API_BASE_URL = http:/​/localhost:3000/api
 
 // Google OAuth Configuration
 // Get your client ID from: https://console.cloud.google.com/apis/credentials
-GOOGLE_CLIENT_ID = your-dev-client-id.apps.googleusercontent.com
+// iOS Client ID (use this one)
+GOOGLE_CLIENT_ID = 714139606616-6h0ah0ri87a6kb2p2a5lnqg7p690q3id.apps.googleusercontent.com
 
 // Bundle Identifier for Development
 DEVELOPMENT_BUNDLE_ID = com.golfdads.GolfDads.dev
