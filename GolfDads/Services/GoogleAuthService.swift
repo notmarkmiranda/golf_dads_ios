@@ -19,7 +19,7 @@ final class GoogleAuthService: GoogleAuthServiceProtocol {
 
     private let clientID: String
 
-    init(clientID: String = APIConfiguration.shared.googleClientID) {
+    init(clientID: String = APIConfiguration.googleClientID) {
         self.clientID = clientID
     }
 
@@ -29,7 +29,7 @@ final class GoogleAuthService: GoogleAuthServiceProtocol {
     func signIn() async throws -> String {
         guard let windowScene = await UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let rootViewController = await windowScene.windows.first?.rootViewController else {
-            throw APIError.custom(message: "Unable to find root view controller")
+            throw APIError.googleSignInFailed(reason: "Unable to find root view controller")
         }
 
         let config = GIDConfiguration(clientID: clientID)
@@ -41,7 +41,7 @@ final class GoogleAuthService: GoogleAuthServiceProtocol {
             )
 
             guard let idToken = result.user.idToken?.tokenString else {
-                throw APIError.custom(message: "Failed to get ID token from Google")
+                throw APIError.googleSignInFailed(reason: "Failed to get ID token from Google")
             }
 
             return idToken
@@ -50,15 +50,15 @@ final class GoogleAuthService: GoogleAuthServiceProtocol {
             if let gidError = error as? GIDSignInError {
                 switch gidError.code {
                 case .canceled:
-                    throw APIError.custom(message: "Sign in canceled")
+                    throw APIError.googleSignInFailed(reason: "Sign in canceled")
                 case .hasNoAuthInKeychain:
-                    throw APIError.custom(message: "No auth in keychain")
+                    throw APIError.googleSignInFailed(reason: "No auth in keychain")
                 default:
-                    throw APIError.custom(message: "Google Sign-In failed: \(gidError.localizedDescription)")
+                    throw APIError.googleSignInFailed(reason: gidError.localizedDescription)
                 }
             }
 
-            throw APIError.custom(message: "Google Sign-In failed: \(error.localizedDescription)")
+            throw APIError.googleSignInFailed(reason: error.localizedDescription)
         }
     }
 

@@ -215,8 +215,23 @@ struct LoginView: View {
     }
 
     private func handleGoogleSignIn() {
-        // TODO: Implement Google Sign-In
-        print("Google Sign-In tapped")
+        authManager.clearError()
+
+        Task {
+            do {
+                // Create Google Auth Service
+                let googleAuthService = GoogleAuthService()
+
+                // Get ID token from Google
+                let idToken = try await googleAuthService.signIn()
+
+                // Send to backend via AuthenticationManager
+                await authManager.googleSignIn(idToken: idToken)
+            } catch {
+                // Error handling is done in AuthenticationManager
+                print("Google Sign-In error: \(error.localizedDescription)")
+            }
+        }
     }
 }
 

@@ -39,9 +39,22 @@
 		334FF9462ED5196F00C5EE18 /* GolfDadsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GolfDadsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		335B5DA02EDE9EF800C7FD9C /* Exceptions for "GolfDads" folder in "GolfDads" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 334FF92E2ED5196D00C5EE18 /* GolfDads */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		334FF9312ED5196D00C5EE18 /* GolfDads */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				335B5DA02EDE9EF800C7FD9C /* Exceptions for "GolfDads" folder in "GolfDads" target */,
+			);
 			path = GolfDads;
 			sourceTree = "<group>";
 		};
@@ -430,6 +443,7 @@
 				DEVELOPMENT_TEAM = 4XQSAD3UT9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GolfDads/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -462,6 +476,7 @@
 				DEVELOPMENT_TEAM = 4XQSAD3UT9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GolfDads/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

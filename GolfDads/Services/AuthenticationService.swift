@@ -18,6 +18,8 @@ struct AuthenticatedUser: Codable {
     let name: String
     let avatarUrl: String?
     let provider: String?
+    let venmoHandle: String?
+    let handicap: Double?
 
     // Custom decoding key mapping
     enum CodingKeys: String, CodingKey {
@@ -26,6 +28,8 @@ struct AuthenticatedUser: Codable {
         case name
         case avatarUrl = "avatar_url"
         case provider
+        case venmoHandle = "venmo_handle"
+        case handicap
     }
 }
 
