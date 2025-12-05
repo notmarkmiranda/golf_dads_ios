@@ -54,13 +54,19 @@ struct AuthenticatedUser: Codable {
         provider = try container.decodeIfPresent(String.self, forKey: .provider)
         venmoHandle = try container.decodeIfPresent(String.self, forKey: .venmoHandle)
 
+        print("🔍 Decoding user: \(email)")
+        print("   venmoHandle: \(venmoHandle ?? "nil")")
+
         // Handle handicap as either Double or String (Rails returns it as string)
         if let handicapDouble = try? container.decodeIfPresent(Double.self, forKey: .handicap) {
             handicap = handicapDouble
+            print("   handicap (as Double): \(handicapDouble)")
         } else if let handicapString = try? container.decodeIfPresent(String.self, forKey: .handicap) {
             handicap = Double(handicapString)
+            print("   handicap (from String): \(String(describing: handicap))")
         } else {
             handicap = nil
+            print("   handicap: nil")
         }
     }
 }
