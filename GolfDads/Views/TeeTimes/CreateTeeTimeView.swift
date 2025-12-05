@@ -13,11 +13,10 @@ struct CreateTeeTimeView: View {
 
     @State private var courseName: String = ""
     @State private var teeTime: Date = Date().addingTimeInterval(86400) // Default to tomorrow
-    @State private var availableSpots: Int = 1
     @State private var totalSpots: Int = 4
+    @State private var reserveForMyself: Int = 0
     @State private var notes: String = ""
     @State private var isPublic: Bool = true
-    @State private var includeTotalSpots: Bool = true
     @State private var selectedGroupIds: Set<Int> = []
     @State private var availableGroups: [Group] = []
     @State private var isLoadingGroups = false
@@ -55,22 +54,29 @@ struct CreateTeeTimeView: View {
 
                 // Availability
                 Section("Availability") {
-                    Picker("Available Spots", selection: $availableSpots) {
+                    Picker("Total Spots", selection: $totalSpots) {
                         ForEach(1...4, id: \.self) { count in
                             Text("\(count) \(count == 1 ? "spot" : "spots")")
                                 .tag(count)
                         }
                     }
 
-                    Toggle("Include Total Spots", isOn: $includeTotalSpots)
-
-                    if includeTotalSpots {
-                        Picker("Total Spots", selection: $totalSpots) {
-                            ForEach(availableSpots...4, id: \.self) { count in
-                                Text("\(count) \(count == 1 ? "spot" : "spots")")
-                                    .tag(count)
-                            }
+                    Picker("Reserve for myself", selection: $reserveForMyself) {
+                        Text("None").tag(0)
+                        ForEach(1...min(totalSpots, 3), id: \.self) { count in
+                            Text("\(count) \(count == 1 ? "spot" : "spots")")
+                                .tag(count)
                         }
+                    }
+
+                    if reserveForMyself > 0 {
+                        Text("\(totalSpots - reserveForMyself) \(totalSpots - reserveForMyself == 1 ? "spot" : "spots") will be available for others")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } else {
+                        Text("All \(totalSpots) \(totalSpots == 1 ? "spot" : "spots") will be available for others")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
 
@@ -239,8 +245,8 @@ struct CreateTeeTimeView: View {
             let _ = try await teeTimeService.createTeeTimePosting(
                 courseName: courseName.trimmingCharacters(in: .whitespaces),
                 teeTime: teeTime,
-                availableSpots: availableSpots,
-                totalSpots: includeTotalSpots ? totalSpots : nil,
+                totalSpots: totalSpots,
+                initialReservationSpots: reserveForMyself > 0 ? reserveForMyself : nil,
                 notes: notes.trimmingCharacters(in: .whitespaces).isEmpty ? nil : notes.trimmingCharacters(in: .whitespaces),
                 groupIds: groupIds
             )

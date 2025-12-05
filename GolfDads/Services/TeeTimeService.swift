@@ -15,8 +15,8 @@ protocol TeeTimeServiceProtocol {
     func createTeeTimePosting(
         courseName: String,
         teeTime: Date,
-        availableSpots: Int,
-        totalSpots: Int?,
+        totalSpots: Int,
+        initialReservationSpots: Int?,
         notes: String?,
         groupIds: [Int]
     ) async throws -> TeeTimePosting
@@ -110,19 +110,19 @@ class TeeTimeService: TeeTimeServiceProtocol {
     func createTeeTimePosting(
         courseName: String,
         teeTime: Date,
-        availableSpots: Int,
-        totalSpots: Int? = nil,
+        totalSpots: Int,
+        initialReservationSpots: Int? = nil,
         notes: String? = nil,
         groupIds: [Int] = []
     ) async throws -> TeeTimePosting {
         struct TeeTimePostingRequest: Encodable {
             let teeTimePosting: TeeTimePostingData
+            let initialReservationSpots: Int?
 
             struct TeeTimePostingData: Encodable {
                 let courseName: String
                 let teeTime: Date
-                let availableSpots: Int
-                let totalSpots: Int?
+                let totalSpots: Int
                 let notes: String?
                 let groupIds: [Int]
             }
@@ -132,11 +132,11 @@ class TeeTimeService: TeeTimeServiceProtocol {
             teeTimePosting: .init(
                 courseName: courseName,
                 teeTime: teeTime,
-                availableSpots: availableSpots,
                 totalSpots: totalSpots,
                 notes: notes,
                 groupIds: groupIds
-            )
+            ),
+            initialReservationSpots: initialReservationSpots
         )
 
         struct Response: Codable {
