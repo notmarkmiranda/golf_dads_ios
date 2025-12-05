@@ -139,7 +139,7 @@ class ReservationService: ReservationServiceProtocol {
 
     /// Delete a reservation
     func deleteReservation(id: Int) async throws {
-        let _: EmptyResponse = try await networkService.request(
+        try await networkService.request(
             endpoint: .reservation(id: id),
             method: .delete,
             body: nil as String?,
@@ -147,7 +147,3 @@ class ReservationService: ReservationServiceProtocol {
         )
     }
 }
-
-// MARK: - Empty Response
-
-private struct EmptyResponse: Codable {}
