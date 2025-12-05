@@ -393,6 +393,15 @@ struct TeeTimeDetailView: View {
             myExistingReservation = nil
             spotsToReserve = 1
             showSuccessAlert = true
+        } catch let error as APIError {
+            // If the reservation is already gone (404), treat it as success
+            if case .notFound = error {
+                myExistingReservation = nil
+                spotsToReserve = 1
+                showSuccessAlert = true
+            } else {
+                reservationError = "Failed to cancel reservation: \(error.localizedDescription)"
+            }
         } catch {
             reservationError = "Failed to cancel reservation: \(error.localizedDescription)"
         }
