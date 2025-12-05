@@ -21,14 +21,14 @@ struct AuthenticatedUser: Codable {
     let venmoHandle: String?
     let handicap: Double?
 
-    // Custom decoding key mapping
+    // CodingKeys - no need for explicit mapping since NetworkService uses .convertFromSnakeCase
     enum CodingKeys: String, CodingKey {
         case id
         case email
         case name
-        case avatarUrl = "avatar_url"
+        case avatarUrl
         case provider
-        case venmoHandle = "venmo_handle"
+        case venmoHandle
         case handicap
     }
 
