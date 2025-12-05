@@ -9,10 +9,12 @@ import SwiftUI
 
 struct TeeTimeDetailView: View {
 
-    let posting: TeeTimePosting
+    let initialPosting: TeeTimePosting
 
+    @State private var posting: TeeTimePosting
     @State private var spotsToReserve: Int = 1
     @State private var isReserving = false
+    @State private var isLoadingPosting = false
     @State private var reservationError: String?
     @State private var showSuccessAlert = false
     @State private var successMessage: String = ""
@@ -21,14 +23,18 @@ struct TeeTimeDetailView: View {
     @Environment(\.dismiss) private var dismiss
 
     private let reservationService: ReservationServiceProtocol
+    private let teeTimeService: TeeTimeServiceProtocol
     @State private var currentUserId: Int?
 
     init(
         posting: TeeTimePosting,
-        reservationService: ReservationServiceProtocol = ReservationService()
+        reservationService: ReservationServiceProtocol = ReservationService(),
+        teeTimeService: TeeTimeServiceProtocol = TeeTimeService()
     ) {
-        self.posting = posting
+        self.initialPosting = posting
+        self._posting = State(initialValue: posting)
         self.reservationService = reservationService
+        self.teeTimeService = teeTimeService
     }
 
     // Check if current user has an existing reservation
@@ -286,6 +292,7 @@ struct TeeTimeDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadCurrentUserId()
+            await refreshPosting()
             loadExistingReservation()
         }
         .alert("Success!", isPresented: $showSuccessAlert) {
@@ -320,6 +327,23 @@ struct TeeTimeDetailView: View {
 
         currentUserId = userId
         print("   ✅ Current user ID set to: \(userId)")
+    }
+
+    private func refreshPosting() async {
+        print("🔄 Refreshing posting data...")
+        isLoadingPosting = true
+
+        do {
+            // Fetch the latest posting data from the API, which includes reservation info
+            let freshPosting = try await teeTimeService.getTeeTimePosting(id: posting.id)
+            posting = freshPosting
+            print("   ✅ Posting refreshed with \(freshPosting.reservations?.count ?? 0) reservations")
+        } catch {
+            print("   ⚠️ Failed to refresh posting: \(error)")
+            // Continue with stale data rather than blocking the user
+        }
+
+        isLoadingPosting = false
     }
 
     private func loadExistingReservation() {
