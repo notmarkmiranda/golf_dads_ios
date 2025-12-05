@@ -12,7 +12,6 @@ struct BrowseView: View {
     @State private var teeTimePostings: [TeeTimePosting] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
-    @State private var currentUserId: Int?
 
     private let teeTimeService: TeeTimeServiceProtocol
 
@@ -23,9 +22,7 @@ struct BrowseView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                if currentUserId == nil {
-                    ProgressView("Loading...")
-                } else if isLoading {
+                if isLoading {
                     ProgressView("Loading tee times...")
                 } else if let errorMessage = errorMessage {
                     VStack(spacing: 16) {
@@ -62,7 +59,7 @@ struct BrowseView: View {
                     .padding()
                 } else {
                     List(teeTimePostings) { posting in
-                        NavigationLink(destination: TeeTimeDetailView(posting: posting, currentUserId: currentUserId)) {
+                        NavigationLink(destination: TeeTimeDetailView(posting: posting)) {
                             TeeTimePostingRow(posting: posting)
                         }
                     }
@@ -86,40 +83,12 @@ struct BrowseView: View {
                 }
             }
             .task {
-                // Load user ID first, then tee times
-                await loadCurrentUserId()
                 await loadTeeTimePostings()
-            }
-            .onAppear {
-                print("🔍 BrowseView appeared with currentUserId: \(String(describing: currentUserId))")
             }
         }
     }
 
     // MARK: - Private Methods
-
-    private func loadCurrentUserId() async {
-        print("🔍 BrowseView: Loading current user ID")
-        // Get the current user's ID from keychain
-        let keychainService = KeychainService()
-        guard let token = keychainService.getToken() else {
-            print("   ❌ No token found in keychain")
-            return
-        }
-
-        // Decode JWT to get user_id (basic JWT decode without verification)
-        let parts = token.components(separatedBy: ".")
-        guard parts.count == 3,
-              let payloadData = Data(base64Encoded: parts[1].base64PaddedString()),
-              let payload = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any],
-              let userId = payload["user_id"] as? Int else {
-            print("   ❌ Failed to decode user ID from token")
-            return
-        }
-
-        currentUserId = userId
-        print("   ✅ Current user ID set to: \(userId)")
-    }
 
     private func loadTeeTimePostings() async {
         isLoading = true
@@ -212,23 +181,4 @@ struct TeeTimePostingRow: View {
 
 #Preview {
     BrowseView()
-}
-
-// MARK: - Base64 Helper
-
-private extension String {
-    /// Adds padding to base64url string to make it valid base64
-    func base64PaddedString() -> String {
-        var base64 = self
-            .replacingOccurrences(of: "-", with: "+")
-            .replacingOccurrences(of: "_", with: "/")
-
-        let remainder = base64.count % 4
-        if remainder > 0 {
-            base64 = base64.padding(toLength: base64.count + 4 - remainder,
-                                    withPad: "=",
-                                    startingAt: 0)
-        }
-        return base64
-    }
 }
