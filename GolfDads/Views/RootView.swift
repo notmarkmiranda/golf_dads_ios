@@ -78,6 +78,7 @@ struct MainTabView: View {
 
 struct ProfileView: View {
     let authManager: AuthenticationManager
+    @State private var showEditProfile = false
 
     var body: some View {
         List {
@@ -106,6 +107,38 @@ struct ProfileView: View {
                         }
                     }
                 }
+
+                Section("Golf Profile") {
+                    HStack {
+                        Text("Venmo Handle")
+                        Spacer()
+                        if let venmoHandle = user.venmoHandle {
+                            Text(venmoHandle)
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("Not set")
+                                .foregroundColor(.gray)
+                                .italic()
+                        }
+                    }
+
+                    HStack {
+                        Text("Handicap")
+                        Spacer()
+                        if let handicap = user.handicap {
+                            Text(String(format: "%.1f", handicap))
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("Not set")
+                                .foregroundColor(.gray)
+                                .italic()
+                        }
+                    }
+
+                    Button("Edit Profile") {
+                        showEditProfile = true
+                    }
+                }
             }
 
             Section {
@@ -118,6 +151,11 @@ struct ProfileView: View {
             }
         }
         .navigationTitle("Profile")
+        .sheet(isPresented: $showEditProfile) {
+            if let user = authManager.currentUser {
+                EditProfileView(authManager: authManager, user: user)
+            }
+        }
     }
 }
 

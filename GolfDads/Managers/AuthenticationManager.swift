@@ -33,6 +33,13 @@ class AuthenticationManager {
     private let authService: AuthenticationServiceProtocol
     private nonisolated(unsafe) var unauthorizedObserver: NSObjectProtocol?
 
+    // MARK: - Public Accessors
+
+    /// Current authentication token
+    var token: String? {
+        authService.currentToken
+    }
+
     // MARK: - Initialization
 
     init(authService: AuthenticationServiceProtocol = AuthenticationService()) {
@@ -160,6 +167,13 @@ class AuthenticationManager {
     /// Check if user is currently authenticated (has valid token)
     func checkAuthStatus() {
         isAuthenticated = authService.isLoggedIn
+    }
+
+    // MARK: - Update Current User
+
+    /// Update the current user information (e.g., after profile edit)
+    func updateCurrentUser(_ user: AuthenticatedUser) {
+        currentUser = user
     }
 
     // MARK: - Clear Error

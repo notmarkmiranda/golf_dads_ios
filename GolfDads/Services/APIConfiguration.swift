@@ -74,6 +74,7 @@ struct APIConfiguration {
         // Users
         case users
         case user(id: Int)
+        case updateProfile
 
         // Groups
         case groups
@@ -106,6 +107,7 @@ struct APIConfiguration {
             // Users
             case .users: return "/v1/users"
             case .user(let id): return "/v1/users/\(id)"
+            case .updateProfile: return "/v1/users/me"
 
             // Groups
             case .groups: return "/v1/groups"
