@@ -12,6 +12,7 @@ struct BrowseView: View {
     @State private var teeTimePostings: [TeeTimePosting] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var currentUserId: Int?
 
     private let teeTimeService: TeeTimeServiceProtocol
 
@@ -59,7 +60,7 @@ struct BrowseView: View {
                     .padding()
                 } else {
                     List(teeTimePostings) { posting in
-                        NavigationLink(destination: TeeTimeDetailView(posting: posting)) {
+                        NavigationLink(destination: TeeTimeDetailView(posting: posting, currentUserId: currentUserId)) {
                             TeeTimePostingRow(posting: posting)
                         }
                     }
@@ -83,12 +84,32 @@ struct BrowseView: View {
                 }
             }
             .task {
+                await loadCurrentUserId()
                 await loadTeeTimePostings()
             }
         }
     }
 
     // MARK: - Private Methods
+
+    private func loadCurrentUserId() async {
+        // Get the current user's ID from keychain
+        let keychainService = KeychainService()
+        guard let token = keychainService.getToken() else {
+            return
+        }
+
+        // Decode JWT to get user_id (basic JWT decode without verification)
+        let parts = token.components(separatedBy: ".")
+        guard parts.count == 3,
+              let payloadData = Data(base64Encoded: parts[1].base64PaddedString()),
+              let payload = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any],
+              let userId = payload["user_id"] as? Int else {
+            return
+        }
+
+        currentUserId = userId
+    }
 
     private func loadTeeTimePostings() async {
         isLoading = true
@@ -181,4 +202,23 @@ struct TeeTimePostingRow: View {
 
 #Preview {
     BrowseView()
+}
+
+// MARK: - Base64 Helper
+
+private extension String {
+    /// Adds padding to base64url string to make it valid base64
+    func base64PaddedString() -> String {
+        var base64 = self
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+
+        let remainder = base64.count % 4
+        if remainder > 0 {
+            base64 = base64.padding(toLength: base64.count + 4 - remainder,
+                                    withPad: "=",
+                                    startingAt: 0)
+        }
+        return base64
+    }
 }
