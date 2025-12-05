@@ -300,14 +300,23 @@ struct TeeTimeDetailView: View {
     // MARK: - Private Methods
 
     private func loadExistingReservation() {
+        print("🔍 loadExistingReservation called")
+        print("   currentUserId: \(String(describing: currentUserId))")
+        print("   posting.reservations: \(String(describing: posting.reservations))")
+
         // Check if current user has a reservation in the posting's reservations
         guard let currentUserId = currentUserId,
               let reservations = posting.reservations else {
+            print("   ❌ Guard failed - currentUserId or reservations is nil")
             return
         }
 
+        print("   ✅ Have currentUserId and reservations")
+        print("   Reservations count: \(reservations.count)")
+
         // Find the reservation for the current user (by userId if available, otherwise skip)
         if let existing = reservations.first(where: { $0.userId == currentUserId }) {
+            print("   ✅ Found existing reservation: \(existing)")
             myExistingReservation = Reservation(
                 id: existing.id,
                 userId: currentUserId,
@@ -317,6 +326,9 @@ struct TeeTimeDetailView: View {
                 updatedAt: existing.createdAt
             )
             spotsToReserve = existing.spotsReserved
+            print("   ✅ Set myExistingReservation with \(existing.spotsReserved) spots")
+        } else {
+            print("   ❌ No reservation found for user \(currentUserId)")
         }
     }
 

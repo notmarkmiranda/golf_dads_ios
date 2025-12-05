@@ -23,7 +23,9 @@ struct BrowseView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                if isLoading {
+                if currentUserId == nil {
+                    ProgressView("Loading...")
+                } else if isLoading {
                     ProgressView("Loading tee times...")
                 } else if let errorMessage = errorMessage {
                     VStack(spacing: 16) {
@@ -84,8 +86,12 @@ struct BrowseView: View {
                 }
             }
             .task {
+                // Load user ID first, then tee times
                 await loadCurrentUserId()
                 await loadTeeTimePostings()
+            }
+            .onAppear {
+                print("🔍 BrowseView appeared with currentUserId: \(String(describing: currentUserId))")
             }
         }
     }
@@ -93,9 +99,11 @@ struct BrowseView: View {
     // MARK: - Private Methods
 
     private func loadCurrentUserId() async {
+        print("🔍 BrowseView: Loading current user ID")
         // Get the current user's ID from keychain
         let keychainService = KeychainService()
         guard let token = keychainService.getToken() else {
+            print("   ❌ No token found in keychain")
             return
         }
 
@@ -105,10 +113,12 @@ struct BrowseView: View {
               let payloadData = Data(base64Encoded: parts[1].base64PaddedString()),
               let payload = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any],
               let userId = payload["user_id"] as? Int else {
+            print("   ❌ Failed to decode user ID from token")
             return
         }
 
         currentUserId = userId
+        print("   ✅ Current user ID set to: \(userId)")
     }
 
     private func loadTeeTimePostings() async {
