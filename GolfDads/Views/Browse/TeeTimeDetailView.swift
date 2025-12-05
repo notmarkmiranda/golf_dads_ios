@@ -15,6 +15,7 @@ struct TeeTimeDetailView: View {
     @State private var isReserving = false
     @State private var reservationError: String?
     @State private var showSuccessAlert = false
+    @State private var successMessage: String = ""
     @State private var myExistingReservation: Reservation?
 
     @Environment(\.dismiss) private var dismiss
@@ -292,7 +293,7 @@ struct TeeTimeDetailView: View {
                 dismiss()
             }
         } message: {
-            Text(hasExistingReservation ? "Your reservation has been updated to \(spotsToReserve) \(spotsToReserve == 1 ? "spot" : "spots")." : "You've successfully reserved \(spotsToReserve) \(spotsToReserve == 1 ? "spot" : "spots") for this tee time.")
+            Text(successMessage)
         }
     }
 
@@ -366,6 +367,7 @@ struct TeeTimeDetailView: View {
                     spotsReserved: spotsToReserve
                 )
                 myExistingReservation = updated
+                successMessage = "Your reservation has been updated to \(spotsToReserve) \(spotsToReserve == 1 ? "spot" : "spots")."
             } else {
                 // Create new reservation
                 let created = try await reservationService.createReservation(
@@ -373,6 +375,7 @@ struct TeeTimeDetailView: View {
                     spotsReserved: spotsToReserve
                 )
                 myExistingReservation = created
+                successMessage = "You've successfully reserved \(spotsToReserve) \(spotsToReserve == 1 ? "spot" : "spots") for this tee time."
             }
             showSuccessAlert = true
         } catch {
@@ -392,12 +395,14 @@ struct TeeTimeDetailView: View {
             try await reservationService.deleteReservation(id: existing.id)
             myExistingReservation = nil
             spotsToReserve = 1
+            successMessage = "Your reservation has been cancelled."
             showSuccessAlert = true
         } catch let error as APIError {
             // If the reservation is already gone (404), treat it as success
             if case .notFound = error {
                 myExistingReservation = nil
                 spotsToReserve = 1
+                successMessage = "Your reservation has been cancelled."
                 showSuccessAlert = true
             } else {
                 reservationError = "Failed to cancel reservation: \(error.localizedDescription)"
