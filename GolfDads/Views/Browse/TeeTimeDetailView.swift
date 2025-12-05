@@ -15,18 +15,34 @@ struct TeeTimeDetailView: View {
     @State private var isReserving = false
     @State private var reservationError: String?
     @State private var showSuccessAlert = false
-    @State private var reservation: Reservation?
+    @State private var myExistingReservation: Reservation?
 
     @Environment(\.dismiss) private var dismiss
 
     private let reservationService: ReservationServiceProtocol
+    private let currentUserId: Int?
 
     init(
         posting: TeeTimePosting,
+        currentUserId: Int? = nil,
         reservationService: ReservationServiceProtocol = ReservationService()
     ) {
         self.posting = posting
+        self.currentUserId = currentUserId
         self.reservationService = reservationService
+    }
+
+    // Check if current user has an existing reservation
+    private var hasExistingReservation: Bool {
+        myExistingReservation != nil
+    }
+
+    // Available spots including the user's current reservation
+    private var availableSpotsForUpdate: Int {
+        if let existing = myExistingReservation {
+            return posting.availableSpots + existing.spotsReserved
+        }
+        return posting.availableSpots
     }
 
     var body: some View {
@@ -145,21 +161,39 @@ struct TeeTimeDetailView: View {
                 }
 
                 // Reservation Section
-                if !posting.isPast && posting.availableSpots > 0 {
+                if !posting.isPast && (posting.availableSpots > 0 || hasExistingReservation) {
                     Divider()
 
                     VStack(alignment: .leading, spacing: 16) {
-                        Label("Reserve Spots", systemImage: "checkmark.circle")
+                        Label(hasExistingReservation ? "Update Reservation" : "Reserve Spots", systemImage: "checkmark.circle")
                             .font(.headline)
+
+                        // Show current reservation if exists
+                        if let existing = myExistingReservation {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Your current reservation")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    Text("\(existing.spotsReserved) \(existing.spotsReserved == 1 ? "spot" : "spots")")
+                                        .font(.title3)
+                                        .fontWeight(.semibold)
+                                }
+                                Spacer()
+                            }
+                            .padding()
+                            .background(Color.blue.opacity(0.1))
+                            .cornerRadius(12)
+                        }
 
                         // Spot Picker
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Number of spots")
+                            Text(hasExistingReservation ? "Change to" : "Number of spots")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
 
                             Picker("Spots", selection: $spotsToReserve) {
-                                ForEach(1...min(posting.availableSpots, 4), id: \.self) { count in
+                                ForEach(1...min(availableSpotsForUpdate, 4), id: \.self) { count in
                                     Text("\(count) \(count == 1 ? "spot" : "spots")")
                                         .tag(count)
                                 }
@@ -167,10 +201,10 @@ struct TeeTimeDetailView: View {
                             .pickerStyle(.segmented)
                         }
 
-                        // Reserve Button
+                        // Reserve/Update Button
                         Button {
                             Task {
-                                await makeReservation()
+                                await saveReservation()
                             }
                         } label: {
                             if isReserving {
@@ -179,14 +213,37 @@ struct TeeTimeDetailView: View {
                                     .tint(.white)
                                     .frame(maxWidth: .infinity)
                             } else {
-                                Text("Reserve \(spotsToReserve) \(spotsToReserve == 1 ? "Spot" : "Spots")")
+                                Text(hasExistingReservation ? "Update to \(spotsToReserve) \(spotsToReserve == 1 ? "Spot" : "Spots")" : "Reserve \(spotsToReserve) \(spotsToReserve == 1 ? "Spot" : "Spots")")
                                     .fontWeight(.semibold)
                                     .frame(maxWidth: .infinity)
                             }
                         }
                         .buttonStyle(.borderedProminent)
                         .controlSize(.large)
-                        .disabled(isReserving)
+                        .disabled(isReserving || (hasExistingReservation && spotsToReserve == myExistingReservation?.spotsReserved))
+
+                        // Cancel Reservation Button (if user has one)
+                        if hasExistingReservation {
+                            Button(role: .destructive) {
+                                Task {
+                                    await cancelReservation()
+                                }
+                            } label: {
+                                if isReserving {
+                                    ProgressView()
+                                        .progressViewStyle(.circular)
+                                        .tint(.red)
+                                        .frame(maxWidth: .infinity)
+                                } else {
+                                    Text("Cancel Reservation")
+                                        .fontWeight(.semibold)
+                                        .frame(maxWidth: .infinity)
+                                }
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.large)
+                            .disabled(isReserving)
+                        }
 
                         // Error Message
                         if let error = reservationError {
@@ -228,29 +285,82 @@ struct TeeTimeDetailView: View {
         }
         .navigationTitle("Tee Time Details")
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Reservation Successful!", isPresented: $showSuccessAlert) {
+        .onAppear {
+            loadExistingReservation()
+        }
+        .alert("Success!", isPresented: $showSuccessAlert) {
             Button("OK") {
                 dismiss()
             }
         } message: {
-            Text("You've successfully reserved \(spotsToReserve) \(spotsToReserve == 1 ? "spot" : "spots") for this tee time.")
+            Text(hasExistingReservation ? "Your reservation has been updated to \(spotsToReserve) \(spotsToReserve == 1 ? "spot" : "spots")." : "You've successfully reserved \(spotsToReserve) \(spotsToReserve == 1 ? "spot" : "spots") for this tee time.")
         }
     }
 
     // MARK: - Private Methods
 
-    private func makeReservation() async {
+    private func loadExistingReservation() {
+        // Check if current user has a reservation in the posting's reservations
+        guard let currentUserId = currentUserId,
+              let reservations = posting.reservations else {
+            return
+        }
+
+        // Find the reservation for the current user
+        if let existing = reservations.first(where: { $0.userId == currentUserId }) {
+            myExistingReservation = Reservation(
+                id: existing.id,
+                userId: existing.userId,
+                teeTimePostingId: posting.id,
+                spotsReserved: existing.spotsReserved,
+                createdAt: existing.createdAt,
+                updatedAt: existing.createdAt
+            )
+            spotsToReserve = existing.spotsReserved
+        }
+    }
+
+    private func saveReservation() async {
         isReserving = true
         reservationError = nil
 
         do {
-            reservation = try await reservationService.createReservation(
-                teeTimePostingId: posting.id,
-                spotsReserved: spotsToReserve
-            )
+            if let existing = myExistingReservation {
+                // Update existing reservation
+                let updated = try await reservationService.updateReservation(
+                    id: existing.id,
+                    spotsReserved: spotsToReserve
+                )
+                myExistingReservation = updated
+            } else {
+                // Create new reservation
+                let created = try await reservationService.createReservation(
+                    teeTimePostingId: posting.id,
+                    spotsReserved: spotsToReserve
+                )
+                myExistingReservation = created
+            }
             showSuccessAlert = true
         } catch {
-            reservationError = "Failed to create reservation: \(error.localizedDescription)"
+            reservationError = "Failed to save reservation: \(error.localizedDescription)"
+        }
+
+        isReserving = false
+    }
+
+    private func cancelReservation() async {
+        guard let existing = myExistingReservation else { return }
+
+        isReserving = true
+        reservationError = nil
+
+        do {
+            try await reservationService.deleteReservation(id: existing.id)
+            myExistingReservation = nil
+            spotsToReserve = 1
+            showSuccessAlert = true
+        } catch {
+            reservationError = "Failed to cancel reservation: \(error.localizedDescription)"
         }
 
         isReserving = false

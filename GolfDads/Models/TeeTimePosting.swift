@@ -10,6 +10,7 @@ import Foundation
 /// Represents a reservation on a tee time posting (only visible to posting owner)
 struct ReservationInfo: Codable, Identifiable, Equatable, Hashable {
     let id: Int
+    let userId: Int
     let userEmail: String
     let spotsReserved: Int
     let createdAt: Date
