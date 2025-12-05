@@ -173,9 +173,6 @@ struct GroupDetailView: View {
         }
         .navigationTitle(group.name)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: TeeTimePosting.self) { posting in
-            TeeTimeDetailView(posting: posting)
-        }
         .refreshable {
             await loadGroupPostings()
         }

@@ -107,6 +107,9 @@ struct GroupsView: View {
         .navigationDestination(for: Group.self) { group in
             GroupDetailView(group: group)
         }
+        .navigationDestination(for: TeeTimePosting.self) { posting in
+            TeeTimeDetailView(posting: posting)
+        }
     }
 
     // MARK: - Methods
