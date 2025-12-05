@@ -52,9 +52,12 @@ struct AuthenticatedUser: Codable {
         name = try container.decode(String.self, forKey: .name)
         avatarUrl = try container.decodeIfPresent(String.self, forKey: .avatarUrl)
         provider = try container.decodeIfPresent(String.self, forKey: .provider)
+
+        // Try to decode venmo_handle (using the CodingKey mapping)
         venmoHandle = try container.decodeIfPresent(String.self, forKey: .venmoHandle)
 
         print("🔍 Decoding user: \(email)")
+        print("   Raw keys: \(container.allKeys)")
         print("   venmoHandle: \(venmoHandle ?? "nil")")
 
         // Handle handicap as either Double or String (Rails returns it as string)
@@ -68,6 +71,19 @@ struct AuthenticatedUser: Codable {
             handicap = nil
             print("   handicap: nil")
         }
+    }
+
+    // Custom encoder to maintain proper key mapping
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(id, forKey: .id)
+        try container.encode(email, forKey: .email)
+        try container.encode(name, forKey: .name)
+        try container.encodeIfPresent(avatarUrl, forKey: .avatarUrl)
+        try container.encodeIfPresent(provider, forKey: .provider)
+        try container.encodeIfPresent(venmoHandle, forKey: .venmoHandle)
+        try container.encodeIfPresent(handicap, forKey: .handicap)
     }
 }
 
