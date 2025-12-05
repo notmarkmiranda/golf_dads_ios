@@ -31,6 +31,38 @@ struct AuthenticatedUser: Codable {
         case venmoHandle = "venmo_handle"
         case handicap
     }
+
+    // Regular init for creating instances
+    init(id: Int, email: String, name: String, avatarUrl: String?, provider: String?, venmoHandle: String?, handicap: Double?) {
+        self.id = id
+        self.email = email
+        self.name = name
+        self.avatarUrl = avatarUrl
+        self.provider = provider
+        self.venmoHandle = venmoHandle
+        self.handicap = handicap
+    }
+
+    // Custom decoder to handle handicap as either string or number
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        id = try container.decode(Int.self, forKey: .id)
+        email = try container.decode(String.self, forKey: .email)
+        name = try container.decode(String.self, forKey: .name)
+        avatarUrl = try container.decodeIfPresent(String.self, forKey: .avatarUrl)
+        provider = try container.decodeIfPresent(String.self, forKey: .provider)
+        venmoHandle = try container.decodeIfPresent(String.self, forKey: .venmoHandle)
+
+        // Handle handicap as either Double or String (Rails returns it as string)
+        if let handicapDouble = try? container.decodeIfPresent(Double.self, forKey: .handicap) {
+            handicap = handicapDouble
+        } else if let handicapString = try? container.decodeIfPresent(String.self, forKey: .handicap) {
+            handicap = Double(handicapString)
+        } else {
+            handicap = nil
+        }
+    }
 }
 
 /// Protocol for authentication operations
