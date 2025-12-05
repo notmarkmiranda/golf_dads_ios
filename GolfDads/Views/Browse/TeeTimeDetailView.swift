@@ -306,11 +306,11 @@ struct TeeTimeDetailView: View {
             return
         }
 
-        // Find the reservation for the current user
+        // Find the reservation for the current user (by userId if available, otherwise skip)
         if let existing = reservations.first(where: { $0.userId == currentUserId }) {
             myExistingReservation = Reservation(
                 id: existing.id,
-                userId: existing.userId,
+                userId: currentUserId,
                 teeTimePostingId: posting.id,
                 spotsReserved: existing.spotsReserved,
                 createdAt: existing.createdAt,
