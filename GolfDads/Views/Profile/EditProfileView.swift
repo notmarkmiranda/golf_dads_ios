@@ -152,14 +152,14 @@ struct EditProfileView: View {
         )
 
         let networkService = NetworkService()
-        let response: AuthenticationResponse = try await networkService.patch(
+        let updatedUser: AuthenticatedUser = try await networkService.patch(
             endpoint: .updateProfile,
             body: request,
             requiresAuth: true
         )
 
         // Update the auth manager with new user data
-        await authManager.updateCurrentUser(response.user)
+        await authManager.updateCurrentUser(updatedUser)
     }
 }
 
