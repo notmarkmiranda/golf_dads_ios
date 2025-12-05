@@ -102,7 +102,7 @@ struct APIConfiguration {
             case .signup: return "/v1/auth/signup"
             case .login: return "/v1/auth/login"
             case .googleSignIn: return "/v1/auth/google"
-            case .currentUser: return "/v1/users/current"
+            case .currentUser: return "/v1/users/me"
 
             // Users
             case .users: return "/v1/users"

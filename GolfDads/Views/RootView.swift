@@ -79,6 +79,7 @@ struct MainTabView: View {
 struct ProfileView: View {
     let authManager: AuthenticationManager
     @State private var showEditProfile = false
+    @State private var isRefreshing = false
 
     var body: some View {
         List {
@@ -151,11 +152,27 @@ struct ProfileView: View {
             }
         }
         .navigationTitle("Profile")
+        .refreshable {
+            await refreshProfile()
+        }
+        .onAppear {
+            // Refresh profile data when view appears to ensure we have latest data
+            Task {
+                await refreshProfile()
+            }
+        }
         .sheet(isPresented: $showEditProfile) {
             if let user = authManager.currentUser {
                 EditProfileView(authManager: authManager, user: user)
             }
         }
+    }
+
+    private func refreshProfile() async {
+        guard !isRefreshing else { return }
+        isRefreshing = true
+        await authManager.refreshCurrentUser()
+        isRefreshing = false
     }
 }
 
