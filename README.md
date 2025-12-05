@@ -93,18 +93,29 @@ This iOS app allows golfers to:
   - Course info, date/time, available spots
   - Public/private and past indicators
   - Navigation to detail view
-- ✅ TeeTimeDetailView - View and reserve specific tee times
+- ✅ TeeTimeDetailView - Complete reservation management
   - Detailed information display
-  - Spot picker (1-4 spots)
-  - Reserve button with loading/success states
-  - Smart handling of past/full tee times
-  - Success alert with auto-dismiss
+  - **Create reservations** - Reserve 1-4 spots on available tee times
+  - **Update reservations** - Change number of spots reserved
+  - **Cancel reservations** - Remove your reservation with confirmation
+  - **Smart validation**: accounts for your current reservation when updating
+    - Example: With 2 spots reserved and 2 available, you can update to 4 total
+    - Prevents unnecessary validation errors
+  - Shows your existing reservation with update/cancel options
   - Reservation details for posting owners (email, spots reserved, time)
-  - Privacy-preserved: only owners see reservation details
-- ✅ CreateTeeTimeView - Create new tee time postings
+  - **Privacy-preserved**: non-owners can see and manage only their own reservation
+  - Context-aware success messages for each action:
+    - "You've successfully reserved X spot(s) for this tee time."
+    - "Your reservation has been updated to X spot(s)."
+    - "Your reservation has been cancelled."
+  - Idempotent operations (404 on cancel treated as success)
+  - Loading states and error handling
+- ✅ CreateTeeTimeView - Simplified tee time creation
   - Course name and tee time selection
-  - Available/total spots pickers
-  - Public/private visibility toggle
+  - Total spots picker (1-4)
+  - Optional "Reserve for myself" (0-3 spots)
+  - Available spots calculated automatically
+  - Public/private visibility toggle with group selection
   - Optional notes field
   - Form validation and error handling
   - Success confirmation with auto-dismiss
@@ -168,12 +179,13 @@ This iOS app allows golfers to:
   - Pull-to-refresh functionality
   - Loading, error, and empty states
   - Auto-refresh after creating
-- **Create Tee Time** - Post new tee times
+- **Create Tee Time** - Simplified posting flow
   - Course name input with auto-capitalization
   - Date/time picker for tee time
-  - Available spots picker (1-4)
-  - Optional total spots picker
-  - Public/private visibility toggle
+  - Total spots picker (1-4)
+  - Optional "Reserve for myself" (0-3 spots)
+  - Available spots calculated automatically: `total_spots - reservations`
+  - Public/private visibility toggle with group selection
   - Optional notes field (multiline)
   - Form validation
   - Success confirmation with auto-dismiss
@@ -184,18 +196,31 @@ This iOS app allows golfers to:
   - Course name, date/time, available spots
   - Public/private and past indicators
   - Tap to view details
-- **Tee Time Details & Reservations** - Complete booking flow
+- **Tee Time Details & Reservations** - Complete reservation management
   - Full tee time information display
   - Visual indicators for status (public/private, past)
-  - Spot picker with segmented control (1-4 spots)
-  - Reserve button with loading states
-  - Success confirmation with alert
-  - Smart handling of edge cases (past tee times, fully booked)
-  - Reservation management for posting owners:
-    - View who reserved spots (email address)
-    - See number of spots each person reserved
-    - View reservation timestamps
-    - Privacy preserved: only owners see reservation details
+  - **Make Reservations:**
+    - Spot picker with segmented control (1-4 spots)
+    - Reserve button with loading states
+    - Success confirmation: "You've successfully reserved X spot(s) for this tee time."
+  - **Manage Your Reservations:**
+    - View your current reservation with spot count
+    - Update spot count with smart validation (accounts for your current spots)
+    - Cancel reservation with destructive button and confirmation
+    - Update success: "Your reservation has been updated to X spot(s)."
+    - Cancel success: "Your reservation has been cancelled."
+  - **For Posting Owners:**
+    - View all reservations (email, spots, time)
+    - See who has reserved spots on your postings
+  - **Privacy Features:**
+    - Non-owners can see and manage only their own reservation
+    - Cannot see other users' reservations
+  - **Smart Validation:**
+    - Update validation accounts for your current reservation
+    - Example: 2 spots reserved + 2 available = can update to 4 total
+    - Prevents "exceeds available spots" errors on valid updates
+  - Idempotent operations (graceful handling of stale data)
+  - Smart handling of edge cases (past tee times, fully booked, already cancelled)
   - Tested and working with production API ✅
 - User profile display with name and email
 - Logout functionality
