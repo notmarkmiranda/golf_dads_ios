@@ -204,7 +204,7 @@ class TeeTimeService: TeeTimeServiceProtocol {
 
     /// Delete a tee time posting
     func deleteTeeTimePosting(id: Int) async throws {
-        let _: EmptyResponse = try await networkService.request(
+        try await networkService.request(
             endpoint: .teeTimePosting(id: id),
             method: .delete,
             body: nil as String?,
@@ -212,10 +212,6 @@ class TeeTimeService: TeeTimeServiceProtocol {
         )
     }
 }
-
-// MARK: - Empty Response
-
-private struct EmptyResponse: Codable {}
 
 // MARK: - Base64 Helper
 
