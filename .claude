@@ -1,0 +1,96 @@
+# Claude Code Instructions for Golf Dads iOS App
+
+## Pre-Commit Checklist
+
+Before committing any changes, always:
+
+### 1. Build & Test
+- Build the project: `xcodebuild -scheme GolfDads -sdk iphonesimulator build`
+- Ensure build succeeds with no errors
+- Run tests if available: `xcodebuild test -scheme GolfDads -destination 'platform=iOS Simulator,name=iPhone 15'`
+- Fix any warnings that are introduced by your changes
+- Test on actual device when location features are modified
+
+### 2. Update Documentation
+- Update `README.md` if:
+  - New features added
+  - Setup instructions changed
+  - New dependencies or permissions required
+  - Architecture changes
+- Update `docs/LOCATION_FEATURES.md` if:
+  - Location-based features modified
+  - New golf course functionality added
+  - New services or managers added
+  - iOS UI for location features changed
+- Update inline code comments for complex SwiftUI views or business logic
+- Add doc comments to new public methods and services
+
+### 3. Code Quality
+- Ensure no force unwrapping (`!`) without proper justification
+- Check for proper error handling with async/await
+- Verify SwiftUI previews still work for modified views
+- Ensure proper use of `@State`, `@StateObject`, `@Binding`, etc.
+- Check for memory leaks in closures (use `[weak self]` where appropriate)
+
+### 4. iOS-Specific Checks
+- If Info.plist changed, document why in commit message
+- If new permissions added, ensure user-facing description is clear
+- If new third-party dependencies added, update documentation
+- Verify backward compatibility with minimum iOS version
+
+### 5. Commit Message
+- Use descriptive commit messages
+- Include:
+  - What changed and why
+  - Any UI/UX changes
+  - Any breaking changes
+  - Testing performed
+- End with Claude Code attribution:
+  ```
+  🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+  Co-Authored-By: Claude <noreply@anthropic.com>
+  ```
+
+## Project-Specific Notes
+
+- SwiftUI-based iOS app (iOS 16.0+)
+- Uses async/await for all network calls
+- Location services with "When In Use" permission
+- Integrates with Rails backend API
+- JWT authentication via Keychain
+- No third-party UI frameworks (pure SwiftUI)
+
+## Architecture Patterns
+
+- **Services**: Networking, authentication, location (in `Services/`)
+- **Views**: Organized by feature area (`Views/Auth/`, `Views/Browse/`, etc.)
+- **Models**: Codable structs matching backend JSON
+- **Managers**: Singleton services like AuthenticationManager
+- Protocol-oriented for testability (e.g., `NetworkServiceProtocol`)
+
+## Key Files to Keep Updated
+
+- `README.md` - Setup and architecture documentation
+- `docs/LOCATION_FEATURES.md` - Location feature documentation
+- `Info.plist` - When permissions or configuration changes
+- `Services/APIConfiguration.swift` - When new API endpoints added
+- `Services/NetworkService.swift` - Core networking logic
+
+## Testing Patterns
+
+- Unit tests for services and business logic
+- UI tests for critical user flows
+- Manual testing on device for:
+  - Location services
+  - Network calls
+  - Authentication flow
+  - Any feature using device hardware
+
+## Common Issues to Watch For
+
+- JSON decoding errors (ensure CodingKeys match or use `.convertFromSnakeCase`)
+- Empty response bodies on DELETE requests (use void return method)
+- Location permission states (handle all: notDetermined, denied, authorized)
+- Network errors (timeout, no connection, API errors)
+- SwiftUI view update issues (ensure `@Published` properties trigger updates)
