@@ -41,38 +41,45 @@ struct GroupDetailView: View {
 
     var body: some View {
         List {
-            // Group Info Section
+            // About Section
             DisclosureGroup("About") {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 16) {
+                    // Description
                     if let description = group.description {
                         Text(description)
                             .font(.body)
                     }
 
+                    // Members
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Members (\(group.memberNames.count))")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+
+                        if group.memberNames.isEmpty {
+                            Text("No members yet")
+                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                        } else {
+                            ForEach(group.memberNames, id: \.self) { memberName in
+                                HStack {
+                                    Image(systemName: "person.circle.fill")
+                                        .foregroundStyle(.blue)
+                                        .imageScale(.small)
+                                    Text(memberName)
+                                        .font(.subheadline)
+                                }
+                                .padding(.vertical, 2)
+                            }
+                        }
+                    }
+
+                    // Created Date
                     Text("Created \(group.createdAt.formatted(date: .abbreviated, time: .omitted))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 8)
-            }
-
-            // Members Section
-            DisclosureGroup("Members (\(group.memberNames.count))") {
-                if group.memberNames.isEmpty {
-                    Text("No members yet")
-                        .foregroundStyle(.secondary)
-                        .font(.caption)
-                        .padding(.vertical, 8)
-                } else {
-                    ForEach(group.memberNames, id: \.self) { memberName in
-                        HStack {
-                            Image(systemName: "person.circle.fill")
-                                .foregroundStyle(.blue)
-                            Text(memberName)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
             }
 
             // Invite Code Section
