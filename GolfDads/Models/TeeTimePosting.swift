@@ -7,6 +7,32 @@
 
 import Foundation
 
+/// Represents golf course information associated with a tee time posting
+struct GolfCourseInfo: Codable, Identifiable, Equatable, Hashable {
+    let id: Int
+    let name: String
+    let clubName: String?
+    let address: String?
+    let city: String?
+    let state: String?
+    let zipCode: String?
+    let latitude: Double?
+    let longitude: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, address, city, state, latitude, longitude
+        case clubName = "club_name"
+        case zipCode = "zip_code"
+    }
+
+    var displayLocation: String {
+        var parts: [String] = []
+        if let city = city { parts.append(city) }
+        if let state = state { parts.append(state) }
+        return parts.joined(separator: ", ")
+    }
+}
+
 /// Represents a reservation on a tee time posting (only visible to posting owner)
 struct ReservationInfo: Codable, Identifiable, Equatable, Hashable {
     let id: Int
@@ -22,6 +48,8 @@ struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
     let groupIds: [Int]
     let teeTime: Date
     let courseName: String
+    let golfCourse: GolfCourseInfo?
+    let distanceMiles: Double?
     let availableSpots: Int
     let totalSpots: Int?
     let notes: String?
@@ -39,6 +67,8 @@ struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
         groupIds = try container.decodeIfPresent([Int].self, forKey: .groupIds) ?? []
         teeTime = try container.decode(Date.self, forKey: .teeTime)
         courseName = try container.decode(String.self, forKey: .courseName)
+        golfCourse = try container.decodeIfPresent(GolfCourseInfo.self, forKey: .golfCourse)
+        distanceMiles = try container.decodeIfPresent(Double.self, forKey: .distanceMiles)
         availableSpots = try container.decode(Int.self, forKey: .availableSpots)
         totalSpots = try container.decodeIfPresent(Int.self, forKey: .totalSpots)
         notes = try container.decodeIfPresent(String.self, forKey: .notes)
@@ -55,6 +85,8 @@ struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
         groupIds: [Int],
         teeTime: Date,
         courseName: String,
+        golfCourse: GolfCourseInfo? = nil,
+        distanceMiles: Double? = nil,
         availableSpots: Int,
         totalSpots: Int?,
         notes: String?,
@@ -67,6 +99,8 @@ struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
         self.groupIds = groupIds
         self.teeTime = teeTime
         self.courseName = courseName
+        self.golfCourse = golfCourse
+        self.distanceMiles = distanceMiles
         self.availableSpots = availableSpots
         self.totalSpots = totalSpots
         self.notes = notes
@@ -76,6 +110,11 @@ struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
     }
 
     // MARK: - Computed Properties
+
+    /// Returns the preferred display name for the course
+    var displayCourseName: String {
+        golfCourse?.name ?? courseName
+    }
 
     /// Returns true if this is a public posting (not restricted to any groups)
     var isPublic: Bool {

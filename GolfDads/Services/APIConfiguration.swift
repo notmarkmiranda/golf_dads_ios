@@ -96,6 +96,14 @@ struct APIConfiguration {
         case reservation(id: Int)
         case myReservations
 
+        // Golf Courses
+        case golfCoursesSearch(query: String)
+        case golfCoursesNearby(latitude: Double, longitude: Double, radius: Int)
+        case golfCoursesCache
+
+        // Tee Time Postings with Location
+        case teeTimePostingsWithLocation(latitude: Double, longitude: Double, radius: Int)
+
         var path: String {
             switch self {
             // Authentication
@@ -128,6 +136,18 @@ struct APIConfiguration {
             case .reservations: return "/v1/reservations"
             case .reservation(let id): return "/v1/reservations/\(id)"
             case .myReservations: return "/v1/reservations/my_reservations"
+
+            // Golf Courses
+            case .golfCoursesSearch(let query):
+                let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
+                return "/v1/golf_courses/search?query=\(encoded)"
+            case .golfCoursesNearby(let latitude, let longitude, let radius):
+                return "/v1/golf_courses/nearby?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)"
+            case .golfCoursesCache: return "/v1/golf_courses/cache"
+
+            // Tee Time Postings with Location
+            case .teeTimePostingsWithLocation(let latitude, let longitude, let radius):
+                return "/v1/tee_time_postings?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)"
             }
         }
 

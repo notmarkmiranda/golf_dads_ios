@@ -9,6 +9,7 @@ import Foundation
 
 protocol TeeTimeServiceProtocol {
     func getTeeTimePostings() async throws -> [TeeTimePosting]
+    func getNearbyTeeTimePostings(latitude: Double, longitude: Double, radius: Int) async throws -> [TeeTimePosting]
     func getTeeTimePosting(id: Int) async throws -> TeeTimePosting
     func getMyTeeTimePostings() async throws -> [TeeTimePosting]
     func getGroupTeeTimePostings(groupId: Int) async throws -> [TeeTimePosting]
@@ -42,6 +43,22 @@ class TeeTimeService: TeeTimeServiceProtocol {
 
         let response: Response = try await networkService.request(
             endpoint: .teeTimePostings,
+            method: .get,
+            body: nil as String?,
+            requiresAuth: true
+        )
+
+        return response.teeTimePostings
+    }
+
+    /// Fetch nearby tee time postings based on location
+    func getNearbyTeeTimePostings(latitude: Double, longitude: Double, radius: Int) async throws -> [TeeTimePosting] {
+        struct Response: Codable {
+            let teeTimePostings: [TeeTimePosting]
+        }
+
+        let response: Response = try await networkService.request(
+            endpoint: .teeTimePostingsWithLocation(latitude: latitude, longitude: longitude, radius: radius),
             method: .get,
             body: nil as String?,
             requiresAuth: true

@@ -6,12 +6,20 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct BrowseView: View {
 
+    @StateObject private var locationManager = LocationManager()
     @State private var teeTimePostings: [TeeTimePosting] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
+
+    // Location filter state
+    @State private var filterMode: LocationFilterMode = .all
+    @State private var manualZipCode: String = ""
+    @State private var radiusMiles: Int = 25
+    @State private var showFilterSheet = false
 
     private let teeTimeService: TeeTimeServiceProtocol
 
@@ -60,7 +68,7 @@ struct BrowseView: View {
                 } else {
                     List(teeTimePostings) { posting in
                         NavigationLink(destination: TeeTimeDetailView(posting: posting)) {
-                            TeeTimePostingRow(posting: posting)
+                            TeeTimePostingRow(posting: posting, showDistance: filterMode == .nearby)
                         }
                     }
                     .listStyle(.insetGrouped)
@@ -71,6 +79,18 @@ struct BrowseView: View {
             }
             .navigationTitle("Browse Tee Times")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        showFilterSheet = true
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                            Text(filterMode.rawValue)
+                                .font(.subheadline)
+                        }
+                    }
+                }
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         Task {
@@ -80,6 +100,27 @@ struct BrowseView: View {
                         Image(systemName: "arrow.clockwise")
                     }
                     .disabled(isLoading)
+                }
+            }
+            .sheet(isPresented: $showFilterSheet) {
+                LocationFilterSheet(
+                    locationManager: locationManager,
+                    filterMode: $filterMode,
+                    manualZipCode: $manualZipCode,
+                    radiusMiles: $radiusMiles
+                )
+            }
+            .onChange(of: filterMode) { _, _ in
+                Task {
+                    await loadTeeTimePostings()
+                }
+            }
+            .onChange(of: manualZipCode) { _, _ in
+                // Only reload if in nearby mode and zip code changed
+                if filterMode == .nearby {
+                    Task {
+                        await loadTeeTimePostings()
+                    }
                 }
             }
             .task {
@@ -95,12 +136,41 @@ struct BrowseView: View {
         errorMessage = nil
 
         do {
-            teeTimePostings = try await teeTimeService.getTeeTimePostings()
+            if filterMode == .all {
+                // Load all tee times
+                teeTimePostings = try await teeTimeService.getTeeTimePostings()
+            } else {
+                // Load nearby tee times based on location
+                let coordinates = try await getCoordinates()
+                teeTimePostings = try await teeTimeService.getNearbyTeeTimePostings(
+                    latitude: coordinates.latitude,
+                    longitude: coordinates.longitude,
+                    radius: radiusMiles
+                )
+            }
+        } catch LocationError.permissionDenied {
+            errorMessage = "Location permission denied. Please enable location services in Settings or enter a zip code in the filter."
+        } catch LocationError.invalidZipCode {
+            errorMessage = "Invalid zip code. Please enter a 5-digit zip code."
+        } catch LocationError.geocodingFailed {
+            errorMessage = "Could not find location for zip code. Please check the zip code and try again."
+        } catch LocationError.timeout {
+            errorMessage = "Location request timed out. Please try again or enter a zip code."
         } catch {
             errorMessage = "Failed to load tee times: \(error.localizedDescription)"
         }
 
         isLoading = false
+    }
+
+    private func getCoordinates() async throws -> CLLocationCoordinate2D {
+        // If manual zip code is provided, use that
+        if !manualZipCode.isEmpty {
+            return try await locationManager.geocodeZipCode(manualZipCode)
+        }
+
+        // Otherwise, get device location
+        return try await locationManager.getCurrentLocation()
     }
 }
 
@@ -108,11 +178,12 @@ struct BrowseView: View {
 
 struct TeeTimePostingRow: View {
     let posting: TeeTimePosting
+    var showDistance: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(posting.courseName)
+                Text(posting.displayCourseName)
                     .font(.headline)
 
                 Spacer()
@@ -125,6 +196,32 @@ struct TeeTimePostingRow: View {
                     Image(systemName: "lock.fill")
                         .foregroundColor(.orange)
                         .font(.caption)
+                }
+            }
+
+            // Golf course location (if available)
+            if let golfCourse = posting.golfCourse, !golfCourse.displayLocation.isEmpty {
+                HStack {
+                    Image(systemName: "mappin.circle")
+                        .foregroundColor(.secondary)
+                        .font(.caption)
+
+                    Text(golfCourse.displayLocation)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            // Distance (if available and requested)
+            if showDistance, let distance = posting.distanceMiles {
+                HStack {
+                    Image(systemName: "location")
+                        .foregroundColor(.secondary)
+                        .font(.caption)
+
+                    Text(String(format: "%.1f miles away", distance))
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
                 }
             }
 
