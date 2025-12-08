@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Golf Course Model
 struct GolfCourse: Codable, Identifiable, Hashable {
     let id: Int?
-    let externalId: String?
+    let externalId: Int?
     let name: String
     let clubName: String?
     let address: String?
@@ -16,23 +16,7 @@ struct GolfCourse: Codable, Identifiable, Hashable {
     let phone: String?
     let website: String?
     let distanceMiles: Double?
-
-    enum CodingKeys: String, CodingKey {
-        case id
-        case externalId = "external_id"
-        case name
-        case clubName = "club_name"
-        case address
-        case city
-        case state
-        case zipCode = "zip_code"
-        case country
-        case latitude
-        case longitude
-        case phone
-        case website
-        case distanceMiles = "distance_miles"
-    }
+    // Note: convertFromSnakeCase decoder strategy automatically handles snake_case -> camelCase
 
     var displayLocation: String {
         var parts: [String] = []
@@ -49,18 +33,12 @@ struct GolfCourse: Codable, Identifiable, Hashable {
 // MARK: - Golf Course Response
 struct GolfCoursesResponse: Codable {
     let golfCourses: [GolfCourse]
-
-    enum CodingKeys: String, CodingKey {
-        case golfCourses = "golf_courses"
-    }
+    // Note: convertFromSnakeCase decoder strategy automatically handles golf_courses -> golfCourses
 }
 
 struct GolfCourseResponse: Codable {
     let golfCourse: GolfCourse
-
-    enum CodingKeys: String, CodingKey {
-        case golfCourse = "golf_course"
-    }
+    // Note: convertFromSnakeCase decoder strategy automatically handles golf_course -> golfCourse
 }
 
 // MARK: - Golf Course Service Protocol
@@ -116,36 +94,37 @@ class GolfCourseService: GolfCourseServiceProtocol {
             let golfCourse: GolfCourseData
 
             struct GolfCourseData: Encodable {
-                let externalId: String
+                let externalId: String?
                 let name: String
-                let clubName: String
-                let address: String
-                let city: String
-                let state: String
-                let zipCode: String
-                let country: String
-                let latitude: Double
-                let longitude: Double
-                let phone: String
-                let website: String
+                let clubName: String?
+                let address: String?
+                let city: String?
+                let state: String?
+                let zipCode: String?
+                let country: String?
+                let latitude: Double?
+                let longitude: Double?
+                let phone: String?
+                let website: String?
             }
         }
 
         let endpoint = APIConfiguration.Endpoint.golfCoursesCache
+        let externalIdString = course.externalId.map { String($0) }
         let body = CacheRequest(
             golfCourse: .init(
-                externalId: course.externalId ?? "",
+                externalId: externalIdString,
                 name: course.name,
-                clubName: course.clubName ?? "",
-                address: course.address ?? "",
-                city: course.city ?? "",
-                state: course.state ?? "",
-                zipCode: course.zipCode ?? "",
-                country: course.country ?? "",
-                latitude: course.latitude ?? 0,
-                longitude: course.longitude ?? 0,
-                phone: course.phone ?? "",
-                website: course.website ?? ""
+                clubName: course.clubName,
+                address: course.address,
+                city: course.city,
+                state: course.state,
+                zipCode: course.zipCode,
+                country: course.country,
+                latitude: course.latitude,
+                longitude: course.longitude,
+                phone: course.phone,
+                website: course.website
             )
         )
 

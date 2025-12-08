@@ -11,7 +11,9 @@ struct CreateTeeTimeView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @State private var courseName: String = ""
+    @State private var selectedGolfCourse: GolfCourse?
+    @State private var manualCourseName: String = ""
+    @State private var showCourseSearch = false
     @State private var teeTime: Date = Date().addingTimeInterval(86400) // Default to tomorrow
     @State private var totalSpots: Int = 4
     @State private var reserveForMyself: Int = 0
@@ -41,8 +43,49 @@ struct CreateTeeTimeView: View {
             Form {
                 // Course Information
                 Section("Course Information") {
-                    TextField("Course Name", text: $courseName)
-                        .autocapitalization(.words)
+                    // Golf Course Selection Button
+                    Button {
+                        showCourseSearch = true
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Golf Course")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+
+                                if let course = selectedGolfCourse {
+                                    Text(course.name)
+                                        .font(.body)
+                                        .foregroundColor(.primary)
+
+                                    if !course.displayLocation.isEmpty {
+                                        Text(course.displayLocation)
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                } else if !manualCourseName.isEmpty {
+                                    Text(manualCourseName)
+                                        .font(.body)
+                                        .foregroundColor(.primary)
+
+                                    Text("Manual entry (no location)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                } else {
+                                    Text("Tap to select course")
+                                        .font(.body)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+
+                            Spacer()
+
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(.secondary)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
 
                     DatePicker(
                         "Tee Time",
@@ -193,7 +236,13 @@ struct CreateTeeTimeView: View {
                     dismiss()
                 }
             } message: {
-                Text("Your tee time at \(courseName) has been posted.")
+                Text("Your tee time at \(displayCourseName) has been posted.")
+            }
+            .sheet(isPresented: $showCourseSearch) {
+                GolfCourseSearchView(
+                    selectedCourse: $selectedGolfCourse,
+                    manualCourseName: $manualCourseName
+                )
             }
             .task {
                 await loadGroups()
@@ -208,12 +257,24 @@ struct CreateTeeTimeView: View {
         }
     }
 
+    // MARK: - Computed Properties
+
+    private var displayCourseName: String {
+        if let course = selectedGolfCourse {
+            return course.name
+        } else if !manualCourseName.isEmpty {
+            return manualCourseName
+        } else {
+            return ""
+        }
+    }
+
     // MARK: - Validation
 
     private var isFormValid: Bool {
-        let hasCourseName = !courseName.trimmingCharacters(in: .whitespaces).isEmpty
+        let hasCourse = selectedGolfCourse != nil || !manualCourseName.trimmingCharacters(in: .whitespaces).isEmpty
         let hasValidVisibility = isPublic || !selectedGroupIds.isEmpty
-        return hasCourseName && hasValidVisibility
+        return hasCourse && hasValidVisibility
     }
 
     // MARK: - Private Methods
@@ -242,13 +303,27 @@ struct CreateTeeTimeView: View {
 
         do {
             let groupIds = isPublic ? [] : Array(selectedGroupIds)
+
+            // Determine course name and ID
+            let courseName: String
+            let golfCourseId: Int?
+
+            if let course = selectedGolfCourse {
+                courseName = course.name
+                golfCourseId = course.id
+            } else {
+                courseName = manualCourseName.trimmingCharacters(in: .whitespaces)
+                golfCourseId = nil
+            }
+
             let _ = try await teeTimeService.createTeeTimePosting(
-                courseName: courseName.trimmingCharacters(in: .whitespaces),
+                courseName: courseName,
                 teeTime: teeTime,
                 totalSpots: totalSpots,
                 initialReservationSpots: reserveForMyself > 0 ? reserveForMyself : nil,
                 notes: notes.trimmingCharacters(in: .whitespaces).isEmpty ? nil : notes.trimmingCharacters(in: .whitespaces),
-                groupIds: groupIds
+                groupIds: groupIds,
+                golfCourseId: golfCourseId
             )
             showSuccessAlert = true
         } catch {
