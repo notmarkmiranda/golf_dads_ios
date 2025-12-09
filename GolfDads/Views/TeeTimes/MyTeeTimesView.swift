@@ -173,22 +173,39 @@ struct MyTeeTimesView: View {
             do {
                 return try await self.teeTimeService.getMyTeeTimePostings()
             } catch {
-                self.errorMessage = "Failed to load tee times: \(error.localizedDescription)"
+                print("❌ Failed to load postings: \(error)")
                 return []
             }
         }()
 
         async let reservationsResult: [Reservation] = {
             do {
-                return try await self.reservationService.getMyReservations()
+                let reservations = try await self.reservationService.getMyReservations()
+                print("🔍 MyTeeTimesView: Loaded \(reservations.count) reservations")
+                for reservation in reservations {
+                    print("  - Reservation \(reservation.id): \(reservation.spotsReserved) spots")
+                    if let posting = reservation.teeTimePosting {
+                        print("    ✅ Has teeTimePosting: \(posting.courseName)")
+                    } else {
+                        print("    ❌ Missing teeTimePosting")
+                    }
+                }
+                return reservations
             } catch {
-                print("Failed to load reservations: \(error)")
+                print("❌ Failed to load reservations: \(error)")
                 return []
             }
         }()
 
         teeTimePostings = await postingsResult
         myReservations = await reservationsResult
+
+        print("📊 Final state: \(teeTimePostings.count) postings, \(myReservations.count) reservations")
+
+        // Set error message if both failed
+        if teeTimePostings.isEmpty && myReservations.isEmpty {
+            errorMessage = "Failed to load tee times. Please try again."
+        }
 
         isLoading = false
     }
