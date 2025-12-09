@@ -166,6 +166,12 @@ struct MyTeeTimesView: View {
 
     @MainActor
     private func loadData() async {
+        // Prevent concurrent loads
+        guard !isLoading else {
+            print("⚠️ Load already in progress, skipping")
+            return
+        }
+
         isLoading = true
         errorMessage = nil
 
