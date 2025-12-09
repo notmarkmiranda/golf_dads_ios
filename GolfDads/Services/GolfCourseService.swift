@@ -69,7 +69,28 @@ class GolfCourseService: GolfCourseServiceProtocol {
             body: nil as String?,
             requiresAuth: true
         )
-        return response.golfCourses
+
+        // Deduplicate courses (client-side safety measure)
+        var seen = Set<String>()
+        return response.golfCourses.filter { course in
+            let key: String
+            if let externalId = course.externalId {
+                key = "ext_\(externalId)"
+            } else {
+                // Use name + city + state as fallback
+                let name = course.name.lowercased().trimmingCharacters(in: .whitespaces)
+                let city = course.city?.lowercased().trimmingCharacters(in: .whitespaces) ?? ""
+                let state = course.state?.lowercased().trimmingCharacters(in: .whitespaces) ?? ""
+                key = "name_\(name)_\(city)_\(state)"
+            }
+
+            if seen.contains(key) {
+                return false
+            } else {
+                seen.insert(key)
+                return true
+            }
+        }
     }
 
     // MARK: - Get Nearby Courses
