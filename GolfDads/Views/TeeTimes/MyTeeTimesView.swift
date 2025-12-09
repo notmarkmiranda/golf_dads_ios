@@ -148,7 +148,7 @@ struct MyTeeTimesView: View {
                     Text("Are you sure you want to delete the tee time at \(posting.courseName)?")
                 }
             }
-            .task {
+            .task(id: "loadData") {
                 await loadData()
             }
             .onChange(of: showCreateSheet) { _, newValue in
@@ -178,6 +178,19 @@ struct MyTeeTimesView: View {
         async let postingsResult: [TeeTimePosting] = {
             do {
                 return try await self.teeTimeService.getMyTeeTimePostings()
+            } catch is CancellationError {
+                print("⚠️ Postings request was cancelled")
+                return []
+            } catch let error as APIError {
+                // Check if it's a URLError with code -999 (cancelled)
+                if case .unknown(let underlyingError) = error,
+                   let urlError = underlyingError as? URLError,
+                   urlError.code == .cancelled {
+                    print("⚠️ Postings request was cancelled (URLError -999)")
+                    return []
+                }
+                print("❌ Failed to load postings: \(error)")
+                return []
             } catch {
                 print("❌ Failed to load postings: \(error)")
                 return []
@@ -197,6 +210,19 @@ struct MyTeeTimesView: View {
                     }
                 }
                 return reservations
+            } catch is CancellationError {
+                print("⚠️ Reservations request was cancelled")
+                return []
+            } catch let error as APIError {
+                // Check if it's a URLError with code -999 (cancelled)
+                if case .unknown(let underlyingError) = error,
+                   let urlError = underlyingError as? URLError,
+                   urlError.code == .cancelled {
+                    print("⚠️ Reservations request was cancelled (URLError -999)")
+                    return []
+                }
+                print("❌ Failed to load reservations: \(error)")
+                return []
             } catch {
                 print("❌ Failed to load reservations: \(error)")
                 return []
