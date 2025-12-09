@@ -199,7 +199,7 @@ struct GolfCourseSearchView: View {
                         }
                     }
 
-                    ForEach(searchResults) { course in
+                    ForEach(searchResults, id: \.self) { course in
                         Button {
                             Task {
                                 await selectCourse(course)
@@ -328,7 +328,7 @@ struct GolfCourseSearchView: View {
                 ProgressView("Searching nearby courses...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(searchResults) { course in
+                List(searchResults, id: \.self) { course in
                     Button {
                         Task {
                             await selectCourse(course)
