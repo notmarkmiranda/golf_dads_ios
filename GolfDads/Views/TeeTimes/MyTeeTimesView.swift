@@ -240,13 +240,22 @@ struct MyTeeTimesView: View {
             }
         }()
 
-        teeTimePostings = await postingsResult
-        myReservations = await reservationsResult
+        let newPostings = await postingsResult
+        let newReservations = await reservationsResult
+
+        // Only update if we got results OR if we currently have no data
+        // This prevents clearing data on cancelled refreshes
+        if !newPostings.isEmpty || teeTimePostings.isEmpty {
+            teeTimePostings = newPostings
+        }
+        if !newReservations.isEmpty || myReservations.isEmpty {
+            myReservations = newReservations
+        }
 
         print("📊 Final state: \(teeTimePostings.count) postings, \(myReservations.count) reservations")
 
-        // Set error message if both failed
-        if teeTimePostings.isEmpty && myReservations.isEmpty {
+        // Set error message only if both failed AND we have no existing data
+        if newPostings.isEmpty && newReservations.isEmpty && teeTimePostings.isEmpty && myReservations.isEmpty {
             errorMessage = "Failed to load tee times. Please try again."
         }
 
