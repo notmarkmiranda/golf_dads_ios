@@ -384,7 +384,8 @@ struct TeeTimeDetailView: View {
                 teeTimePostingId: posting.id,
                 spotsReserved: existing.spotsReserved,
                 createdAt: existing.createdAt,
-                updatedAt: existing.createdAt
+                updatedAt: existing.createdAt,
+                teeTimePosting: nil
             )
             spotsToReserve = existing.spotsReserved
             print("   ✅ Set myExistingReservation with \(existing.spotsReserved) spots")

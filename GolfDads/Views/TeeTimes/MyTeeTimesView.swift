@@ -10,6 +10,7 @@ import SwiftUI
 struct MyTeeTimesView: View {
 
     @State private var teeTimePostings: [TeeTimePosting] = []
+    @State private var myReservations: [Reservation] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showCreateSheet = false
@@ -17,9 +18,14 @@ struct MyTeeTimesView: View {
     @State private var showDeleteAlert = false
 
     private let teeTimeService: TeeTimeServiceProtocol
+    private let reservationService: ReservationServiceProtocol
 
-    init(teeTimeService: TeeTimeServiceProtocol = TeeTimeService()) {
+    init(
+        teeTimeService: TeeTimeServiceProtocol = TeeTimeService(),
+        reservationService: ReservationServiceProtocol = ReservationService()
+    ) {
         self.teeTimeService = teeTimeService
+        self.reservationService = reservationService
     }
 
     var body: some View {
@@ -39,13 +45,13 @@ struct MyTeeTimesView: View {
 
                         Button("Try Again") {
                             Task {
-                                await loadMyTeeTimePostings()
+                                await loadData()
                             }
                         }
                         .buttonStyle(.bordered)
                     }
                     .padding()
-                } else if teeTimePostings.isEmpty {
+                } else if teeTimePostings.isEmpty && myReservations.isEmpty {
                     VStack(spacing: 16) {
                         Image(systemName: "calendar.badge.plus")
                             .font(.system(size: 50))
@@ -71,23 +77,45 @@ struct MyTeeTimesView: View {
                     .padding()
                 } else {
                     List {
-                        ForEach(teeTimePostings) { posting in
-                            NavigationLink(destination: TeeTimeDetailView(posting: posting)) {
-                                MyTeeTimeRow(posting: posting)
-                            }
-                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                Button(role: .destructive) {
-                                    postingToDelete = posting
-                                    showDeleteAlert = true
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
+                        // My Postings Section
+                        if !teeTimePostings.isEmpty {
+                            Section {
+                                ForEach(teeTimePostings) { posting in
+                                    NavigationLink(destination: TeeTimeDetailView(posting: posting)) {
+                                        MyTeeTimeRow(posting: posting)
+                                    }
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                        Button(role: .destructive) {
+                                            postingToDelete = posting
+                                            showDeleteAlert = true
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                    }
                                 }
+                            } header: {
+                                Text("My Postings")
+                            }
+                        }
+
+                        // My Reservations Section
+                        if !myReservations.isEmpty {
+                            Section {
+                                ForEach(myReservations) { reservation in
+                                    if let posting = reservation.teeTimePosting {
+                                        NavigationLink(destination: TeeTimeDetailView(posting: createTeeTimePosting(from: reservation))) {
+                                            MyReservationRow(reservation: reservation, posting: posting)
+                                        }
+                                    }
+                                }
+                            } header: {
+                                Text("My Reservations")
                             }
                         }
                     }
                     .listStyle(.insetGrouped)
                     .refreshable {
-                        await loadMyTeeTimePostings()
+                        await loadData()
                     }
                 }
             }
@@ -121,13 +149,13 @@ struct MyTeeTimesView: View {
                 }
             }
             .task {
-                await loadMyTeeTimePostings()
+                await loadData()
             }
             .onChange(of: showCreateSheet) { _, newValue in
                 // Reload when create sheet is dismissed
                 if !newValue {
                     Task {
-                        await loadMyTeeTimePostings()
+                        await loadData()
                     }
                 }
             }
@@ -136,17 +164,55 @@ struct MyTeeTimesView: View {
 
     // MARK: - Private Methods
 
-    private func loadMyTeeTimePostings() async {
+    @MainActor
+    private func loadData() async {
         isLoading = true
         errorMessage = nil
 
-        do {
-            teeTimePostings = try await teeTimeService.getMyTeeTimePostings()
-        } catch {
-            errorMessage = "Failed to load tee times: \(error.localizedDescription)"
-        }
+        async let postingsResult: [TeeTimePosting] = {
+            do {
+                return try await self.teeTimeService.getMyTeeTimePostings()
+            } catch {
+                self.errorMessage = "Failed to load tee times: \(error.localizedDescription)"
+                return []
+            }
+        }()
+
+        async let reservationsResult: [Reservation] = {
+            do {
+                return try await self.reservationService.getMyReservations()
+            } catch {
+                print("Failed to load reservations: \(error)")
+                return []
+            }
+        }()
+
+        teeTimePostings = await postingsResult
+        myReservations = await reservationsResult
 
         isLoading = false
+    }
+
+    private func createTeeTimePosting(from reservation: Reservation) -> TeeTimePosting {
+        guard let posting = reservation.teeTimePosting else {
+            fatalError("Reservation should have posting info")
+        }
+
+        return TeeTimePosting(
+            id: posting.id,
+            userId: reservation.userId,
+            groupIds: [],
+            teeTime: posting.teeTime,
+            courseName: posting.courseName,
+            golfCourse: nil,
+            distanceMiles: nil,
+            availableSpots: posting.availableSpots,
+            totalSpots: posting.totalSpots,
+            notes: posting.notes,
+            reservations: nil,
+            createdAt: reservation.createdAt,
+            updatedAt: reservation.updatedAt
+        )
     }
 
     private func deleteTeeTime(_ posting: TeeTimePosting) async {
@@ -182,6 +248,82 @@ struct MyTeeTimeRow: View {
                     Image(systemName: "lock.fill")
                         .foregroundColor(.orange)
                         .font(.caption)
+                }
+            }
+
+            HStack {
+                Image(systemName: "calendar")
+                    .foregroundColor(.secondary)
+                    .font(.caption)
+
+                Text(posting.teeTime, style: .date)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+
+                Text(posting.teeTime, style: .time)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+
+            HStack {
+                Image(systemName: "person.2")
+                    .foregroundColor(.secondary)
+                    .font(.caption)
+
+                Text("\(posting.availableSpots) spots available")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+
+                if let totalSpots = posting.totalSpots {
+                    Text("of \(totalSpots)")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            if let notes = posting.notes, !notes.isEmpty {
+                Text(notes)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+            }
+
+            if posting.isPast {
+                Text("Past")
+                    .font(.caption)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.red.opacity(0.2))
+                    .foregroundColor(.red)
+                    .cornerRadius(4)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+// MARK: - My Reservation Row
+
+struct MyReservationRow: View {
+    let reservation: Reservation
+    let posting: ReservationTeeTimeInfo
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(posting.courseName)
+                    .font(.headline)
+
+                Spacer()
+
+                HStack(spacing: 4) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                        .font(.caption)
+
+                    Text("\(reservation.spotsReserved) \(reservation.spotsReserved == 1 ? "spot" : "spots")")
+                        .font(.caption)
+                        .foregroundColor(.green)
                 }
             }
 
