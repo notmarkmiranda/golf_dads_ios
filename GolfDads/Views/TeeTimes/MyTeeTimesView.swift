@@ -16,6 +16,7 @@ struct MyTeeTimesView: View {
     @State private var showCreateSheet = false
     @State private var postingToDelete: TeeTimePosting?
     @State private var showDeleteAlert = false
+    @State private var currentLoadTask: Task<Void, Never>?
 
     private let teeTimeService: TeeTimeServiceProtocol
     private let reservationService: ReservationServiceProtocol
@@ -114,9 +115,6 @@ struct MyTeeTimesView: View {
                         }
                     }
                     .listStyle(.insetGrouped)
-                    .refreshable {
-                        await loadData()
-                    }
                 }
             }
             .navigationTitle("My Tee Times")
@@ -149,20 +147,33 @@ struct MyTeeTimesView: View {
                 }
             }
             .task(id: "loadData") {
+                startLoadData()
+            }
+            .refreshable {
+                // Cancel existing task and start new one
+                currentLoadTask?.cancel()
                 await loadData()
             }
             .onChange(of: showCreateSheet) { _, newValue in
                 // Reload when create sheet is dismissed
                 if !newValue {
-                    Task {
-                        await loadData()
-                    }
+                    startLoadData()
                 }
             }
         }
     }
 
     // MARK: - Private Methods
+
+    private func startLoadData() {
+        // Cancel any existing load task
+        currentLoadTask?.cancel()
+
+        // Start a new load task
+        currentLoadTask = Task {
+            await loadData()
+        }
+    }
 
     @MainActor
     private func loadData() async {
