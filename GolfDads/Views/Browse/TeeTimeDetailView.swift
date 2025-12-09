@@ -129,19 +129,33 @@ struct TeeTimeDetailView: View {
                     }
                 }
 
-                // Reservations Section (only visible to posting owner)
+                // Reservations Section (visible to all users)
                 if let reservations = posting.reservations, !reservations.isEmpty {
                     Divider()
 
                     VStack(alignment: .leading, spacing: 12) {
-                        Label("Reservations", systemImage: "person.2.fill")
+                        Label("Reservations (\(reservations.count))", systemImage: "person.2.fill")
                             .font(.headline)
 
                         ForEach(reservations) { reservation in
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(reservation.userEmail)
-                                        .font(.body)
+                                    HStack(spacing: 4) {
+                                        Text(reservation.userEmail)
+                                            .font(.body)
+
+                                        // Show "You" badge if this is the current user's reservation
+                                        if reservation.userId == currentUserId {
+                                            Text("(You)")
+                                                .font(.caption)
+                                                .foregroundColor(.blue)
+                                                .padding(.horizontal, 6)
+                                                .padding(.vertical, 2)
+                                                .background(Color.blue.opacity(0.1))
+                                                .cornerRadius(4)
+                                        }
+                                    }
+
                                     Text("Reserved \(reservation.createdAt, style: .relative) ago")
                                         .font(.caption)
                                         .foregroundColor(.secondary)

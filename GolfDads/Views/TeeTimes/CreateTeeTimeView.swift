@@ -22,6 +22,7 @@ struct CreateTeeTimeView: View {
     @State private var selectedGroupIds: Set<Int> = []
     @State private var availableGroups: [Group] = []
     @State private var isLoadingGroups = false
+    @State private var hasInitializedVisibility = false
 
     @State private var isCreating = false
     @State private var errorMessage: String?
@@ -283,6 +284,13 @@ struct CreateTeeTimeView: View {
         isLoadingGroups = true
         do {
             availableGroups = try await groupService.getGroups()
+
+            // On first load, if user has groups, default to private and select all groups
+            if !hasInitializedVisibility && !availableGroups.isEmpty {
+                isPublic = false
+                selectedGroupIds = Set(availableGroups.map { $0.id })
+                hasInitializedVisibility = true
+            }
         } catch {
             // Silently fail - user will see empty state
         }
