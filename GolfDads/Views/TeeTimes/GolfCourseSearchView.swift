@@ -27,6 +27,7 @@ struct GolfCourseSearchView: View {
     @State private var errorMessage: String?
     @State private var searchTask: Task<Void, Never>?
     @State private var radiusMiles: Int = 25
+    @State private var showManualEntry = false
 
     private let golfCourseService: GolfCourseServiceProtocol
 
@@ -74,6 +75,19 @@ struct GolfCourseSearchView: View {
             }
             .onChange(of: searchText) { _, newValue in
                 handleSearchTextChange(newValue)
+            }
+            .sheet(isPresented: $showManualEntry) {
+                ManualCourseEntryView(
+                    selectedCourse: $selectedCourse,
+                    manualCourseName: $manualCourseName,
+                    initialCourseName: searchText
+                )
+            }
+            .onChange(of: selectedCourse) { _, newValue in
+                // Dismiss when a course is selected (from manual entry or search)
+                if newValue != nil {
+                    dismiss()
+                }
             }
         }
     }
@@ -483,9 +497,7 @@ struct GolfCourseSearchView: View {
     }
 
     private func selectManualEntry() {
-        manualCourseName = searchText.trimmingCharacters(in: .whitespaces)
-        selectedCourse = nil // Clear selected course
-        dismiss()
+        showManualEntry = true
     }
 }
 
