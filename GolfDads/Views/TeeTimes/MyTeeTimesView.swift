@@ -243,18 +243,20 @@ struct MyTeeTimesView: View {
         let newPostings = await postingsResult
         let newReservations = await reservationsResult
 
+        // Get IDs of postings where user has a reservation
+        let postingIdsWithReservations = Set(newReservations.compactMap { $0.teeTimePosting?.id })
+
         // Only update if we got results OR if we currently have no data
         // This prevents clearing data on cancelled refreshes
         if !newPostings.isEmpty || teeTimePostings.isEmpty {
-            teeTimePostings = newPostings
+            // Filter out postings where the user has a reservation
+            // (those should appear in "My Reservations" instead)
+            teeTimePostings = newPostings.filter { !postingIdsWithReservations.contains($0.id) }
         }
         if !newReservations.isEmpty || myReservations.isEmpty {
-            // Filter out reservations where the user is the posting owner
-            // (those should only appear in "My Postings", not "My Reservations")
-            myReservations = newReservations.filter { reservation in
-                guard let posting = reservation.teeTimePosting else { return false }
-                return posting.userId != reservation.userId
-            }
+            // Keep all reservations - even if user owns the posting
+            // If they reserved spots on their own posting, show it in reservations
+            myReservations = newReservations
         }
 
         print("📊 Final state: \(teeTimePostings.count) postings, \(myReservations.count) reservations")
