@@ -9,6 +9,7 @@ import Foundation
 
 struct ReservationTeeTimeInfo: Codable, Equatable, Hashable {
     let id: Int
+    let userId: Int
     let courseName: String
     let teeTime: Date
     let availableSpots: Int

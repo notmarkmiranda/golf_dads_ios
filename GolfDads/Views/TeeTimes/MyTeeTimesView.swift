@@ -249,7 +249,12 @@ struct MyTeeTimesView: View {
             teeTimePostings = newPostings
         }
         if !newReservations.isEmpty || myReservations.isEmpty {
-            myReservations = newReservations
+            // Filter out reservations where the user is the posting owner
+            // (those should only appear in "My Postings", not "My Reservations")
+            myReservations = newReservations.filter { reservation in
+                guard let posting = reservation.teeTimePosting else { return false }
+                return posting.userId != reservation.userId
+            }
         }
 
         print("📊 Final state: \(teeTimePostings.count) postings, \(myReservations.count) reservations")
