@@ -311,7 +311,11 @@ struct TeeTimeDetailView: View {
         }
         .alert("Success!", isPresented: $showSuccessAlert) {
             Button("OK") {
-                dismiss()
+                // Only dismiss if this was a new reservation or update
+                // Don't dismiss on cancellation so user can see the updated posting
+                if !successMessage.contains("cancelled") {
+                    dismiss()
+                }
             }
         } message: {
             Text(successMessage)
@@ -435,6 +439,11 @@ struct TeeTimeDetailView: View {
             myExistingReservation = nil
             spotsToReserve = 1
             successMessage = "Your reservation has been cancelled."
+
+            // Refresh the posting to show updated available spots
+            await refreshPosting()
+            loadExistingReservation()
+
             showSuccessAlert = true
         } catch let error as APIError {
             // If the reservation is already gone (404), treat it as success
@@ -442,6 +451,11 @@ struct TeeTimeDetailView: View {
                 myExistingReservation = nil
                 spotsToReserve = 1
                 successMessage = "Your reservation has been cancelled."
+
+                // Refresh the posting to show updated available spots
+                await refreshPosting()
+                loadExistingReservation()
+
                 showSuccessAlert = true
             } else {
                 reservationError = "Failed to cancel reservation: \(error.localizedDescription)"
