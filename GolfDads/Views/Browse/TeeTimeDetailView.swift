@@ -329,7 +329,10 @@ struct TeeTimeDetailView: View {
             Button("Add to Calendar") {
                 Task {
                     if let reservation = pendingReservation {
-                        await calendarSyncManager.syncReservation(reservation, shouldPromptUser: false)
+                        let success = await calendarSyncManager.syncReservation(reservation, shouldPromptUser: true)
+                        if !success {
+                            reservationError = "Failed to add to calendar. Please check calendar permissions in Settings."
+                        }
                     }
                     pendingReservation = nil
                 }

@@ -248,7 +248,10 @@ struct CreateTeeTimeView: View {
                 Button("Add to Calendar") {
                     Task {
                         if let posting = createdPosting {
-                            await calendarSyncManager.syncPosting(posting, shouldPromptUser: false)
+                            let success = await calendarSyncManager.syncPosting(posting, shouldPromptUser: true)
+                            if !success {
+                                errorMessage = "Failed to add to calendar. Please check calendar permissions in Settings."
+                            }
                         }
                         createdPosting = nil
                     }
