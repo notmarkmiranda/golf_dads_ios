@@ -113,7 +113,7 @@ struct GroupDetailView: View {
                     }
                     .buttonStyle(.borderless)
 
-                    ShareLink(item: group.inviteCode) {
+                    ShareLink(item: shareMessage, subject: Text("Join my golf group!")) {
                         Label("Share", systemImage: "square.and.arrow.up")
                             .labelStyle(.iconOnly)
                     }
@@ -208,6 +208,22 @@ struct GroupDetailView: View {
                     }
                 }
         }
+    }
+
+    // MARK: - Computed Properties
+
+    private var shareMessage: String {
+        let deepLink = "threeputt://groups/join?code=\(group.inviteCode)"
+        return """
+        Join "\(group.name)" on Three Putt!
+
+        Tap this link if you have the app:
+        \(deepLink)
+
+        Or manually enter code: \(group.inviteCode)
+
+        Don't have Three Putt yet? Download it from the App Store!
+        """
     }
 
     // MARK: - Methods
