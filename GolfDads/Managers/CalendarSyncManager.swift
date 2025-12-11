@@ -4,20 +4,18 @@
 //
 
 import Foundation
-import Observation
 
 /// Manager for orchestrating calendar sync operations
 @MainActor
-@Observable
-class CalendarSyncManager {
+class CalendarSyncManager: ObservableObject {
 
     // MARK: - Properties
 
     private let calendarService: CalendarServiceProtocol
     private let storageService: CalendarEventStorageProtocol
 
-    private(set) var hasCalendarPermission: Bool = false
-    private(set) var isSyncing: Bool = false
+    @Published private(set) var hasCalendarPermission: Bool = false
+    @Published private(set) var isSyncing: Bool = false
 
     // MARK: - Initialization
 
