@@ -63,7 +63,7 @@ class DeepLinkHandler: ObservableObject {
 
     private func joinGroup(with code: String) async {
         do {
-            let group = try await groupService.joinWithCode(code)
+            let group = try await groupService.joinWithInviteCode(code)
 
             // Show success message
             alertMessage = "Successfully joined \"\(group.name)\"!"
