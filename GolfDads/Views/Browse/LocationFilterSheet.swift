@@ -93,7 +93,7 @@ struct LocationFilterSheet: View {
                     } header: {
                         Text("Location Permission")
                     } footer: {
-                        Text("Golf Dads needs your location to show nearby tee times. You can also manually enter a zip code below.")
+                        Text("Three Putt needs your location to show nearby tee times. You can also manually enter a zip code below.")
                     }
 
                     // Manual Zip Code Override

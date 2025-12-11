@@ -7,7 +7,7 @@
 	<key>API_BASE_URL</key>
 	<string>$(API_BASE_URL)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Golf Dads needs your location to show nearby tee times and golf courses in your area.</string>
+	<string>Three Putt needs your location to show nearby tee times and golf courses in your area.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

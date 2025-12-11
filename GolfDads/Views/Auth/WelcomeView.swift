@@ -35,7 +35,7 @@ struct WelcomeView: View {
                         .font(.system(size: 80))
                         .foregroundColor(.white)
 
-                    Text("Golf Dads")
+                    Text("Three Putt")
                         .font(.system(size: 48, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
 

@@ -35,7 +35,7 @@ struct SignUpView: View {
                                 .foregroundColor(Color(red: 0.2, green: 0.6, blue: 0.3))
                                 .padding(.top, 40)
 
-                            Text("Join Golf Dads")
+                            Text("Join Three Putt")
                                 .font(.title.bold())
 
                             Text("Create your account")
