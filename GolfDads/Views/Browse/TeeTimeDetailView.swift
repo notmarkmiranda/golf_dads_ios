@@ -316,9 +316,13 @@ struct TeeTimeDetailView: View {
         }
         .alert("Success!", isPresented: $showSuccessAlert) {
             Button("OK") {
-                // Only dismiss if this was a new reservation or update
-                // Don't dismiss on cancellation so user can see the updated posting
-                if !successMessage.contains("cancelled") {
+                // If this was a new reservation, show calendar prompt next
+                if pendingReservation != nil {
+                    showCalendarPrompt = true
+                }
+                // Only dismiss if this was an update or cancellation (no calendar prompt)
+                // Don't dismiss if we're showing calendar prompt next
+                else if !successMessage.contains("cancelled") {
                     dismiss()
                 }
             }
@@ -335,10 +339,12 @@ struct TeeTimeDetailView: View {
                         }
                     }
                     pendingReservation = nil
+                    dismiss()
                 }
             }
             Button("Not Now", role: .cancel) {
                 pendingReservation = nil
+                dismiss()
             }
         } message: {
             Text("Would you like to add this tee time to your calendar? It will automatically update if the time changes.")
@@ -446,9 +452,9 @@ struct TeeTimeDetailView: View {
                 )
                 myExistingReservation = created
 
-                // Show calendar prompt for new reservation
+                // Store reservation for calendar prompt
+                // Calendar prompt will show after success alert is dismissed
                 pendingReservation = created
-                showCalendarPrompt = true
 
                 successMessage = "You've successfully reserved \(spotsToReserve) \(spotsToReserve == 1 ? "spot" : "spots") for this tee time."
             }
