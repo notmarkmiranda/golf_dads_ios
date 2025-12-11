@@ -116,7 +116,8 @@ final class ReservationTests: XCTestCase {
             teeTimePostingId: 10,
             spotsReserved: 2,
             createdAt: Date(timeIntervalSince1970: 1705315800),
-            updatedAt: Date(timeIntervalSince1970: 1705315800)
+            updatedAt: Date(timeIntervalSince1970: 1705315800),
+            teeTimePosting: nil
         )
 
         let encoder = JSONEncoder()
@@ -145,7 +146,8 @@ final class ReservationTests: XCTestCase {
             teeTimePostingId: 10,
             spotsReserved: 2,
             createdAt: date,
-            updatedAt: date
+            updatedAt: date,
+            teeTimePosting: nil
         )
 
         let reservation2 = Reservation(
@@ -154,7 +156,8 @@ final class ReservationTests: XCTestCase {
             teeTimePostingId: 10,
             spotsReserved: 2,
             createdAt: date,
-            updatedAt: date
+            updatedAt: date,
+            teeTimePosting: nil
         )
 
         let reservation3 = Reservation(
@@ -163,7 +166,8 @@ final class ReservationTests: XCTestCase {
             teeTimePostingId: 10,
             spotsReserved: 3,
             createdAt: date,
-            updatedAt: date
+            updatedAt: date,
+            teeTimePosting: nil
         )
 
         // Then
@@ -181,7 +185,8 @@ final class ReservationTests: XCTestCase {
             teeTimePostingId: 10,
             spotsReserved: 2,
             createdAt: Date(),
-            updatedAt: Date()
+            updatedAt: Date(),
+            teeTimePosting: nil
         )
 
         // Then

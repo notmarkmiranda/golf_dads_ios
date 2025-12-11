@@ -45,9 +45,7 @@ final class AuthenticationServiceTests: XCTestCase {
                 email: email,
                 name: name,
                 avatarUrl: nil,
-                provider: "email",
-                venmoHandle: nil,
-                handicap: nil
+                provider: "email"
             )
         )
         mockNetworkService.mockResponse = mockResponse
@@ -101,9 +99,7 @@ final class AuthenticationServiceTests: XCTestCase {
                 email: email,
                 name: "Existing User",
                 avatarUrl: "https://example.com/avatar.jpg",
-                provider: "email",
-                venmoHandle: nil,
-                handicap: nil
+                provider: "email"
             )
         )
         mockNetworkService.mockResponse = mockResponse
@@ -161,9 +157,7 @@ final class AuthenticationServiceTests: XCTestCase {
                 email: "google@example.com",
                 name: "Google User",
                 avatarUrl: "https://lh3.googleusercontent.com/avatar",
-                provider: "google",
-                venmoHandle: nil,
-                handicap: nil
+                provider: "google"
             )
         )
         mockNetworkService.mockResponse = mockResponse
@@ -196,9 +190,7 @@ final class AuthenticationServiceTests: XCTestCase {
             email: "current@example.com",
             name: "Current User",
             avatarUrl: nil,
-            provider: "email",
-            venmoHandle: nil,
-            handicap: nil
+            provider: "email"
         )
         mockNetworkService.mockResponse = mockUser
 

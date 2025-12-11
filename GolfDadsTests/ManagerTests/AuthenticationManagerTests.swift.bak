@@ -63,9 +63,7 @@ final class AuthenticationManagerTests: XCTestCase {
                 email: email,
                 name: name,
                 avatarUrl: nil,
-                provider: "email",
-                venmoHandle: nil,
-                handicap: nil
+                provider: "email"
             )
         )
         mockAuthService.mockResponse = mockResponse
@@ -108,7 +106,7 @@ final class AuthenticationManagerTests: XCTestCase {
         let expectation = expectation(description: "Loading state observed")
         mockAuthService.mockResponse = AuthenticationResponse(
             token: "token",
-            user: AuthenticatedUser(id: 1, email: "test@example.com", name: "Test", avatarUrl: nil, provider: "email", venmoHandle: nil, handicap: nil)
+            user: AuthenticatedUser(id: 1, email: "test@example.com", name: "Test", avatarUrl: nil, provider: "email")
         )
 
         // When
@@ -142,9 +140,7 @@ final class AuthenticationManagerTests: XCTestCase {
                 email: email,
                 name: "Existing User",
                 avatarUrl: "https://example.com/avatar.jpg",
-                provider: "email",
-                venmoHandle: nil,
-                handicap: nil
+                provider: "email"
             )
         )
         mockAuthService.mockResponse = mockResponse
@@ -236,7 +232,7 @@ final class AuthenticationManagerTests: XCTestCase {
         // Given - set up authenticated state
         mockAuthService.mockResponse = AuthenticationResponse(
             token: "token",
-            user: AuthenticatedUser(id: 1, email: "test@example.com", name: "Test", avatarUrl: nil, provider: "email", venmoHandle: nil, handicap: nil)
+            user: AuthenticatedUser(id: 1, email: "test@example.com", name: "Test", avatarUrl: nil, provider: "email")
         )
         await sut.login(email: "test@example.com", password: "pass")
         XCTAssertTrue(sut.isAuthenticated)
@@ -256,7 +252,7 @@ final class AuthenticationManagerTests: XCTestCase {
         // Given - set up authenticated state
         mockAuthService.mockResponse = AuthenticationResponse(
             token: "token",
-            user: AuthenticatedUser(id: 1, email: "test@example.com", name: "Test", avatarUrl: nil, provider: "email", venmoHandle: nil, handicap: nil)
+            user: AuthenticatedUser(id: 1, email: "test@example.com", name: "Test", avatarUrl: nil, provider: "email")
         )
         await sut.login(email: "test@example.com", password: "pass")
 
@@ -322,9 +318,7 @@ final class AuthenticationManagerTests: XCTestCase {
             email: "updated@example.com",
             name: "Updated User",
             avatarUrl: "https://example.com/new-avatar.jpg",
-            provider: "email",
-            venmoHandle: nil,
-            handicap: nil
+            provider: "email"
         )
         mockAuthService.mockUser = mockUser
         mockAuthService.mockIsLoggedIn = true
