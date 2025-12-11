@@ -28,6 +28,11 @@ struct CreateTeeTimeView: View {
     @State private var errorMessage: String?
     @State private var showSuccessAlert = false
 
+    // Calendar integration
+    @StateObject private var calendarSyncManager = CalendarSyncManager()
+    @State private var showCalendarPrompt = false
+    @State private var createdPosting: TeeTimePosting?
+
     private let teeTimeService: TeeTimeServiceProtocol
     private let groupService: GroupServiceProtocol
 
@@ -239,6 +244,21 @@ struct CreateTeeTimeView: View {
             } message: {
                 Text("Your tee time at \(displayCourseName) has been posted.")
             }
+            .alert("Add to Calendar?", isPresented: $showCalendarPrompt) {
+                Button("Add to Calendar") {
+                    Task {
+                        if let posting = createdPosting {
+                            await calendarSyncManager.syncPosting(posting, shouldPromptUser: false)
+                        }
+                        createdPosting = nil
+                    }
+                }
+                Button("Not Now", role: .cancel) {
+                    createdPosting = nil
+                }
+            } message: {
+                Text("Would you like to add this tee time to your calendar? It will automatically update if the time changes.")
+            }
             .sheet(isPresented: $showCourseSearch) {
                 GolfCourseSearchView(
                     selectedCourse: $selectedGolfCourse,
@@ -324,7 +344,7 @@ struct CreateTeeTimeView: View {
                 golfCourseId = nil
             }
 
-            let _ = try await teeTimeService.createTeeTimePosting(
+            let posting = try await teeTimeService.createTeeTimePosting(
                 courseName: courseName,
                 teeTime: teeTime,
                 totalSpots: totalSpots,
@@ -333,6 +353,13 @@ struct CreateTeeTimeView: View {
                 groupIds: groupIds,
                 golfCourseId: golfCourseId
             )
+
+            // Show calendar prompt if user reserved spots for themselves
+            if reserveForMyself > 0 {
+                createdPosting = posting
+                showCalendarPrompt = true
+            }
+
             showSuccessAlert = true
         } catch {
             errorMessage = "Failed to create tee time: \(error.localizedDescription)"

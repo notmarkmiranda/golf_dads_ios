@@ -26,6 +26,11 @@ struct TeeTimeDetailView: View {
     private let teeTimeService: TeeTimeServiceProtocol
     @State private var currentUserId: Int?
 
+    // Calendar integration
+    @StateObject private var calendarSyncManager = CalendarSyncManager()
+    @State private var showCalendarPrompt = false
+    @State private var pendingReservation: Reservation?
+
     init(
         posting: TeeTimePosting,
         reservationService: ReservationServiceProtocol = ReservationService(),
@@ -320,6 +325,21 @@ struct TeeTimeDetailView: View {
         } message: {
             Text(successMessage)
         }
+        .alert("Add to Calendar?", isPresented: $showCalendarPrompt) {
+            Button("Add to Calendar") {
+                Task {
+                    if let reservation = pendingReservation {
+                        await calendarSyncManager.syncReservation(reservation, shouldPromptUser: false)
+                    }
+                    pendingReservation = nil
+                }
+            }
+            Button("Not Now", role: .cancel) {
+                pendingReservation = nil
+            }
+        } message: {
+            Text("Would you like to add this tee time to your calendar? It will automatically update if the time changes.")
+        }
     }
 
     // MARK: - Private Methods
@@ -410,6 +430,10 @@ struct TeeTimeDetailView: View {
                     spotsReserved: spotsToReserve
                 )
                 myExistingReservation = updated
+
+                // Auto-update calendar event if exists
+                await calendarSyncManager.updateReservationIfNeeded(updated)
+
                 successMessage = "Your reservation has been updated to \(spotsToReserve) \(spotsToReserve == 1 ? "spot" : "spots")."
             } else {
                 // Create new reservation
@@ -418,6 +442,11 @@ struct TeeTimeDetailView: View {
                     spotsReserved: spotsToReserve
                 )
                 myExistingReservation = created
+
+                // Show calendar prompt for new reservation
+                pendingReservation = created
+                showCalendarPrompt = true
+
                 successMessage = "You've successfully reserved \(spotsToReserve) \(spotsToReserve == 1 ? "spot" : "spots") for this tee time."
             }
             showSuccessAlert = true
@@ -436,6 +465,10 @@ struct TeeTimeDetailView: View {
 
         do {
             try await reservationService.deleteReservation(id: existing.id)
+
+            // Remove from calendar
+            await calendarSyncManager.removeReservation(reservationId: existing.id)
+
             myExistingReservation = nil
             spotsToReserve = 1
             successMessage = "Your reservation has been cancelled."

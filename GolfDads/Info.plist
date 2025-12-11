@@ -31,5 +31,11 @@
 	</array>
 	<key>GOOGLE_CLIENT_ID</key>
 	<string>714139606616-6h0ah0ri87a6kb2p2a5lnqg7p690q3id.apps.googleusercontent.com</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Three Putt needs access to your calendar to automatically add and sync your golf tee times.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Three Putt needs full calendar access to create, update, and remove tee time events automatically.</string>
+	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+	<string>Three Putt needs write access to add your golf tee times to your calendar.</string>
 </dict>
 </plist>

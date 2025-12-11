@@ -21,6 +21,9 @@ struct MyTeeTimesView: View {
     private let teeTimeService: TeeTimeServiceProtocol
     private let reservationService: ReservationServiceProtocol
 
+    // Calendar integration
+    @StateObject private var calendarSyncManager = CalendarSyncManager()
+
     init(
         teeTimeService: TeeTimeServiceProtocol = TeeTimeService(),
         reservationService: ReservationServiceProtocol = ReservationService()
@@ -273,6 +276,16 @@ struct MyTeeTimesView: View {
             errorMessage = "Failed to load tee times. Please try again."
         }
 
+        // Auto-sync: Check for changes and update calendar events
+        await calendarSyncManager.syncAllReservations(myReservations)
+        await calendarSyncManager.syncAllPostings(teeTimePostings)
+
+        // Cleanup deleted events
+        await calendarSyncManager.cleanupDeletedEvents(
+            currentReservations: myReservations,
+            currentPostings: teeTimePostings
+        )
+
         isLoading = false
     }
 
@@ -301,6 +314,10 @@ struct MyTeeTimesView: View {
     private func deleteTeeTime(_ posting: TeeTimePosting) async {
         do {
             try await teeTimeService.deleteTeeTimePosting(id: posting.id)
+
+            // Remove from calendar
+            await calendarSyncManager.removePosting(postingId: posting.id)
+
             // Remove from list
             teeTimePostings.removeAll { $0.id == posting.id }
             postingToDelete = nil
