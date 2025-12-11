@@ -186,6 +186,9 @@ struct MyTeeTimesView: View {
         isLoading = true
         errorMessage = nil
 
+        // Track whether we had actual errors (not just empty results)
+        var hadError = false
+
         async let postingsResult: [TeeTimePosting] = {
             do {
                 return try await self.teeTimeService.getMyTeeTimePostings()
@@ -201,9 +204,11 @@ struct MyTeeTimesView: View {
                     return []
                 }
                 print("❌ Failed to load postings: \(error)")
+                hadError = true
                 return []
             } catch {
                 print("❌ Failed to load postings: \(error)")
+                hadError = true
                 return []
             }
         }()
@@ -233,9 +238,11 @@ struct MyTeeTimesView: View {
                     return []
                 }
                 print("❌ Failed to load reservations: \(error)")
+                hadError = true
                 return []
             } catch {
                 print("❌ Failed to load reservations: \(error)")
+                hadError = true
                 return []
             }
         }()
@@ -261,8 +268,8 @@ struct MyTeeTimesView: View {
 
         print("📊 Final state: \(teeTimePostings.count) postings, \(myReservations.count) reservations")
 
-        // Set error message only if both failed AND we have no existing data
-        if newPostings.isEmpty && newReservations.isEmpty && teeTimePostings.isEmpty && myReservations.isEmpty {
+        // Only set error message if we had actual errors (not just empty results from a fresh database)
+        if hadError && teeTimePostings.isEmpty && myReservations.isEmpty {
             errorMessage = "Failed to load tee times. Please try again."
         }
 
