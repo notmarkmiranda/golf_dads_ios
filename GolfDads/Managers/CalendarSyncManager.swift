@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import Combine
 
 /// Manager for orchestrating calendar sync operations
 @MainActor
