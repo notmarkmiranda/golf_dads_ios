@@ -239,7 +239,12 @@ struct CreateTeeTimeView: View {
             }
             .alert("Tee Time Created!", isPresented: $showSuccessAlert) {
                 Button("OK") {
-                    dismiss()
+                    // If user reserved spots, show calendar prompt next
+                    if createdPosting != nil {
+                        showCalendarPrompt = true
+                    } else {
+                        dismiss()
+                    }
                 }
             } message: {
                 Text("Your tee time at \(displayCourseName) has been posted.")
@@ -254,10 +259,12 @@ struct CreateTeeTimeView: View {
                             }
                         }
                         createdPosting = nil
+                        dismiss()
                     }
                 }
                 Button("Not Now", role: .cancel) {
                     createdPosting = nil
+                    dismiss()
                 }
             } message: {
                 Text("Would you like to add this tee time to your calendar? It will automatically update if the time changes.")
@@ -357,10 +364,10 @@ struct CreateTeeTimeView: View {
                 golfCourseId: golfCourseId
             )
 
-            // Show calendar prompt if user reserved spots for themselves
+            // Store posting if user reserved spots for themselves
+            // Calendar prompt will show after success alert is dismissed
             if reserveForMyself > 0 {
                 createdPosting = posting
-                showCalendarPrompt = true
             }
 
             showSuccessAlert = true
