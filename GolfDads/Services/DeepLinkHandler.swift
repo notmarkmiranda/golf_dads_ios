@@ -14,6 +14,7 @@ class DeepLinkHandler: ObservableObject {
     @Published var pendingInviteCode: String?
     @Published var showJoinGroupAlert = false
     @Published var alertMessage: String?
+    @Published var joinedGroup: Group?
 
     private let groupService: GroupServiceProtocol
 
@@ -64,6 +65,9 @@ class DeepLinkHandler: ObservableObject {
     private func joinGroup(with code: String) async {
         do {
             let group = try await groupService.joinWithInviteCode(code)
+
+            // Store the joined group for navigation
+            joinedGroup = group
 
             // Show success message
             alertMessage = "Successfully joined \"\(group.name)\"!"

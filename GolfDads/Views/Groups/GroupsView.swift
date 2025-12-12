@@ -20,6 +20,8 @@ struct GroupsView: View {
     @State private var showingJoinWithCode = false
     @State private var navigationPath = NavigationPath()
 
+    @EnvironmentObject private var deepLinkHandler: DeepLinkHandler
+
     private let groupService: GroupServiceProtocol
 
     // MARK: - Initialization
@@ -99,6 +101,18 @@ struct GroupsView: View {
         }
         .task {
             await loadGroups()
+        }
+        .onChange(of: deepLinkHandler.joinedGroup) { oldValue, newGroup in
+            if let group = newGroup {
+                // Add to groups list if not already present
+                if !groups.contains(where: { $0.id == group.id }) {
+                    groups.insert(group, at: 0)
+                }
+                // Navigate to the group
+                navigationPath.append(group)
+                // Clear the joined group
+                deepLinkHandler.joinedGroup = nil
+            }
         }
         .onAppear {
             // Listen for group deleted/left notifications
@@ -198,4 +212,5 @@ struct GroupRowView: View {
 
 #Preview {
     GroupsView(authManager: AuthenticationManager())
+        .environmentObject(DeepLinkHandler())
 }
