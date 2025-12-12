@@ -118,6 +118,19 @@ struct GroupsView: View {
                     groups.removeAll { $0.id == groupId }
                 }
             }
+
+            // Listen for group updated notifications
+            NotificationCenter.default.addObserver(
+                forName: .groupUpdated,
+                object: nil,
+                queue: .main
+            ) { notification in
+                if let updatedGroup = notification.object as? Group {
+                    if let index = groups.firstIndex(where: { $0.id == updatedGroup.id }) {
+                        groups[index] = updatedGroup
+                    }
+                }
+            }
         }
     }
 

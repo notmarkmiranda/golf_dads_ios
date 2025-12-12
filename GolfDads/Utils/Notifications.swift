@@ -16,4 +16,7 @@ extension Notification.Name {
 
     /// Posted when a user leaves a group (object: group ID as Int)
     static let groupLeft = Notification.Name("groupLeft")
+
+    /// Posted when a group is updated (object: updated Group)
+    static let groupUpdated = Notification.Name("groupUpdated")
 }

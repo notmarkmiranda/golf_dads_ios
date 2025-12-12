@@ -339,6 +339,8 @@ struct GroupDetailView: View {
                             description: description
                         )
                         group = updated
+                        // Notify GroupsView to update its list
+                        NotificationCenter.default.post(name: .groupUpdated, object: updated)
                     } catch {
                         if let apiError = error as? APIError {
                             errorMessage = apiError.userMessage
@@ -359,6 +361,8 @@ struct GroupDetailView: View {
                         )
                         group = updated
                         await loadMembers()  // Refresh to show new owner badge
+                        // Notify GroupsView to update its list
+                        NotificationCenter.default.post(name: .groupUpdated, object: updated)
                     } catch {
                         if let apiError = error as? APIError {
                             errorMessage = apiError.userMessage
