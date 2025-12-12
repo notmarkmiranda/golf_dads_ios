@@ -373,6 +373,13 @@ struct GroupDetailView: View {
                 }
             }
         }
+        .alert("Error", isPresented: .constant(errorMessage != nil), presenting: errorMessage) { _ in
+            Button("OK") {
+                errorMessage = nil
+            }
+        } message: { message in
+            Text(message)
+        }
     }
 
     // MARK: - Computed Properties
