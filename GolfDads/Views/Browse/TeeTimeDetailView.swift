@@ -30,6 +30,8 @@ struct TeeTimeDetailView: View {
     @StateObject private var calendarSyncManager = CalendarSyncManager()
     @State private var showCalendarPrompt = false
     @State private var pendingReservation: Reservation?
+    @State private var showCalendarResultAlert = false
+    @State private var calendarResultMessage = ""
 
     init(
         posting: TeeTimePosting,
@@ -333,13 +335,18 @@ struct TeeTimeDetailView: View {
             Button("Add to Calendar") {
                 Task {
                     if let reservation = pendingReservation {
+                        print("🔵 Starting calendar sync for reservation \(reservation.id)")
                         let success = await calendarSyncManager.syncReservation(reservation, shouldPromptUser: true)
-                        if !success {
-                            reservationError = "Failed to add to calendar. Please check calendar permissions in Settings."
+                        if success {
+                            calendarResultMessage = "✅ Tee time added to your calendar!"
+                            print("✅ Calendar sync succeeded")
+                        } else {
+                            calendarResultMessage = "❌ Failed to add to calendar. Please check calendar permissions in Settings."
+                            print("❌ Calendar sync failed")
                         }
+                        showCalendarResultAlert = true
                     }
                     pendingReservation = nil
-                    dismiss()
                 }
             }
             Button("Not Now", role: .cancel) {
@@ -348,6 +355,13 @@ struct TeeTimeDetailView: View {
             }
         } message: {
             Text("Would you like to add this tee time to your calendar? It will automatically update if the time changes.")
+        }
+        .alert("Calendar", isPresented: $showCalendarResultAlert) {
+            Button("OK") {
+                dismiss()
+            }
+        } message: {
+            Text(calendarResultMessage)
         }
     }
 

@@ -32,6 +32,8 @@ struct CreateTeeTimeView: View {
     @StateObject private var calendarSyncManager = CalendarSyncManager()
     @State private var showCalendarPrompt = false
     @State private var createdPosting: TeeTimePosting?
+    @State private var showCalendarResultAlert = false
+    @State private var calendarResultMessage = ""
 
     private let teeTimeService: TeeTimeServiceProtocol
     private let groupService: GroupServiceProtocol
@@ -253,13 +255,18 @@ struct CreateTeeTimeView: View {
                 Button("Add to Calendar") {
                     Task {
                         if let posting = createdPosting {
+                            print("🔵 Starting calendar sync for posting \(posting.id)")
                             let success = await calendarSyncManager.syncPosting(posting, shouldPromptUser: true)
-                            if !success {
-                                errorMessage = "Failed to add to calendar. Please check calendar permissions in Settings."
+                            if success {
+                                calendarResultMessage = "✅ Tee time added to your calendar!"
+                                print("✅ Calendar sync succeeded")
+                            } else {
+                                calendarResultMessage = "❌ Failed to add to calendar. Please check calendar permissions in Settings."
+                                print("❌ Calendar sync failed")
                             }
+                            showCalendarResultAlert = true
                         }
                         createdPosting = nil
-                        dismiss()
                     }
                 }
                 Button("Not Now", role: .cancel) {
@@ -268,6 +275,13 @@ struct CreateTeeTimeView: View {
                 }
             } message: {
                 Text("Would you like to add this tee time to your calendar? It will automatically update if the time changes.")
+            }
+            .alert("Calendar", isPresented: $showCalendarResultAlert) {
+                Button("OK") {
+                    dismiss()
+                }
+            } message: {
+                Text(calendarResultMessage)
             }
             .sheet(isPresented: $showCourseSearch) {
                 GolfCourseSearchView(
