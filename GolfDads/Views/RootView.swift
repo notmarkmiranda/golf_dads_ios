@@ -43,25 +43,31 @@ struct RootView: View {
 struct MainTabView: View {
     let authManager: AuthenticationManager
 
+    @EnvironmentObject private var deepLinkHandler: DeepLinkHandler
+    @State private var selectedTab = 0
+
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             // Home Tab - My Tee Times
             MyTeeTimesView()
                 .tabItem {
                     Label("My Tee Times", systemImage: "calendar")
                 }
+                .tag(0)
 
             // Groups Tab
             GroupsView(authManager: authManager)
                 .tabItem {
                     Label("Groups", systemImage: "person.3.fill")
                 }
+                .tag(1)
 
             // Browse Tab
             BrowseView()
                 .tabItem {
                     Label("Browse", systemImage: "flag")
                 }
+                .tag(2)
 
             // Profile Tab
             NavigationView {
@@ -69,6 +75,13 @@ struct MainTabView: View {
             }
             .tabItem {
                 Label("Profile", systemImage: "person.circle.fill")
+            }
+            .tag(3)
+        }
+        .onChange(of: deepLinkHandler.joinedGroup) { oldValue, newGroup in
+            if newGroup != nil {
+                // Switch to Groups tab when a group is joined via deep link
+                selectedTab = 1
             }
         }
     }
