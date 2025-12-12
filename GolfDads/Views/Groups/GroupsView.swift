@@ -94,6 +94,28 @@ struct GroupsView: View {
         .task {
             await loadGroups()
         }
+        .onAppear {
+            // Listen for group deleted/left notifications
+            NotificationCenter.default.addObserver(
+                forName: .groupDeleted,
+                object: nil,
+                queue: .main
+            ) { notification in
+                if let groupId = notification.object as? Int {
+                    groups.removeAll { $0.id == groupId }
+                }
+            }
+
+            NotificationCenter.default.addObserver(
+                forName: .groupLeft,
+                object: nil,
+                queue: .main
+            ) { notification in
+                if let groupId = notification.object as? Int {
+                    groups.removeAll { $0.id == groupId }
+                }
+            }
+        }
     }
 
     // MARK: - Subviews

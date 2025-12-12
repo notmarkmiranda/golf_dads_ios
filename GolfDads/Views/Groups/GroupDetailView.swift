@@ -11,6 +11,9 @@ struct GroupDetailView: View {
 
     // MARK: - Properties
 
+    @Environment(AuthenticationManager.self) private var authManager
+    @Environment(\.dismiss) private var dismiss
+
     @State private var group: Group
 
     @State private var teeTimePostings: [TeeTimePosting] = []
@@ -22,8 +25,23 @@ struct GroupDetailView: View {
     @State private var regenerateErrorMessage: String?
     @State private var showCreateTeeTime = false
 
+    // Group member management
+    @State private var groupMembers: [GroupMember] = []
+    @State private var isLoadingMembers = false
+
+    // Owner privilege actions
+    @State private var showEditGroup = false
+    @State private var showTransferOwnership = false
+    @State private var showDeleteConfirmation = false
+    @State private var showLeaveConfirmation = false
+    @State private var isDeleting = false
+
     private let teeTimeService: TeeTimeServiceProtocol
     private let groupService: GroupServiceProtocol
+
+    private var isCurrentUserOwner: Bool {
+        group.isOwner(userId: authManager.currentUser?.id)
+    }
 
     // MARK: - Initialization
 
@@ -52,22 +70,65 @@ struct GroupDetailView: View {
 
                     // Members
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Members (\(group.memberNames.count))")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
+                        HStack {
+                            Text("Members (\(groupMembers.count))")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
 
-                        if group.memberNames.isEmpty {
+                            Spacer()
+
+                            if isLoadingMembers {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                            }
+                        }
+
+                        if groupMembers.isEmpty {
                             Text("No members yet")
                                 .foregroundStyle(.secondary)
                                 .font(.caption)
                         } else {
-                            ForEach(group.memberNames, id: \.self) { memberName in
+                            ForEach(groupMembers) { member in
                                 HStack {
                                     Image(systemName: "person.circle.fill")
                                         .foregroundStyle(.blue)
                                         .imageScale(.small)
-                                    Text(memberName)
-                                        .font(.subheadline)
+
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        HStack(spacing: 4) {
+                                            Text(member.name)
+                                                .font(.subheadline)
+
+                                            if member.id == group.ownerId {
+                                                Text("Owner")
+                                                    .font(.caption2)
+                                                    .padding(.horizontal, 6)
+                                                    .padding(.vertical, 2)
+                                                    .background(.blue.opacity(0.2))
+                                                    .foregroundStyle(.blue)
+                                                    .clipShape(Capsule())
+                                            }
+                                        }
+
+                                        Text(member.email)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+
+                                    Spacer()
+
+                                    // Remove button (owner only, can't remove self or owner)
+                                    if isCurrentUserOwner && member.id != group.ownerId {
+                                        Button(role: .destructive) {
+                                            Task {
+                                                await removeMember(member)
+                                            }
+                                        } label: {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .foregroundStyle(.red)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
                                 }
                                 .padding(.vertical, 2)
                             }
@@ -180,11 +241,69 @@ struct GroupDetailView: View {
         }
         .navigationTitle(group.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    if isCurrentUserOwner {
+                        // Owner actions
+                        Button {
+                            showEditGroup = true
+                        } label: {
+                            Label("Edit Group", systemImage: "pencil")
+                        }
+
+                        Button {
+                            showTransferOwnership = true
+                        } label: {
+                            Label("Transfer Ownership", systemImage: "arrow.right.circle")
+                        }
+
+                        Divider()
+
+                        Button(role: .destructive) {
+                            showDeleteConfirmation = true
+                        } label: {
+                            Label("Delete Group", systemImage: "trash")
+                        }
+                    } else {
+                        // Member actions
+                        Button(role: .destructive) {
+                            showLeaveConfirmation = true
+                        } label: {
+                            Label("Leave Group", systemImage: "rectangle.portrait.and.arrow.right")
+                        }
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+            }
+        }
         .refreshable {
             await loadGroupPostings()
         }
         .task {
             await loadGroupPostings()
+            await loadMembers()
+        }
+        .confirmationDialog("Delete Group", isPresented: $showDeleteConfirmation) {
+            Button("Delete Group and Exclusive Tee Times", role: .destructive) {
+                Task {
+                    await deleteGroup()
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will permanently delete the group and all tee times posted ONLY to this group. This cannot be undone.")
+        }
+        .confirmationDialog("Leave Group", isPresented: $showLeaveConfirmation) {
+            Button("Leave Group", role: .destructive) {
+                Task {
+                    await leaveGroup()
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("You will need a new invite code to rejoin this group.")
         }
         .confirmationDialog(
             "Regenerate Invite Code?",
@@ -207,6 +326,46 @@ struct GroupDetailView: View {
                         await loadGroupPostings()
                     }
                 }
+        }
+        .sheet(isPresented: $showEditGroup) {
+            EditGroupView(group: group) { name, description in
+                Task {
+                    do {
+                        let updated = try await groupService.updateGroup(
+                            id: group.id,
+                            name: name,
+                            description: description
+                        )
+                        group = updated
+                    } catch {
+                        if let apiError = error as? APIError {
+                            errorMessage = apiError.userMessage
+                        } else {
+                            errorMessage = "Failed to update group: \(error.localizedDescription)"
+                        }
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showTransferOwnership) {
+            TransferOwnershipView(group: group, members: groupMembers) { newOwnerId in
+                Task {
+                    do {
+                        let updated = try await groupService.transferOwnership(
+                            groupId: group.id,
+                            newOwnerId: newOwnerId
+                        )
+                        group = updated
+                        await loadMembers()  // Refresh to show new owner badge
+                    } catch {
+                        if let apiError = error as? APIError {
+                            errorMessage = apiError.userMessage
+                        } else {
+                            errorMessage = "Failed to transfer ownership: \(error.localizedDescription)"
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -283,6 +442,67 @@ struct GroupDetailView: View {
         }
 
         isRegenerating = false
+    }
+
+    private func loadMembers() async {
+        isLoadingMembers = true
+
+        do {
+            groupMembers = try await groupService.getGroupMembers(groupId: group.id)
+        } catch {
+            print("Failed to load members: \(error)")
+            // Fallback to member names from group
+            groupMembers = group.memberNames.enumerated().map { index, name in
+                GroupMember(id: -index, email: name, name: name, joinedAt: nil)
+            }
+        }
+
+        isLoadingMembers = false
+    }
+
+    private func removeMember(_ member: GroupMember) async {
+        do {
+            try await groupService.removeMember(groupId: group.id, userId: member.id)
+            groupMembers.removeAll { $0.id == member.id }
+        } catch {
+            if let apiError = error as? APIError {
+                errorMessage = apiError.userMessage
+            } else {
+                errorMessage = "Failed to remove member: \(error.localizedDescription)"
+            }
+        }
+    }
+
+    private func deleteGroup() async {
+        isDeleting = true
+
+        do {
+            try await groupService.deleteGroup(id: group.id)
+            NotificationCenter.default.post(name: .groupDeleted, object: group.id)
+            dismiss()
+        } catch {
+            if let apiError = error as? APIError {
+                errorMessage = apiError.userMessage
+            } else {
+                errorMessage = "Failed to delete group: \(error.localizedDescription)"
+            }
+        }
+
+        isDeleting = false
+    }
+
+    private func leaveGroup() async {
+        do {
+            try await groupService.leaveGroup(id: group.id)
+            NotificationCenter.default.post(name: .groupLeft, object: group.id)
+            dismiss()
+        } catch {
+            if let apiError = error as? APIError {
+                errorMessage = apiError.userMessage
+            } else {
+                errorMessage = "Failed to leave group: \(error.localizedDescription)"
+            }
+        }
     }
 }
 
