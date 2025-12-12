@@ -73,6 +73,7 @@ class CalendarService: CalendarServiceProtocol {
     // MARK: - Properties
 
     private let eventStore: EKEventStore
+    private var permissionGrantedInSession = false
 
     // MARK: - Initialization
 
@@ -86,11 +87,24 @@ class CalendarService: CalendarServiceProtocol {
         // iOS 17+ uses new permission model
         if #available(iOS 17.0, *) {
             do {
-                let granted = try await eventStore.requestFullAccessToEvents()
-                print("📅 Calendar permission: \(granted ? "granted" : "denied")")
+                // Request write-only access (which is what we need for creating events)
+                let granted = try await eventStore.requestWriteOnlyAccessToEvents()
+                print("📅 Calendar write-only permission result: \(granted)")
+
+                // Store the result in session
+                permissionGrantedInSession = granted
+
+                // Give system time to update authorization status
+                try? await Task.sleep(nanoseconds: 200_000_000) // 200ms
+
+                // Check the actual authorization status
+                let status = EKEventStore.authorizationStatus(for: .event)
+                print("📅 Authorization status after request: \(status.rawValue)")
+
                 return granted
             } catch {
                 print("❌ Calendar permission request failed: \(error)")
+                permissionGrantedInSession = false
                 return false
             }
         } else {
@@ -100,6 +114,7 @@ class CalendarService: CalendarServiceProtocol {
                     if let error = error {
                         print("❌ Calendar permission request failed: \(error)")
                     }
+                    self.permissionGrantedInSession = granted
                     print("📅 Calendar permission: \(granted ? "granted" : "denied")")
                     continuation.resume(returning: granted)
                 }
@@ -110,9 +125,25 @@ class CalendarService: CalendarServiceProtocol {
     func hasCalendarAccess() async -> Bool {
         if #available(iOS 17.0, *) {
             let status = EKEventStore.authorizationStatus(for: .event)
+            print("📅 iOS 17+ authorization status: \(status.rawValue) - fullAccess=\(status == .fullAccess), writeOnly=\(status == .writeOnly)")
+
+            // If permission was granted in this session, trust that even if status check fails
+            if permissionGrantedInSession {
+                print("📅 Permission was granted in this session, using that")
+                return true
+            }
+
             return status == .fullAccess || status == .writeOnly
         } else {
             let status = EKEventStore.authorizationStatus(for: .event)
+            print("📅 iOS <17 authorization status: \(status.rawValue) - authorized=\(status == .authorized)")
+
+            // If permission was granted in this session, trust that
+            if permissionGrantedInSession {
+                print("📅 Permission was granted in this session, using that")
+                return true
+            }
+
             return status == .authorized
         }
     }
@@ -128,9 +159,19 @@ class CalendarService: CalendarServiceProtocol {
         url: URL?
     ) async throws -> String {
         // Verify permission
-        guard await hasCalendarAccess() else {
+        let hasAccess = await hasCalendarAccess()
+        print("📅 Attempting to create event, hasAccess: \(hasAccess)")
+
+        guard hasAccess else {
             throw CalendarError.permissionDenied
         }
+
+        // Check if we have a default calendar
+        guard let defaultCalendar = eventStore.defaultCalendarForNewEvents else {
+            print("❌ No default calendar found")
+            throw CalendarError.eventStoreUnavailable
+        }
+        print("📅 Using default calendar: \(defaultCalendar.title)")
 
         // Create event
         let event = EKEvent(eventStore: eventStore)
@@ -140,7 +181,7 @@ class CalendarService: CalendarServiceProtocol {
         event.location = location
         event.notes = notes
         event.url = url
-        event.calendar = eventStore.defaultCalendarForNewEvents
+        event.calendar = defaultCalendar
 
         // Save event
         do {
@@ -149,6 +190,7 @@ class CalendarService: CalendarServiceProtocol {
             return event.eventIdentifier
         } catch {
             print("❌ Failed to create calendar event: \(error)")
+            print("❌ Error details: \(error.localizedDescription)")
             throw CalendarError.failedToSave(error)
         }
     }

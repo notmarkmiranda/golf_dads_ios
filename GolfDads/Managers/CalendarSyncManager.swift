@@ -342,13 +342,30 @@ class CalendarSyncManager: ObservableObject {
     // MARK: - Private Helpers
 
     private func ensurePermission(shouldPromptUser: Bool) async -> Bool {
-        if await calendarService.hasCalendarAccess() {
+        // First check if we already have permission
+        let hasAccess = await calendarService.hasCalendarAccess()
+        print("📅 Current calendar access status: \(hasAccess)")
+
+        if hasAccess {
             hasCalendarPermission = true
             return true
         }
 
+        // If we don't have permission and should prompt, request it
         if shouldPromptUser {
-            return await requestPermission()
+            let granted = await requestPermission()
+            print("📅 Permission request result: \(granted)")
+
+            // Give the system a moment to update the authorization status
+            if granted {
+                try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
+
+                // Verify the permission is actually set
+                let verified = await calendarService.hasCalendarAccess()
+                print("📅 Verified calendar access after grant: \(verified)")
+                return verified
+            }
+            return false
         }
 
         return false
