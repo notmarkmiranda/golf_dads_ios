@@ -16,15 +16,6 @@ struct Group: Codable, Identifiable, Equatable, Hashable {
     let memberNames: [String]
     let createdAt: Date
     let updatedAt: Date
-
-    enum CodingKeys: String, CodingKey {
-        case id, name, description
-        case ownerId = "owner_id"
-        case inviteCode = "invite_code"
-        case memberNames = "member_names"
-        case createdAt = "created_at"
-        case updatedAt = "updated_at"
-    }
 }
 
 // MARK: - Permission Helpers
