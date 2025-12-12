@@ -157,10 +157,10 @@ enum APIError: LocalizedError {
             return "Request timed out"
         case .unauthorized(let message):
             return message ?? "Please log in again"
-        case .forbidden:
-            return "Permission denied"
-        case .notFound:
-            return "Not found"
+        case .forbidden(let message):
+            return message ?? "Permission denied"
+        case .notFound(let message):
+            return message ?? "Not found"
         case .validationError(let errors):
             if let firstField = errors.keys.first,
                let firstErrorArray = errors[firstField],
