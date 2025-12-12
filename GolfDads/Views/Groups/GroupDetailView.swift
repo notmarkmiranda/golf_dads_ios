@@ -247,7 +247,7 @@ struct GroupDetailView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
                     if isCurrentUserOwner {
-                        // Owner actions
+                        // Owner-only actions
                         Button {
                             showEditGroup = true
                         } label: {
@@ -267,13 +267,15 @@ struct GroupDetailView: View {
                         } label: {
                             Label("Delete Group", systemImage: "trash")
                         }
-                    } else {
-                        // Member actions
-                        Button(role: .destructive) {
-                            showLeaveConfirmation = true
-                        } label: {
-                            Label("Leave Group", systemImage: "rectangle.portrait.and.arrow.right")
-                        }
+
+                        Divider()
+                    }
+
+                    // Leave Group - available to everyone (but owners will get an error)
+                    Button(role: .destructive) {
+                        showLeaveConfirmation = true
+                    } label: {
+                        Label("Leave Group", systemImage: "rectangle.portrait.and.arrow.right")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
