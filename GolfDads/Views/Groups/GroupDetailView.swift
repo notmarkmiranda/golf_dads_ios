@@ -11,9 +11,9 @@ struct GroupDetailView: View {
 
     // MARK: - Properties
 
-    @Environment(AuthenticationManager.self) private var authManager
     @Environment(\.dismiss) private var dismiss
 
+    let authManager: AuthenticationManager
     @State private var group: Group
 
     @State private var teeTimePostings: [TeeTimePosting] = []
@@ -46,10 +46,12 @@ struct GroupDetailView: View {
     // MARK: - Initialization
 
     init(
+        authManager: AuthenticationManager,
         group: Group,
         teeTimeService: TeeTimeServiceProtocol = TeeTimeService(),
         groupService: GroupServiceProtocol = GroupService()
     ) {
+        self.authManager = authManager
         self._group = State(initialValue: group)
         self.teeTimeService = teeTimeService
         self.groupService = groupService
@@ -511,6 +513,7 @@ struct GroupDetailView: View {
 #Preview {
     NavigationStack {
         GroupDetailView(
+            authManager: AuthenticationManager(),
             group: Group(
                 id: 1,
                 name: "Weekend Warriors",

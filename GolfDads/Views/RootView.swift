@@ -52,7 +52,7 @@ struct MainTabView: View {
                 }
 
             // Groups Tab
-            GroupsView()
+            GroupsView(authManager: authManager)
                 .tabItem {
                     Label("Groups", systemImage: "person.3.fill")
                 }

@@ -11,6 +11,8 @@ struct GroupsView: View {
 
     // MARK: - Properties
 
+    let authManager: AuthenticationManager
+
     @State private var groups: [Group] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -21,7 +23,8 @@ struct GroupsView: View {
 
     // MARK: - Initialization
 
-    init(groupService: GroupServiceProtocol = GroupService()) {
+    init(authManager: AuthenticationManager, groupService: GroupServiceProtocol = GroupService()) {
+        self.authManager = authManager
         self.groupService = groupService
     }
 
@@ -127,7 +130,7 @@ struct GroupsView: View {
             }
         }
         .navigationDestination(for: Group.self) { group in
-            GroupDetailView(group: group)
+            GroupDetailView(authManager: authManager, group: group)
         }
         .navigationDestination(for: TeeTimePosting.self) { posting in
             TeeTimeDetailView(posting: posting)
@@ -178,5 +181,5 @@ struct GroupRowView: View {
 // MARK: - Preview
 
 #Preview {
-    GroupsView()
+    GroupsView(authManager: AuthenticationManager())
 }
