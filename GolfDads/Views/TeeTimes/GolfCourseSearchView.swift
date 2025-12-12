@@ -30,15 +30,18 @@ struct GolfCourseSearchView: View {
     @State private var showManualEntry = false
 
     private let golfCourseService: GolfCourseServiceProtocol
+    private let favoriteService: FavoriteCourseServiceProtocol
 
     init(
         selectedCourse: Binding<GolfCourse?>,
         manualCourseName: Binding<String>,
-        golfCourseService: GolfCourseServiceProtocol = GolfCourseService()
+        golfCourseService: GolfCourseServiceProtocol = GolfCourseService(),
+        favoriteService: FavoriteCourseServiceProtocol = FavoriteCourseService()
     ) {
         self._selectedCourse = selectedCourse
         self._manualCourseName = manualCourseName
         self.golfCourseService = golfCourseService
+        self.favoriteService = favoriteService
     }
 
     var body: some View {
@@ -219,7 +222,13 @@ struct GolfCourseSearchView: View {
                                 await selectCourse(course)
                             }
                         } label: {
-                            GolfCourseRow(course: course, showDistance: false)
+                            GolfCourseRow(
+                                course: course,
+                                showDistance: false,
+                                onFavoriteToggle: { course in
+                                    await toggleFavorite(course)
+                                }
+                            )
                         }
                     }
                 }
@@ -348,7 +357,13 @@ struct GolfCourseSearchView: View {
                             await selectCourse(course)
                         }
                     } label: {
-                        GolfCourseRow(course: course, showDistance: true)
+                        GolfCourseRow(
+                            course: course,
+                            showDistance: true,
+                            onFavoriteToggle: { course in
+                                await toggleFavorite(course)
+                            }
+                        )
                     }
                 }
                 .listStyle(.plain)
@@ -499,6 +514,28 @@ struct GolfCourseSearchView: View {
     private func selectManualEntry() {
         showManualEntry = true
     }
+
+    // MARK: - Favorite Toggle
+
+    private func toggleFavorite(_ course: GolfCourse) async {
+        guard let courseId = course.id else { return }
+
+        do {
+            let updatedCourse: GolfCourse
+            if course.isFavorite == true {
+                updatedCourse = try await favoriteService.removeFavorite(courseId: courseId)
+            } else {
+                updatedCourse = try await favoriteService.addFavorite(courseId: courseId)
+            }
+
+            // Update in search results
+            if let index = searchResults.firstIndex(where: { $0.id == courseId }) {
+                searchResults[index] = updatedCourse
+            }
+        } catch {
+            errorMessage = "Failed to update favorite"
+        }
+    }
 }
 
 // MARK: - Golf Course Row
@@ -506,6 +543,9 @@ struct GolfCourseSearchView: View {
 struct GolfCourseRow: View {
     let course: GolfCourse
     var showDistance: Bool = false
+    var onFavoriteToggle: ((GolfCourse) async -> Void)? = nil
+
+    @State private var isTogglingFavorite = false
 
     var body: some View {
         HStack {
@@ -536,6 +576,27 @@ struct GolfCourseRow: View {
             }
 
             Spacer()
+
+            // Favorite button if toggle callback provided
+            if let onFavoriteToggle = onFavoriteToggle {
+                Button {
+                    Task {
+                        isTogglingFavorite = true
+                        await onFavoriteToggle(course)
+                        isTogglingFavorite = false
+                    }
+                } label: {
+                    if isTogglingFavorite {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                    } else {
+                        Image(systemName: course.favoriteIcon)
+                            .foregroundStyle((course.isFavorite ?? false) ? .yellow : .gray)
+                    }
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing, 8)
+            }
 
             Image(systemName: "chevron.right")
                 .font(.caption)

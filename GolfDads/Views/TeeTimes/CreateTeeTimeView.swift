@@ -34,16 +34,25 @@ struct CreateTeeTimeView: View {
     @State private var createdPosting: TeeTimePosting?
     @State private var showCalendarResultAlert = false
     @State private var calendarResultMessage = ""
+    @State private var recentFavorites: [GolfCourse] = []
+    @State private var showFavorites = false
 
     private let teeTimeService: TeeTimeServiceProtocol
     private let groupService: GroupServiceProtocol
+    private let favoriteService: FavoriteCourseServiceProtocol
+
+    let preselectedCourse: GolfCourse?
 
     init(
+        preselectedCourse: GolfCourse? = nil,
         teeTimeService: TeeTimeServiceProtocol = TeeTimeService(),
-        groupService: GroupServiceProtocol = GroupService()
+        groupService: GroupServiceProtocol = GroupService(),
+        favoriteService: FavoriteCourseServiceProtocol = FavoriteCourseService()
     ) {
+        self.preselectedCourse = preselectedCourse
         self.teeTimeService = teeTimeService
         self.groupService = groupService
+        self.favoriteService = favoriteService
     }
 
     var body: some View {
@@ -51,49 +60,86 @@ struct CreateTeeTimeView: View {
             Form {
                 // Course Information
                 Section("Course Information") {
-                    // Golf Course Selection Button
-                    Button {
-                        showCourseSearch = true
-                    } label: {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Golf Course")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                    if selectedGolfCourse != nil || !manualCourseName.isEmpty {
+                        // Show selected course
+                        Button {
+                            showCourseSearch = true
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Golf Course")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
 
-                                if let course = selectedGolfCourse {
-                                    Text(course.name)
-                                        .font(.body)
-                                        .foregroundColor(.primary)
+                                    if let course = selectedGolfCourse {
+                                        Text(course.name)
+                                            .font(.body)
+                                            .foregroundColor(.primary)
 
-                                    if !course.displayLocation.isEmpty {
-                                        Text(course.displayLocation)
+                                        if !course.displayLocation.isEmpty {
+                                            Text(course.displayLocation)
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+                                    } else if !manualCourseName.isEmpty {
+                                        Text(manualCourseName)
+                                            .font(.body)
+                                            .foregroundColor(.primary)
+
+                                        Text("Manual entry (no location)")
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                     }
-                                } else if !manualCourseName.isEmpty {
-                                    Text(manualCourseName)
-                                        .font(.body)
-                                        .foregroundColor(.primary)
+                                }
 
-                                    Text("Manual entry (no location)")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                } else {
-                                    Text("Tap to select course")
-                                        .font(.body)
-                                        .foregroundColor(.secondary)
+                                Spacer()
+
+                                Image(systemName: "magnifyingglass")
+                                    .foregroundColor(.secondary)
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        // Show search button
+                        Button {
+                            showCourseSearch = true
+                        } label: {
+                            Label("Search for Course", systemImage: "magnifyingglass")
+                        }
+
+                        // Show recent favorites for quick access
+                        if !recentFavorites.isEmpty {
+                            ForEach(recentFavorites.prefix(3), id: \.id) { course in
+                                Button {
+                                    selectedGolfCourse = course
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "star.fill")
+                                            .foregroundStyle(.yellow)
+                                            .imageScale(.small)
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(course.name)
+                                                .foregroundColor(.primary)
+                                            if !course.displayLocation.isEmpty {
+                                                Text(course.displayLocation)
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                            }
+                                        }
+                                        Spacer()
+                                    }
                                 }
                             }
 
-                            Spacer()
-
-                            Image(systemName: "magnifyingglass")
-                                .foregroundColor(.secondary)
+                            Button("View All Favorites") {
+                                showFavorites = true
+                            }
+                            .font(.caption)
+                            .foregroundColor(.blue)
                         }
-                        .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
 
                     DatePicker(
                         "Tee Time",
@@ -289,8 +335,17 @@ struct CreateTeeTimeView: View {
                     manualCourseName: $manualCourseName
                 )
             }
+            .sheet(isPresented: $showFavorites) {
+                FavoriteCoursesView()
+            }
             .task {
                 await loadGroups()
+                await loadRecentFavorites()
+
+                // Set preselected course if provided
+                if let preselected = preselectedCourse {
+                    selectedGolfCourse = preselected
+                }
             }
             .onChange(of: isPublic) { _, newValue in
                 if !newValue {
@@ -390,6 +445,16 @@ struct CreateTeeTimeView: View {
         }
 
         isCreating = false
+    }
+
+    private func loadRecentFavorites() async {
+        do {
+            let favorites = try await favoriteService.getFavorites()
+            recentFavorites = Array(favorites.prefix(3))
+        } catch {
+            // Silently fail - favorites are optional convenience
+            recentFavorites = []
+        }
     }
 }
 

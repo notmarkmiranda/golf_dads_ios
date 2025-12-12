@@ -103,6 +103,11 @@ struct APIConfiguration {
         case golfCoursesNearby(latitude: Double, longitude: Double, radius: Int)
         case golfCoursesCache
 
+        // Favorite Golf Courses
+        case getFavorites
+        case addFavorite
+        case removeFavorite(courseId: Int)
+
         // Tee Time Postings with Location
         case teeTimePostingsWithLocation(latitude: Double, longitude: Double, radius: Int)
 
@@ -148,6 +153,11 @@ struct APIConfiguration {
             case .golfCoursesNearby(let latitude, let longitude, let radius):
                 return "/v1/golf_courses/nearby?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)"
             case .golfCoursesCache: return "/v1/golf_courses/cache"
+
+            // Favorite Golf Courses
+            case .getFavorites: return "/v1/favorite_golf_courses"
+            case .addFavorite: return "/v1/favorite_golf_courses"
+            case .removeFavorite(let courseId): return "/v1/favorite_golf_courses/\(courseId)"
 
             // Tee Time Postings with Location
             case .teeTimePostingsWithLocation(let latitude, let longitude, let radius):

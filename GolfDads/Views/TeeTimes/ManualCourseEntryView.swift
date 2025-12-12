@@ -158,7 +158,8 @@ struct ManualCourseEntryView: View {
             longitude: nil,
             phone: trimmedPhone.isEmpty ? nil : trimmedPhone,
             website: trimmedWebsite.isEmpty ? nil : trimmedWebsite,
-            distanceMiles: nil
+            distanceMiles: nil,
+            isFavorite: nil
         )
 
         do {

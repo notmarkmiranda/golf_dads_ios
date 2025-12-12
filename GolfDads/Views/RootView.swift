@@ -153,6 +153,14 @@ struct ProfileView: View {
                         showEditProfile = true
                     }
                 }
+
+                Section("Golf") {
+                    NavigationLink {
+                        FavoriteCoursesView()
+                    } label: {
+                        Label("Favorite Courses", systemImage: "star.fill")
+                    }
+                }
             }
 
             Section {

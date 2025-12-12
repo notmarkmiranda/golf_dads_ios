@@ -16,6 +16,7 @@ struct GolfCourse: Codable, Identifiable, Hashable {
     let phone: String?
     let website: String?
     let distanceMiles: Double?
+    let isFavorite: Bool?
     // Note: convertFromSnakeCase decoder strategy automatically handles snake_case -> camelCase
 
     var displayLocation: String {
@@ -27,6 +28,10 @@ struct GolfCourse: Codable, Identifiable, Hashable {
 
     var hasCoordinates: Bool {
         return latitude != nil && longitude != nil
+    }
+
+    var favoriteIcon: String {
+        (isFavorite ?? false) ? "star.fill" : "star"
     }
 }
 
