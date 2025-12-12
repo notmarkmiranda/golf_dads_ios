@@ -82,6 +82,8 @@ struct APIConfiguration {
         case groupMembers(groupId: Int)
         case joinGroup(groupId: Int)
         case leaveGroup(groupId: Int)
+        case removeMember(groupId: Int, userId: Int)
+        case transferOwnership(groupId: Int)
         case regenerateInviteCode(groupId: Int)
         case joinWithInviteCode
 
@@ -123,6 +125,8 @@ struct APIConfiguration {
             case .groupMembers(let groupId): return "/v1/groups/\(groupId)/members"
             case .joinGroup(let groupId): return "/v1/groups/\(groupId)/join"
             case .leaveGroup(let groupId): return "/v1/groups/\(groupId)/leave"
+            case .removeMember(let groupId, let userId): return "/v1/groups/\(groupId)/members/\(userId)"
+            case .transferOwnership(let groupId): return "/v1/groups/\(groupId)/transfer_ownership"
             case .regenerateInviteCode(let groupId): return "/v1/groups/\(groupId)/regenerate_code"
             case .joinWithInviteCode: return "/v1/groups/join_with_code"
 
