@@ -18,6 +18,7 @@ struct GroupsView: View {
     @State private var errorMessage: String?
     @State private var showingCreateGroup = false
     @State private var showingJoinWithCode = false
+    @State private var navigationPath = NavigationPath()
 
     private let groupService: GroupServiceProtocol
 
@@ -31,7 +32,7 @@ struct GroupsView: View {
     // MARK: - Body
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             SwiftUI.Group {
                 if isLoading {
                     ProgressView("Loading groups...")
@@ -91,6 +92,8 @@ struct GroupsView: View {
             .sheet(isPresented: $showingJoinWithCode) {
                 JoinWithCodeView { newGroup in
                     groups.insert(newGroup, at: 0)
+                    // Navigate to the newly joined group
+                    navigationPath.append(newGroup)
                 }
             }
         }
