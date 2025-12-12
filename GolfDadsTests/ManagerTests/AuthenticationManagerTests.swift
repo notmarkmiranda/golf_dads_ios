@@ -291,26 +291,40 @@ final class AuthenticationManagerTests: XCTestCase {
 
     // MARK: - Check Auth Status Tests
 
-    func testCheckAuthStatusWhenLoggedIn() {
+    func testCheckAuthStatusWhenLoggedIn() async {
         // Given
         mockAuthService.mockIsLoggedIn = true
+        let mockUser = AuthenticatedUser(
+            id: 1,
+            email: "test@example.com",
+            name: "Test User",
+            avatarUrl: nil,
+            provider: "email",
+            venmoHandle: nil,
+            handicap: nil
+        )
+        mockAuthService.mockUser = mockUser
 
         // When
-        sut.checkAuthStatus()
+        await sut.checkAuthStatus()
 
         // Then
         XCTAssertTrue(sut.isAuthenticated)
+        XCTAssertNotNil(sut.currentUser)
+        XCTAssertEqual(sut.currentUser?.id, 1)
+        XCTAssertTrue(mockAuthService.getCurrentUserCalled)
     }
 
-    func testCheckAuthStatusWhenLoggedOut() {
+    func testCheckAuthStatusWhenLoggedOut() async {
         // Given
         mockAuthService.mockIsLoggedIn = false
 
         // When
-        sut.checkAuthStatus()
+        await sut.checkAuthStatus()
 
         // Then
         XCTAssertFalse(sut.isAuthenticated)
+        XCTAssertFalse(mockAuthService.getCurrentUserCalled)
     }
 
     // MARK: - Refresh Current User Tests
