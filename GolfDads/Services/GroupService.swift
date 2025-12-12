@@ -193,11 +193,7 @@ class GroupService: GroupServiceProtocol {
 
     /// Remove a member from a group (owner only)
     func removeMember(groupId: Int, userId: Int) async throws {
-        struct Response: Decodable {
-            let message: String
-        }
-
-        let _: Response = try await networkService.delete(
+        try await networkService.delete(
             endpoint: .removeMember(groupId: groupId, userId: userId)
         )
     }
