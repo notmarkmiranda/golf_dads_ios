@@ -317,6 +317,9 @@ class CalendarSyncManager: ObservableObject {
         let currentReservationIds = Set(currentReservations.map { $0.id })
         let currentPostingIds = Set(currentPostings.map { $0.id })
 
+        // Also get posting IDs from reservations (postings we have reservations on)
+        let reservedPostingIds = Set(currentReservations.compactMap { $0.teeTimePosting?.id })
+
         for mapping in allMappings {
             switch mapping.entityType {
             case .reservation:
@@ -325,7 +328,10 @@ class CalendarSyncManager: ObservableObject {
                     await removeReservation(reservationId: mapping.entityId)
                 }
             case .posting:
-                if !currentPostingIds.contains(mapping.entityId) {
+                // Only cleanup postings that:
+                // 1. Are not in our current postings (we don't own them anymore)
+                // 2. AND are not postings we have reservations on (we still have a reservation)
+                if !currentPostingIds.contains(mapping.entityId) && !reservedPostingIds.contains(mapping.entityId) {
                     print("🗑️ Cleaning up deleted posting \(mapping.entityId)")
                     await removePosting(postingId: mapping.entityId)
                 }

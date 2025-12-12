@@ -277,13 +277,15 @@ struct MyTeeTimesView: View {
         }
 
         // Auto-sync: Check for changes and update calendar events
+        // Use filtered list for syncing (only sync what's displayed in "My Postings")
         await calendarSyncManager.syncAllReservations(myReservations)
         await calendarSyncManager.syncAllPostings(teeTimePostings)
 
         // Cleanup deleted events
+        // Pass UNFILTERED postings list so cleanup knows about ALL user's postings
         await calendarSyncManager.cleanupDeletedEvents(
             currentReservations: myReservations,
-            currentPostings: teeTimePostings
+            currentPostings: newPostings  // Use unfiltered list!
         )
 
         isLoading = false
