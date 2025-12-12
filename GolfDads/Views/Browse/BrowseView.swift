@@ -20,10 +20,13 @@ struct BrowseView: View {
     @State private var manualZipCode: String = ""
     @State private var radiusMiles: Int = 25
     @State private var showFilterSheet = false
+    @State private var hasLoadedPreferences = false
 
     private let teeTimeService: TeeTimeServiceProtocol
+    let authManager: AuthenticationManager
 
-    init(teeTimeService: TeeTimeServiceProtocol = TeeTimeService()) {
+    init(authManager: AuthenticationManager, teeTimeService: TeeTimeServiceProtocol = TeeTimeService()) {
+        self.authManager = authManager
         self.teeTimeService = teeTimeService
     }
 
@@ -124,12 +127,29 @@ struct BrowseView: View {
                 }
             }
             .task {
+                // Load user preferences on first appear
+                if !hasLoadedPreferences {
+                    loadLocationPreferences()
+                    hasLoadedPreferences = true
+                }
                 await loadTeeTimePostings()
             }
         }
     }
 
     // MARK: - Private Methods
+
+    private func loadLocationPreferences() {
+        guard let user = authManager.currentUser else { return }
+
+        // Load saved zip code preference
+        if let zipCode = user.homeZipCode, !zipCode.isEmpty {
+            manualZipCode = zipCode
+        }
+
+        // Load saved radius preference (defaults to 25 if not set)
+        radiusMiles = user.preferredRadiusMiles ?? 25
+    }
 
     private func loadTeeTimePostings() async {
         isLoading = true
@@ -277,5 +297,5 @@ struct TeeTimePostingRow: View {
 }
 
 #Preview {
-    BrowseView()
+    BrowseView(authManager: AuthenticationManager())
 }

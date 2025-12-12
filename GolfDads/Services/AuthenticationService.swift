@@ -20,6 +20,8 @@ struct AuthenticatedUser: Codable {
     let provider: String?
     let venmoHandle: String?
     let handicap: Double?
+    let homeZipCode: String?
+    let preferredRadiusMiles: Int?
 
     // CodingKeys - no need for explicit mapping since NetworkService uses .convertFromSnakeCase
     enum CodingKeys: String, CodingKey {
@@ -30,10 +32,12 @@ struct AuthenticatedUser: Codable {
         case provider
         case venmoHandle
         case handicap
+        case homeZipCode
+        case preferredRadiusMiles
     }
 
     // Regular init for creating instances
-    init(id: Int, email: String, name: String, avatarUrl: String?, provider: String?, venmoHandle: String?, handicap: Double?) {
+    init(id: Int, email: String, name: String, avatarUrl: String?, provider: String?, venmoHandle: String?, handicap: Double?, homeZipCode: String? = nil, preferredRadiusMiles: Int? = nil) {
         self.id = id
         self.email = email
         self.name = name
@@ -41,6 +45,8 @@ struct AuthenticatedUser: Codable {
         self.provider = provider
         self.venmoHandle = venmoHandle
         self.handicap = handicap
+        self.homeZipCode = homeZipCode
+        self.preferredRadiusMiles = preferredRadiusMiles
     }
 
     // Custom decoder to handle handicap as either string or number
@@ -71,6 +77,10 @@ struct AuthenticatedUser: Codable {
             handicap = nil
             print("   handicap: nil")
         }
+
+        // Decode location preferences
+        homeZipCode = try container.decodeIfPresent(String.self, forKey: .homeZipCode)
+        preferredRadiusMiles = try container.decodeIfPresent(Int.self, forKey: .preferredRadiusMiles)
     }
 
     // Custom encoder to maintain proper key mapping
@@ -83,6 +93,8 @@ struct AuthenticatedUser: Codable {
         try container.encodeIfPresent(avatarUrl, forKey: .avatarUrl)
         try container.encodeIfPresent(provider, forKey: .provider)
         try container.encodeIfPresent(venmoHandle, forKey: .venmoHandle)
+        try container.encodeIfPresent(homeZipCode, forKey: .homeZipCode)
+        try container.encodeIfPresent(preferredRadiusMiles, forKey: .preferredRadiusMiles)
         try container.encodeIfPresent(handicap, forKey: .handicap)
     }
 }

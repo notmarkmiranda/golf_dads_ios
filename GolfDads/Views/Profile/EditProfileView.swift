@@ -15,6 +15,8 @@ struct EditProfileView: View {
     @State private var name: String
     @State private var venmoHandle: String
     @State private var handicapText: String
+    @State private var homeZipCode: String
+    @State private var preferredRadius: Int
     @State private var isLoading = false
     @State private var errorMessage: String?
 
@@ -24,6 +26,8 @@ struct EditProfileView: View {
         _name = State(initialValue: user.name)
         _venmoHandle = State(initialValue: user.venmoHandle ?? "")
         _handicapText = State(initialValue: user.handicap != nil ? String(format: "%.1f", user.handicap!) : "")
+        _homeZipCode = State(initialValue: user.homeZipCode ?? "")
+        _preferredRadius = State(initialValue: user.preferredRadiusMiles ?? 25)
     }
 
     var body: some View {
@@ -59,6 +63,22 @@ struct EditProfileView: View {
                     Text("Golf Handicap")
                 } footer: {
                     Text("Your golf handicap index (0-54.0). Leave blank if you don't have one.")
+                }
+
+                Section {
+                    TextField("Home Zip Code", text: $homeZipCode)
+                        .keyboardType(.numberPad)
+                        .textContentType(.postalCode)
+
+                    Picker("Preferred Search Radius", selection: $preferredRadius) {
+                        ForEach([5, 10, 15, 20, 25, 30, 40, 50, 75, 100], id: \.self) { radius in
+                            Text("\(radius) miles").tag(radius)
+                        }
+                    }
+                } header: {
+                    Text("Location Preferences")
+                } footer: {
+                    Text("Set your default location for browsing tee times. You can always change it when searching.")
                 }
 
                 if let errorMessage {
@@ -112,14 +132,28 @@ struct EditProfileView: View {
             }
         }
 
+        // Validate zip code
+        let trimmedZip = homeZipCode.trimmingCharacters(in: .whitespaces)
+        if !trimmedZip.isEmpty {
+            // Must be exactly 5 digits
+            if trimmedZip.count != 5 || !trimmedZip.allSatisfy({ $0.isNumber }) {
+                errorMessage = "Zip code must be exactly 5 digits"
+                isLoading = false
+                return
+            }
+        }
+
         // Prepare venmo handle (remove if empty)
         let finalVenmoHandle = venmoHandle.trimmingCharacters(in: .whitespaces).isEmpty ? nil : venmoHandle
+        let finalZipCode = trimmedZip.isEmpty ? nil : trimmedZip
 
         do {
             try await updateProfile(
                 name: name,
                 venmoHandle: finalVenmoHandle,
-                handicap: handicap
+                handicap: handicap,
+                homeZipCode: finalZipCode,
+                preferredRadiusMiles: preferredRadius
             )
             dismiss()
         } catch {
@@ -128,7 +162,7 @@ struct EditProfileView: View {
         }
     }
 
-    private func updateProfile(name: String, venmoHandle: String?, handicap: Double?) async throws {
+    private func updateProfile(name: String, venmoHandle: String?, handicap: Double?, homeZipCode: String?, preferredRadiusMiles: Int?) async throws {
         guard let token = authManager.token else {
             throw APIError.unauthorized(message: "Not authenticated")
         }
@@ -140,6 +174,8 @@ struct EditProfileView: View {
                 let name: String
                 let venmoHandle: String?
                 let handicap: Double?
+                let homeZipCode: String?
+                let preferredRadiusMiles: Int?
             }
         }
 
@@ -147,7 +183,9 @@ struct EditProfileView: View {
             user: UpdateProfileRequest.UserUpdate(
                 name: name,
                 venmoHandle: venmoHandle,
-                handicap: handicap
+                handicap: handicap,
+                homeZipCode: homeZipCode,
+                preferredRadiusMiles: preferredRadiusMiles
             )
         )
 

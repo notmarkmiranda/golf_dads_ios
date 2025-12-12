@@ -63,7 +63,7 @@ struct MainTabView: View {
                 .tag(1)
 
             // Browse Tab
-            BrowseView()
+            BrowseView(authManager: authManager)
                 .tabItem {
                     Label("Browse", systemImage: "flag")
                 }
@@ -144,6 +144,32 @@ struct ProfileView: View {
                                 .foregroundColor(.secondary)
                         } else {
                             Text("Not set")
+                                .foregroundColor(.gray)
+                                .italic()
+                        }
+                    }
+
+                    HStack {
+                        Text("Home Zip Code")
+                        Spacer()
+                        if let zipCode = user.homeZipCode {
+                            Text(zipCode)
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("Not set")
+                                .foregroundColor(.gray)
+                                .italic()
+                        }
+                    }
+
+                    HStack {
+                        Text("Preferred Search Radius")
+                        Spacer()
+                        if let radius = user.preferredRadiusMiles {
+                            Text("\(radius) miles")
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("25 miles (default)")
                                 .foregroundColor(.gray)
                                 .italic()
                         }
