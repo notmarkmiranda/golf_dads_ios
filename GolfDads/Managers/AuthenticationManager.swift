@@ -165,8 +165,11 @@ class AuthenticationManager {
     // MARK: - Check Auth Status
 
     /// Check if user is currently authenticated (has valid token)
-    func checkAuthStatus() {
+    func checkAuthStatus() async {
         isAuthenticated = authService.isLoggedIn
+        if isAuthenticated {
+            await refreshCurrentUser()
+        }
     }
 
     // MARK: - Update Current User

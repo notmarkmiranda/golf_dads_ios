@@ -32,8 +32,8 @@ struct RootView: View {
                 }
             }
         }
-        .onAppear {
-            authManager.checkAuthStatus()
+        .task {
+            await authManager.checkAuthStatus()
         }
     }
 }

@@ -24,7 +24,13 @@ extension Group {
     /// - Parameter userId: The user ID to check (typically from AuthenticationManager.currentUser?.id)
     /// - Returns: True if the user is the owner, false otherwise
     func isOwner(userId: Int?) -> Bool {
-        guard let userId = userId else { return false }
-        return ownerId == userId
+        print("🔍 Checking ownership: group.ownerId=\(ownerId), userId=\(userId?.description ?? "nil")")
+        guard let userId = userId else {
+            print("❌ User ID is nil, not owner")
+            return false
+        }
+        let isOwner = ownerId == userId
+        print(isOwner ? "✅ User IS owner" : "❌ User is NOT owner")
+        return isOwner
     }
 }
