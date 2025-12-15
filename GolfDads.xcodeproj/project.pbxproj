@@ -14,6 +14,7 @@
 		335BE6EF2ED51E73009F0F2F /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 335BE6EE2ED51E73009F0F2F /* SnapshotTesting */; };
 		335BE6F12ED51E73009F0F2F /* SnapshotTestingCustomDump in Frameworks */ = {isa = PBXBuildFile; productRef = 335BE6F02ED51E73009F0F2F /* SnapshotTestingCustomDump */; };
 		335BE6F82ED53ACB009F0F2F /* ViewInspector in Frameworks */ = {isa = PBXBuildFile; productRef = 335BE6F72ED53ACB009F0F2F /* ViewInspector */; };
+		33B6798B2EEEFDE5006A5126 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 33B6798A2EEEFDE5006A5126 /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33B6798B2EEEFDE5006A5126 /* FirebaseMessaging in Frameworks */,
 				335BE6E22ED51D8E009F0F2F /* GoogleSignIn in Frameworks */,
 				335BE6E42ED51D8E009F0F2F /* GoogleSignInSwift in Frameworks */,
 				335BE6E72ED51DC7009F0F2F /* KeychainAccess in Frameworks */,
@@ -145,6 +147,7 @@
 				335BE6E12ED51D8E009F0F2F /* GoogleSignIn */,
 				335BE6E32ED51D8E009F0F2F /* GoogleSignInSwift */,
 				335BE6E62ED51DC7009F0F2F /* KeychainAccess */,
+				33B6798A2EEEFDE5006A5126 /* FirebaseMessaging */,
 			);
 			productName = GolfDads;
 			productReference = 334FF92F2ED5196D00C5EE18 /* GolfDads.app */;
@@ -237,6 +240,7 @@
 				335BE6E52ED51DC7009F0F2F /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				335BE6EB2ED51E73009F0F2F /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 				335BE6F62ED53ACB009F0F2F /* XCRemoteSwiftPackageReference "ViewInspector" */,
+				33B679892EEEFDE5006A5126 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 334FF9302ED5196D00C5EE18 /* Products */;
@@ -669,6 +673,14 @@
 				minimumVersion = 0.10.3;
 			};
 		};
+		33B679892EEEFDE5006A5126 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.7.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -706,6 +718,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 335BE6F62ED53ACB009F0F2F /* XCRemoteSwiftPackageReference "ViewInspector" */;
 			productName = ViewInspector;
+		};
+		33B6798A2EEEFDE5006A5126 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 33B679892EEEFDE5006A5126 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

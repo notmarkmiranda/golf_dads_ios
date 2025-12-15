@@ -111,6 +111,12 @@ struct APIConfiguration {
         // Tee Time Postings with Location
         case teeTimePostingsWithLocation(latitude: Double, longitude: Double, radius: Int)
 
+        // Notifications
+        case deviceTokens
+        case deviceToken(token: String)
+        case notificationPreferences
+        case groupNotificationSettings(groupId: Int)
+
         var path: String {
             switch self {
             // Authentication
@@ -162,6 +168,12 @@ struct APIConfiguration {
             // Tee Time Postings with Location
             case .teeTimePostingsWithLocation(let latitude, let longitude, let radius):
                 return "/v1/tee_time_postings?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)"
+
+            // Notifications
+            case .deviceTokens: return "/v1/device_tokens"
+            case .deviceToken(let token): return "/v1/device_tokens/\(token)"
+            case .notificationPreferences: return "/v1/notification_preferences"
+            case .groupNotificationSettings(let groupId): return "/v1/groups/\(groupId)/notification_settings"
             }
         }
 

@@ -15,6 +15,7 @@ class DeepLinkHandler: ObservableObject {
     @Published var showJoinGroupAlert = false
     @Published var alertMessage: String?
     @Published var joinedGroup: Group?
+    @Published var pendingTeeTimeId: Int?
 
     private let groupService: GroupServiceProtocol
 
@@ -38,6 +39,12 @@ class DeepLinkHandler: ObservableObject {
         } else {
             print("❌ Unknown deep link path: \(url.host ?? "nil")")
         }
+    }
+
+    /// Navigate to a specific tee time (triggered by push notifications)
+    func navigateToTeeTime(id: Int) {
+        print("🔔 Navigate to tee time: \(id)")
+        pendingTeeTimeId = id
     }
 
     private func handleGroupsDeepLink(url: URL) {

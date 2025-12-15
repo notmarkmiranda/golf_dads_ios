@@ -37,5 +37,9 @@
 	<string>Three Putt needs full calendar access to create, update, and remove tee time events automatically.</string>
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
 	<string>Three Putt needs write access to add your golf tee times to your calendar.</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>Three Putt sends you notifications about tee time reservations, group activity, and upcoming tee times.</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 </dict>
 </plist>

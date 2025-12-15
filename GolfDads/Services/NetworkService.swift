@@ -42,6 +42,10 @@ enum HTTPMethod: String {
 /// Network service for making HTTP requests to the API
 class NetworkService: NetworkServiceProtocol {
 
+    // MARK: - Singleton
+
+    static let shared = NetworkService()
+
     // MARK: - Properties
 
     private let session: URLSessionProtocol
@@ -345,6 +349,94 @@ extension NetworkServiceProtocol {
             method: .delete,
             body: nil as String?,
             requiresAuth: requiresAuth
+        )
+    }
+}
+
+// MARK: - Notification API Methods
+
+extension NetworkService {
+
+    /// Register device token for push notifications
+    func registerDeviceToken(token: String, platform: String) async throws {
+        struct DeviceTokenRequest: Codable {
+            let deviceToken: DeviceTokenData
+
+            struct DeviceTokenData: Codable {
+                let token: String
+                let platform: String
+            }
+        }
+
+        let request = DeviceTokenRequest(
+            deviceToken: DeviceTokenRequest.DeviceTokenData(token: token, platform: platform)
+        )
+
+        try await self.request(
+            endpoint: .deviceTokens,
+            method: .post,
+            body: request,
+            requiresAuth: true
+        )
+    }
+
+    /// Unregister device token
+    func unregisterDeviceToken(token: String) async throws {
+        try await self.request(
+            endpoint: .deviceToken(token: token),
+            method: .delete,
+            body: nil as String?,
+            requiresAuth: true
+        )
+    }
+
+    /// Get user's notification preferences
+    func getNotificationPreferences() async throws -> NotificationPreferences {
+        let response: NotificationPreferencesResponse = try await self.request(
+            endpoint: .notificationPreferences,
+            method: .get,
+            body: nil as String?,
+            requiresAuth: true
+        )
+
+        return response.notificationPreferences ?? NotificationPreferences.defaultPreferences
+    }
+
+    /// Update user's notification preferences
+    func updateNotificationPreferences(_ update: NotificationPreferencesUpdate) async throws -> NotificationPreferences {
+        let request = NotificationPreferencesUpdateRequest(
+            notificationPreferences: update
+        )
+
+        let response: NotificationPreferencesResponse = try await self.request(
+            endpoint: .notificationPreferences,
+            method: .patch,
+            body: request,
+            requiresAuth: true
+        )
+
+        return response.notificationPreferences ?? NotificationPreferences.defaultPreferences
+    }
+
+    /// Update notification settings for a specific group (mute/unmute)
+    func updateGroupNotificationSettings(groupId: Int, muted: Bool) async throws {
+        struct GroupNotificationSettingsRequest: Codable {
+            let notificationSettings: NotificationSettingsData
+
+            struct NotificationSettingsData: Codable {
+                let muted: Bool
+            }
+        }
+
+        let request = GroupNotificationSettingsRequest(
+            notificationSettings: GroupNotificationSettingsRequest.NotificationSettingsData(muted: muted)
+        )
+
+        try await self.request(
+            endpoint: .groupNotificationSettings(groupId: groupId),
+            method: .patch,
+            body: request,
+            requiresAuth: true
         )
     }
 }

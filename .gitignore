@@ -78,3 +78,4 @@ iOSInjectionProject/
 *.xcconfig
 Config.plist
 GoogleService-Info.plist
+GolfDads/GoogleService-Info.plist
