@@ -333,6 +333,27 @@ swiftlint
 - **TDD approach** - write tests first
 - **Target:** 80%+ code coverage
 
+## 📦 Releases
+
+### Version 1.2 (Current - December 2024)
+**Major Features:**
+- 🔔 Push notifications with Firebase Cloud Messaging
+  - Reservation alerts (created/cancelled)
+  - Group activity notifications
+  - Tee time reminders (24h and 2h before)
+  - Granular notification settings
+- 📍 Location preferences and distance filtering
+- ⭐ Favorite golf courses
+- 👥 Enhanced group owner privileges
+- 🐛 iOS 17+ calendar fixes and stability improvements
+
+### Version 1.1 (December 12, 2024)
+- Initial TestFlight release
+- Core tee time browsing and management
+- Group creation and invitations
+- Calendar integration
+- Profile management
+
 ## 📖 Documentation
 
 - [`FOLDER_STRUCTURE.md`](FOLDER_STRUCTURE.md) - Project organization
