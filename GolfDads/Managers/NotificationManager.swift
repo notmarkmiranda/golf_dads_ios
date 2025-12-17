@@ -129,8 +129,7 @@ class NotificationManager: NSObject, ObservableObject {
 
         // Extract notification data
         if let notificationType = userInfo["type"] as? String,
-           let teeTimeIdString = userInfo["tee_time_id"] as? String,
-           let teeTimeId = Int(teeTimeIdString) {
+           let teeTimeId = userInfo["tee_time_id"] as? Int {
 
             print("🔔 Notification type: \(notificationType), Tee Time ID: \(teeTimeId)")
 
