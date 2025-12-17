@@ -16,6 +16,11 @@ struct Group: Codable, Identifiable, Equatable, Hashable {
     let memberNames: [String]
     let createdAt: Date
     let updatedAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, description, ownerId, inviteCode, memberNames, createdAt, updatedAt
+        // Note: convertFromSnakeCase decoder strategy automatically handles snake_case -> camelCase
+    }
 }
 
 // MARK: - Permission Helpers

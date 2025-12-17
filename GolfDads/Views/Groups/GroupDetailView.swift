@@ -36,6 +36,10 @@ struct GroupDetailView: View {
     @State private var showLeaveConfirmation = false
     @State private var isDeleting = false
 
+    // Notification settings
+    @State private var isGroupMuted = false
+    @State private var isTogglingNotifications = false
+
     private let teeTimeService: TeeTimeServiceProtocol
     private let groupService: GroupServiceProtocol
 
@@ -270,6 +274,25 @@ struct GroupDetailView: View {
 
                         Divider()
                     }
+
+                    // Notification toggle - available to everyone
+                    Button {
+                        Task {
+                            await toggleNotifications()
+                        }
+                    } label: {
+                        if isTogglingNotifications {
+                            Label("Updating...", systemImage: "bell")
+                        } else {
+                            Label(
+                                isGroupMuted ? "Unmute Notifications" : "Mute Notifications",
+                                systemImage: isGroupMuted ? "bell.fill" : "bell.slash.fill"
+                            )
+                        }
+                    }
+                    .disabled(isTogglingNotifications)
+
+                    Divider()
 
                     // Leave Group - available to everyone (but owners will get an error)
                     Button(role: .destructive) {
@@ -518,6 +541,27 @@ struct GroupDetailView: View {
                 errorMessage = "Failed to leave group: \(error.localizedDescription)"
             }
         }
+    }
+
+    private func toggleNotifications() async {
+        isTogglingNotifications = true
+        let newMutedState = !isGroupMuted
+
+        do {
+            try await NetworkService.shared.updateGroupNotificationSettings(
+                groupId: group.id,
+                muted: newMutedState
+            )
+            isGroupMuted = newMutedState
+        } catch {
+            if let apiError = error as? APIError {
+                errorMessage = apiError.userMessage
+            } else {
+                errorMessage = "Failed to update notifications: \(error.localizedDescription)"
+            }
+        }
+
+        isTogglingNotifications = false
     }
 }
 

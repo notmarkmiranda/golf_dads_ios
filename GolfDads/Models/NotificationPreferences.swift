@@ -17,13 +17,8 @@ struct NotificationPreferences: Codable, Equatable {
     var reminder2hEnabled: Bool
 
     enum CodingKeys: String, CodingKey {
-        case id
-        case userId = "user_id"
-        case reservationsEnabled = "reservations_enabled"
-        case groupActivityEnabled = "group_activity_enabled"
-        case remindersEnabled = "reminders_enabled"
-        case reminder24hEnabled = "reminder_24h_enabled"
-        case reminder2hEnabled = "reminder_2h_enabled"
+        case id, userId, reservationsEnabled, groupActivityEnabled, remindersEnabled, reminder24hEnabled, reminder2hEnabled
+        // Note: convertFromSnakeCase decoder strategy automatically handles snake_case -> camelCase
     }
 
     // Default preferences (all enabled)
@@ -45,7 +40,8 @@ struct NotificationPreferencesResponse: Codable {
     let notificationPreferences: NotificationPreferences?
 
     enum CodingKeys: String, CodingKey {
-        case notificationPreferences = "notification_preferences"
+        case notificationPreferences
+        // Note: convertFromSnakeCase decoder strategy automatically handles snake_case -> camelCase
     }
 }
 
@@ -53,7 +49,8 @@ struct NotificationPreferencesUpdateRequest: Codable {
     let notificationPreferences: NotificationPreferencesUpdate
 
     enum CodingKeys: String, CodingKey {
-        case notificationPreferences = "notification_preferences"
+        case notificationPreferences
+        // Note: convertFromSnakeCase decoder strategy automatically handles snake_case -> camelCase
     }
 }
 
@@ -65,10 +62,7 @@ struct NotificationPreferencesUpdate: Codable {
     var reminder2hEnabled: Bool?
 
     enum CodingKeys: String, CodingKey {
-        case reservationsEnabled = "reservations_enabled"
-        case groupActivityEnabled = "group_activity_enabled"
-        case remindersEnabled = "reminders_enabled"
-        case reminder24hEnabled = "reminder_24h_enabled"
-        case reminder2hEnabled = "reminder_2h_enabled"
+        case reservationsEnabled, groupActivityEnabled, remindersEnabled, reminder24hEnabled, reminder2hEnabled
+        // Note: convertFromSnakeCase decoder strategy automatically handles snake_case -> camelCase
     }
 }

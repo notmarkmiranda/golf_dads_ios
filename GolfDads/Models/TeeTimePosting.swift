@@ -20,9 +20,8 @@ struct GolfCourseInfo: Codable, Identifiable, Equatable, Hashable {
     let longitude: Double?
 
     enum CodingKeys: String, CodingKey {
-        case id, name, address, city, state, latitude, longitude
-        case clubName = "club_name"
-        case zipCode = "zip_code"
+        case id, name, clubName, address, city, state, zipCode, latitude, longitude
+        // Note: convertFromSnakeCase decoder strategy automatically handles snake_case -> camelCase
     }
 
     var displayLocation: String {
@@ -40,6 +39,11 @@ struct ReservationInfo: Codable, Identifiable, Equatable, Hashable {
     let userEmail: String
     let spotsReserved: Int
     let createdAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case id, userId, userEmail, spotsReserved, createdAt
+        // Note: convertFromSnakeCase decoder strategy automatically handles snake_case -> camelCase
+    }
 }
 
 struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
@@ -56,6 +60,23 @@ struct TeeTimePosting: Codable, Identifiable, Equatable, Hashable {
     let reservations: [ReservationInfo]?  // Only present if user is posting owner
     let createdAt: Date
     let updatedAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case userId
+        case groupIds
+        case teeTime
+        case courseName
+        case golfCourse
+        case distanceMiles
+        case availableSpots
+        case totalSpots
+        case notes
+        case reservations
+        case createdAt
+        case updatedAt
+        // Note: convertFromSnakeCase decoder strategy automatically handles snake_case -> camelCase
+    }
 
     // MARK: - Custom Decoding
 

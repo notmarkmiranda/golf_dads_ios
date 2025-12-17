@@ -40,6 +40,7 @@ class TeeTimeService: TeeTimeServiceProtocol {
     func getTeeTimePostings() async throws -> [TeeTimePosting] {
         struct Response: Codable {
             let teeTimePostings: [TeeTimePosting]
+            // Note: convertFromSnakeCase decoder strategy automatically handles tee_time_postings -> teeTimePostings
         }
 
         let response: Response = try await networkService.request(
@@ -56,6 +57,7 @@ class TeeTimeService: TeeTimeServiceProtocol {
     func getNearbyTeeTimePostings(latitude: Double, longitude: Double, radius: Int) async throws -> [TeeTimePosting] {
         struct Response: Codable {
             let teeTimePostings: [TeeTimePosting]
+            // Note: convertFromSnakeCase decoder strategy automatically handles tee_time_postings -> teeTimePostings
         }
 
         let response: Response = try await networkService.request(
@@ -72,6 +74,7 @@ class TeeTimeService: TeeTimeServiceProtocol {
     func getTeeTimePosting(id: Int) async throws -> TeeTimePosting {
         struct Response: Codable {
             let teeTimePosting: TeeTimePosting
+            // Note: convertFromSnakeCase decoder strategy automatically handles tee_time_posting -> teeTimePosting
         }
 
         let response: Response = try await networkService.request(
@@ -112,6 +115,7 @@ class TeeTimeService: TeeTimeServiceProtocol {
     func getGroupTeeTimePostings(groupId: Int) async throws -> [TeeTimePosting] {
         struct Response: Codable {
             let teeTimePostings: [TeeTimePosting]
+            // Note: convertFromSnakeCase decoder strategy automatically handles tee_time_postings -> teeTimePostings
         }
 
         let response: Response = try await networkService.request(

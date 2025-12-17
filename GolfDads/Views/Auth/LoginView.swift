@@ -11,6 +11,7 @@ struct LoginView: View {
 
     let authManager: AuthenticationManager
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var notificationManager: NotificationManager
 
     @State private var email = ""
     @State private var password = ""
@@ -194,6 +195,11 @@ struct LoginView: View {
         .onChange(of: authManager.isAuthenticated) { _, isAuthenticated in
             if isAuthenticated {
                 dismiss()
+
+                // Request notification permission after successful login
+                Task {
+                    await requestNotificationPermissionIfNeeded()
+                }
             }
         }
     }
@@ -231,6 +237,13 @@ struct LoginView: View {
                 // Error handling is done in AuthenticationManager
                 print("Google Sign-In error: \(error.localizedDescription)")
             }
+        }
+    }
+
+    private func requestNotificationPermissionIfNeeded() async {
+        // Only request if permission hasn't been determined yet
+        if notificationManager.authorizationStatus == .notDetermined {
+            await notificationManager.requestAuthorization()
         }
     }
 }

@@ -187,6 +187,14 @@ struct ProfileView: View {
                         Label("Favorite Courses", systemImage: "star.fill")
                     }
                 }
+
+                Section("Settings") {
+                    NavigationLink {
+                        NotificationSettingsView()
+                    } label: {
+                        Label("Notifications", systemImage: "bell.fill")
+                    }
+                }
             }
 
             Section {

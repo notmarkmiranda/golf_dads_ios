@@ -32,6 +32,20 @@ class NotificationManager: NSObject, ObservableObject {
         Task {
             await checkAuthorizationStatus()
         }
+
+        // Listen for app becoming active to refresh notification status
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appDidBecomeActive),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+    }
+
+    @objc private func appDidBecomeActive() {
+        Task {
+            await checkAuthorizationStatus()
+        }
     }
 
     // MARK: - Authorization

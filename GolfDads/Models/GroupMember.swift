@@ -14,7 +14,7 @@ struct GroupMember: Codable, Identifiable, Equatable {
     let joinedAt: Date?
 
     enum CodingKeys: String, CodingKey {
-        case id, email, name
-        case joinedAt = "joined_at"
+        case id, email, name, joinedAt
+        // Note: convertFromSnakeCase decoder strategy automatically handles snake_case -> camelCase
     }
 }

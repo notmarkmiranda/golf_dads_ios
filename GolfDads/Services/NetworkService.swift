@@ -64,6 +64,7 @@ class NetworkService: NetworkServiceProtocol {
 
         // Configure decoder for API date formats
         self.decoder = JSONDecoder()
+        // Convert snake_case from API to camelCase for Swift
         decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         // Custom date decoder to handle both ISO8601 with and without fractional seconds
@@ -392,14 +393,15 @@ extension NetworkService {
 
     /// Get user's notification preferences
     func getNotificationPreferences() async throws -> NotificationPreferences {
-        let response: NotificationPreferencesResponse = try await self.request(
+        // GET returns preferences directly (not wrapped)
+        let response: NotificationPreferences = try await self.request(
             endpoint: .notificationPreferences,
             method: .get,
             body: nil as String?,
             requiresAuth: true
         )
 
-        return response.notificationPreferences ?? NotificationPreferences.defaultPreferences
+        return response
     }
 
     /// Update user's notification preferences
@@ -408,14 +410,15 @@ extension NetworkService {
             notificationPreferences: update
         )
 
-        let response: NotificationPreferencesResponse = try await self.request(
+        // PATCH returns preferences directly (not wrapped)
+        let response: NotificationPreferences = try await self.request(
             endpoint: .notificationPreferences,
             method: .patch,
             body: request,
             requiresAuth: true
         )
 
-        return response.notificationPreferences ?? NotificationPreferences.defaultPreferences
+        return response
     }
 
     /// Update notification settings for a specific group (mute/unmute)

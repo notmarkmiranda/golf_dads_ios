@@ -11,6 +11,7 @@ struct SignUpView: View {
 
     let authManager: AuthenticationManager
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var notificationManager: NotificationManager
 
     @State private var name = ""
     @State private var email = ""
@@ -219,6 +220,11 @@ struct SignUpView: View {
         .onChange(of: authManager.isAuthenticated) { _, isAuthenticated in
             if isAuthenticated {
                 dismiss()
+
+                // Request notification permission after successful signup
+                Task {
+                    await requestNotificationPermissionIfNeeded()
+                }
             }
         }
     }
@@ -254,6 +260,13 @@ struct SignUpView: View {
 
         Task {
             await authManager.signUp(email: email, password: password, name: name)
+        }
+    }
+
+    private func requestNotificationPermissionIfNeeded() async {
+        // Only request if permission hasn't been determined yet
+        if notificationManager.authorizationStatus == .notDetermined {
+            await notificationManager.requestAuthorization()
         }
     }
 }
