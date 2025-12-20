@@ -28,11 +28,12 @@ final class APIConfigurationTests: XCTestCase {
         XCTAssertEqual(APIConfiguration.Endpoint.signup.path, "/v1/auth/signup")
         XCTAssertEqual(APIConfiguration.Endpoint.login.path, "/v1/auth/login")
         XCTAssertEqual(APIConfiguration.Endpoint.googleSignIn.path, "/v1/auth/google")
-        XCTAssertEqual(APIConfiguration.Endpoint.currentUser.path, "/v1/users/current")
+        XCTAssertEqual(APIConfiguration.Endpoint.currentUser.path, "/v1/users/me")
 
         // User endpoints
         XCTAssertEqual(APIConfiguration.Endpoint.users.path, "/v1/users")
         XCTAssertEqual(APIConfiguration.Endpoint.user(id: 123).path, "/v1/users/123")
+        XCTAssertEqual(APIConfiguration.Endpoint.updateProfile.path, "/v1/users/me")
 
         // Group endpoints
         XCTAssertEqual(APIConfiguration.Endpoint.groups.path, "/v1/groups")
@@ -40,6 +41,10 @@ final class APIConfigurationTests: XCTestCase {
         XCTAssertEqual(APIConfiguration.Endpoint.groupMembers(groupId: 789).path, "/v1/groups/789/members")
         XCTAssertEqual(APIConfiguration.Endpoint.joinGroup(groupId: 111).path, "/v1/groups/111/join")
         XCTAssertEqual(APIConfiguration.Endpoint.leaveGroup(groupId: 222).path, "/v1/groups/222/leave")
+        XCTAssertEqual(APIConfiguration.Endpoint.removeMember(groupId: 100, userId: 200).path, "/v1/groups/100/members/200")
+        XCTAssertEqual(APIConfiguration.Endpoint.transferOwnership(groupId: 300).path, "/v1/groups/300/transfer_ownership")
+        XCTAssertEqual(APIConfiguration.Endpoint.regenerateInviteCode(groupId: 400).path, "/v1/groups/400/regenerate_code")
+        XCTAssertEqual(APIConfiguration.Endpoint.joinWithInviteCode.path, "/v1/groups/join_with_code")
 
         // Tee Time Posting endpoints
         XCTAssertEqual(APIConfiguration.Endpoint.teeTimePostings.path, "/v1/tee_time_postings")
@@ -54,6 +59,17 @@ final class APIConfigurationTests: XCTestCase {
         XCTAssertEqual(APIConfiguration.Endpoint.reservations.path, "/v1/reservations")
         XCTAssertEqual(APIConfiguration.Endpoint.reservation(id: 555).path, "/v1/reservations/555")
         XCTAssertEqual(APIConfiguration.Endpoint.myReservations.path, "/v1/reservations/my_reservations")
+
+        // Golf Course endpoints
+        XCTAssertEqual(APIConfiguration.Endpoint.golfCoursesCache.path, "/v1/golf_courses/cache")
+        XCTAssertEqual(APIConfiguration.Endpoint.getFavorites.path, "/v1/favorite_golf_courses")
+        XCTAssertEqual(APIConfiguration.Endpoint.addFavorite.path, "/v1/favorite_golf_courses")
+        XCTAssertEqual(APIConfiguration.Endpoint.removeFavorite(courseId: 999).path, "/v1/favorite_golf_courses/999")
+
+        // Notification endpoints
+        XCTAssertEqual(APIConfiguration.Endpoint.deviceTokens.path, "/v1/device_tokens")
+        XCTAssertEqual(APIConfiguration.Endpoint.notificationPreferences.path, "/v1/notification_preferences")
+        XCTAssertEqual(APIConfiguration.Endpoint.groupNotificationSettings(groupId: 777).path, "/v1/groups/777/notification_settings")
     }
 
     func testFullURLConstruction() {

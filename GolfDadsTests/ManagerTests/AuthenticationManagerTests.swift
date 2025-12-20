@@ -195,7 +195,11 @@ final class AuthenticationManagerTests: XCTestCase {
                 email: "google@example.com",
                 name: "Google User",
                 avatarUrl: "https://lh3.googleusercontent.com/avatar",
-                provider: "google"
+                provider: "google",
+                venmoHandle: nil,
+                handicap: nil,
+                homeZipCode: nil,
+                preferredRadiusMiles: nil
             )
         )
         mockAuthService.mockResponse = mockResponse
