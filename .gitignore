@@ -74,6 +74,9 @@ iOSInjectionProject/
 ## macOS
 .DS_Store
 
+# Test output
+*.log
+
 # Environment & Secrets
 *.xcconfig
 Config.plist
