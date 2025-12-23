@@ -394,8 +394,27 @@ swiftlint
 
 ## 📦 Releases
 
-### Version 1.2 Build 3 (Current - December 2024)
+### Version 1.2.1 Build 4 (Current - December 2025)
 **Latest Updates:**
+- 🐛 **Critical Fix:** Push notifications now display tee times in your local timezone instead of UTC
+- 🌍 **Automatic timezone detection:** App sends device timezone during registration
+- 🔄 **Smart updates:** Timezone automatically updates when you travel
+- ✅ All tests passing (104/104)
+- 📖 Comprehensive documentation added
+
+**What This Fixes:**
+- Before: Mountain Time user saw "5:15pm" (UTC time) ❌
+- After: Mountain Time user sees "10:15am" (correct local time) ✅
+- Each user's device shows times in their own timezone automatically
+
+**Technical Details:**
+- iOS sends `TimeZone.current.identifier` during device token registration
+- Backend formats notification times per-device based on stored timezone
+- Backward compatible: older app versions continue working (show UTC with "UTC" suffix)
+- See [PUSH_NOTIFICATION_TIMEZONE_FIX.md](../docs/PUSH_NOTIFICATION_TIMEZONE_FIX.md) for full implementation details
+
+### Version 1.2 Build 3 (December 2025)
+**Updates:**
 - 🐛 **Critical Fix:** Push notifications now work correctly when someone reserves a spot on your tee time
 - ✅ All tests passing (105/105)
 - 🔧 Enhanced notification tap handling
@@ -411,7 +430,7 @@ swiftlint
 - 👥 Enhanced group owner privileges
 - 🐛 iOS 17+ calendar fixes and stability improvements
 
-### Version 1.1 (December 12, 2024)
+### Version 1.1 (December 12, 2025)
 - Initial TestFlight release
 - Core tee time browsing and management
 - Group creation and invitations
