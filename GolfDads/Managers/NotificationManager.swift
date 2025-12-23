@@ -45,6 +45,11 @@ class NotificationManager: NSObject, ObservableObject {
     @objc private func appDidBecomeActive() {
         Task {
             await checkAuthorizationStatus()
+
+            // Re-register device token to update timezone if user has traveled
+            if let token = deviceToken {
+                registerTokenWithBackend(token)
+            }
         }
     }
 

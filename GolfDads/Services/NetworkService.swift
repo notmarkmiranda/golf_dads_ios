@@ -366,11 +366,16 @@ extension NetworkService {
             struct DeviceTokenData: Codable {
                 let token: String
                 let platform: String
+                let timezone: String
             }
         }
 
         let request = DeviceTokenRequest(
-            deviceToken: DeviceTokenRequest.DeviceTokenData(token: token, platform: platform)
+            deviceToken: DeviceTokenRequest.DeviceTokenData(
+                token: token,
+                platform: platform,
+                timezone: TimeZone.current.identifier
+            )
         )
 
         try await self.request(
