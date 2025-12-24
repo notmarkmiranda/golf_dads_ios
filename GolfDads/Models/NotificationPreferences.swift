@@ -55,4 +55,12 @@ struct NotificationPreferencesUpdate: Codable {
     var remindersEnabled: Bool?
     var reminder24HEnabled: Bool?
     var reminder2HEnabled: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case reservationsEnabled = "reservations_enabled"
+        case groupActivityEnabled = "group_activity_enabled"
+        case remindersEnabled = "reminders_enabled"
+        case reminder24HEnabled = "reminder_24h_enabled"
+        case reminder2HEnabled = "reminder_2h_enabled"
+    }
 }

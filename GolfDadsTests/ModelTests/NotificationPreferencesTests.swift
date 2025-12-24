@@ -70,6 +70,32 @@ final class NotificationPreferencesTests: XCTestCase {
 
     // MARK: - Encoding Tests
 
+    func testEncodeForBackendPatchRequest() throws {
+        // This test verifies the exact format the backend expects
+        // Backend permits: reminder_24h_enabled, reminder_2h_enabled
+        // Backend rejects: reminder24_h_enabled, reminder2_h_enabled
+
+        let update = NotificationPreferencesUpdate(
+            reservationsEnabled: true,
+            groupActivityEnabled: true,
+            remindersEnabled: true,
+            reminder24HEnabled: false,
+            reminder2HEnabled: true
+        )
+
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(update)
+        let jsonString = String(data: data, encoding: .utf8)!
+
+        // Verify correct format is present
+        XCTAssertTrue(jsonString.contains("\"reminder_24h_enabled\""), "Must encode as reminder_24h_enabled for backend")
+        XCTAssertTrue(jsonString.contains("\"reminder_2h_enabled\""), "Must encode as reminder_2h_enabled for backend")
+
+        // Verify incorrect format is NOT present
+        XCTAssertFalse(jsonString.contains("\"reminder24_h_enabled\""), "Must NOT encode as reminder24_h_enabled - backend will reject")
+        XCTAssertFalse(jsonString.contains("\"reminder2_h_enabled\""), "Must NOT encode as reminder2_h_enabled - backend will reject")
+    }
+
     func testEncodeNotificationPreferencesUpdateToSnakeCase() throws {
         let update = NotificationPreferencesUpdate(
             reservationsEnabled: true,
@@ -80,15 +106,20 @@ final class NotificationPreferencesTests: XCTestCase {
         )
 
         let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
+        // Note: We DON'T use convertToSnakeCase because we have explicit CodingKeys
         let data = try encoder.encode(update)
         let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
 
+        // Verify backend-expected format with underscores in correct positions
         XCTAssertEqual(json["reservations_enabled"] as? Bool, true)
         XCTAssertEqual(json["group_activity_enabled"] as? Bool, false)
         XCTAssertEqual(json["reminders_enabled"] as? Bool, true)
-        XCTAssertEqual(json["reminder_24h_enabled"] as? Bool, false)
-        XCTAssertEqual(json["reminder_2h_enabled"] as? Bool, true)
+        XCTAssertEqual(json["reminder_24h_enabled"] as? Bool, false, "Should encode as reminder_24h_enabled, not reminder24_h_enabled")
+        XCTAssertEqual(json["reminder_2h_enabled"] as? Bool, true, "Should encode as reminder_2h_enabled, not reminder2_h_enabled")
+
+        // Verify it does NOT produce the wrong format
+        XCTAssertNil(json["reminder24_h_enabled"], "Should NOT encode as reminder24_h_enabled")
+        XCTAssertNil(json["reminder2_h_enabled"], "Should NOT encode as reminder2_h_enabled")
     }
 
     func testEncodePartialNotificationPreferencesUpdate() throws {
@@ -104,10 +135,10 @@ final class NotificationPreferencesTests: XCTestCase {
         let data = try encoder.encode(update)
         let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
 
-        XCTAssertNil(json["reservations_enabled"])
+        XCTAssertNil(json["reservations_enabled"], "Nil values should not be encoded")
         XCTAssertEqual(json["group_activity_enabled"] as? Bool, true)
-        XCTAssertNil(json["reminders_enabled"])
-        XCTAssertNil(json["reminder_24h_enabled"])
+        XCTAssertNil(json["reminders_enabled"], "Nil values should not be encoded")
+        XCTAssertNil(json["reminder_24h_enabled"], "Nil values should not be encoded")
         XCTAssertEqual(json["reminder_2h_enabled"] as? Bool, false)
     }
 
@@ -172,10 +203,14 @@ final class NotificationPreferencesTests: XCTestCase {
         let prefs = json["notification_preferences"] as! [String: Any]
 
         XCTAssertEqual(prefs["reservations_enabled"] as? Bool, true)
-        XCTAssertNil(prefs["group_activity_enabled"])
+        XCTAssertNil(prefs["group_activity_enabled"], "Nil values should not be encoded")
         XCTAssertEqual(prefs["reminders_enabled"] as? Bool, false)
-        XCTAssertNil(prefs["reminder_24h_enabled"])
+        XCTAssertNil(prefs["reminder_24h_enabled"], "Nil values should not be encoded")
         XCTAssertEqual(prefs["reminder_2h_enabled"] as? Bool, true)
+
+        // Verify correct format for numbered fields
+        XCTAssertNil(prefs["reminder24_h_enabled"], "Should NOT encode as reminder24_h_enabled")
+        XCTAssertNil(prefs["reminder2_h_enabled"], "Should NOT encode as reminder2_h_enabled")
     }
 
     // MARK: - Equatable Tests
