@@ -11,6 +11,11 @@
 - Solution: Added explicit CodingKeys for proper field mapping between iOS and backend
 - All notification preference toggles now work correctly
 
+### My Tee Times Screen
+- Automatically hide tee times older than 6 hours from My Postings and My Reservations
+- Sort tee times chronologically with soonest tee time first
+- Keeps your tee time list focused on upcoming golf rounds
+
 ## Testing
 
 - iOS tests: 116 passing (12 new NotificationPreferences tests added)

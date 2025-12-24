@@ -7,9 +7,12 @@
 ### Notification Preferences
 - Fixed bug where notification preferences failed to load with decoding error
 - Fixed bug where 24-hour and 2-hour reminder toggles wouldn't turn off
-- Problem: Swift's snake_case conversion doesn't handle numbered fields correctly
-- Solution: Added explicit CodingKeys for proper field mapping between iOS and backend
 - All notification preference toggles now work correctly
+
+### My Tee Times Screen
+- Automatically hide tee times older than 6 hours
+- Sort tee times with soonest first
+- Keeps your list focused on upcoming rounds
 
 ## Testing
 
