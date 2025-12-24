@@ -1,6 +1,49 @@
-# Three Putt - Version 1.2.1
+# Three Putt - Version 1.2.1 Build 4
 
-## Bug Fixes
+**Release Date:** December 22, 2025
+
+## Critical Bug Fix
+
+### Push Notification Timezone
+Push notifications now display tee times in your local timezone instead of UTC.
+
+**Problem Fixed:**
+- Users were receiving notifications showing UTC time instead of local time
+- Example: Mountain Time user creating 10:15am tee time would see notification showing 5:15pm
+
+**Solution:**
+- App automatically sends device timezone during push token registration
+- Backend formats notification times specifically for each device's timezone
+- Timezone updates automatically when app launches (handles traveling users)
+- No user setup required
+
+**Technical Changes:**
+- NetworkService: Sends TimeZone.current.identifier during device token registration
+- NotificationManager: Re-registers token on app launch to keep timezone current
+- Backend: Added timezone column to device_tokens table
+- Backend: All notification jobs now format times per-device
+
+## Additional Fixes
+
+### Group Join Error Handling
+- Invalid invite codes now show proper error message instead of "internal server error"
+- Added input sanitization for invite codes (whitespace trimming, case handling)
+- Improved robustness with better exception handling
+
+## Testing
+
+- All 104 iOS tests passing
+- All 602 backend tests passing
+- Comprehensive test coverage for timezone functionality
+- Tests cover edge cases and backward compatibility
+
+## Backward Compatibility
+
+- Old app versions (Builds 1-3) continue working without changes
+- Devices without timezone information show UTC with "UTC" suffix until updated
+- All API changes are additive and backward compatible
+
+## Previous Version 1.2.1 Fixes
 
 - Fixed critical issue preventing favorite courses from loading
 - Fixed error preventing browse tee times from displaying

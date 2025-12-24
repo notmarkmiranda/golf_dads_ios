@@ -5,6 +5,55 @@
 All Swift code for Phase 4 (iOS Foundation) has been implemented. The iOS app now has the core infrastructure for push notifications using Firebase Cloud Messaging.
 
 **Completion Date:** December 14, 2024
+**Updated:** December 22, 2025 (Build 4 - Timezone Enhancement)
+
+---
+
+## Build 4 Enhancement: Timezone Support
+
+**Date:** December 22, 2025
+
+### Changes to NotificationManager
+- Added automatic device token re-registration on app launch
+- Token re-registers every time app becomes active
+- Keeps timezone information current when users travel
+
+```swift
+@objc private func appDidBecomeActive() {
+    Task {
+        await checkAuthorizationStatus()
+
+        // Re-register device token to update timezone if user has traveled
+        if let token = deviceToken {
+            registerTokenWithBackend(token)
+        }
+    }
+}
+```
+
+### Changes to NetworkService
+- Device token registration now includes timezone information
+- Sends `TimeZone.current.identifier` (e.g., "America/Denver")
+- Backend uses this to format notification times in user's local timezone
+
+```swift
+struct DeviceTokenData: Codable {
+    let token: String
+    let platform: String
+    let timezone: String  // NEW in Build 4
+}
+```
+
+### Why This Matters
+- Push notifications now display times in user's local timezone instead of UTC
+- Example: Mountain Time user sees "10:15am" instead of "5:15pm" (UTC)
+- Automatic - no user setup required
+- Updates when traveling or changing device timezone
+
+### Backend Integration
+- Backend stores timezone in `device_tokens.timezone` column
+- Each notification formatted per-device based on stored timezone
+- Backward compatible: devices without timezone show "UTC" suffix
 
 ---
 
