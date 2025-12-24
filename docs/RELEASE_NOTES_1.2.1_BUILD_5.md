@@ -2,18 +2,22 @@
 
 **Release Date:** December 23, 2025
 
-## Changes in This Build
+## Bug Fixes
 
-[Content will be added as features/fixes are implemented]
+### Notification Preferences
+- Fixed bug where notification preferences failed to load with decoding error
+- Fixed bug where 24-hour and 2-hour reminder toggles wouldn't turn off
+- Problem: Swift's snake_case conversion doesn't handle numbered fields correctly
+- Solution: Added explicit CodingKeys for proper field mapping between iOS and backend
+- All notification preference toggles now work correctly
 
 ## Testing
 
-- iOS tests: [Count to be updated]
-- Backend tests: [Count to be updated]
+- iOS tests: 116 passing (12 new NotificationPreferences tests added)
+- Backend tests: 604 passing (2 new notification preferences tests added)
+- Comprehensive test coverage for encoding/decoding
 
 ## Previous Builds
 
-### Build 4 (December 22, 2025)
-- Fixed push notification timezone bug
-- Fixed notification preferences loading and toggle bugs
-- Improved group join error handling
+### Build 4 (December 23, 2025)
+- Fixed push notification timezone bug (notifications now show local time instead of UTC)
