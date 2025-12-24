@@ -25,6 +25,13 @@ Push notifications now display tee times in your local timezone instead of UTC.
 
 ## Additional Fixes
 
+### Notification Preferences Bug
+- Fixed bug where notification preferences failed to load with decoding error
+- Fixed bug where 24-hour and 2-hour reminder toggles wouldn't turn off
+- Problem: Swift's snake_case conversion doesn't handle numbered fields correctly
+- Solution: Added explicit CodingKeys for proper field mapping between iOS and backend
+- Notification preferences now load correctly and all toggles work as expected
+
 ### Group Join Error Handling
 - Invalid invite codes now show proper error message instead of "internal server error"
 - Added input sanitization for invite codes (whitespace trimming, case handling)
@@ -32,9 +39,10 @@ Push notifications now display tee times in your local timezone instead of UTC.
 
 ## Testing
 
-- All 104 iOS tests passing
-- All 602 backend tests passing
+- All 116 iOS tests passing (12 new NotificationPreferences tests added)
+- All 604 backend tests passing (2 new notification preferences tests added)
 - Comprehensive test coverage for timezone functionality
+- Comprehensive test coverage for notification preferences encoding/decoding
 - Tests cover edge cases and backward compatibility
 
 ## Backward Compatibility
