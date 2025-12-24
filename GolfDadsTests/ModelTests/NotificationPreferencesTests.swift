@@ -161,6 +161,7 @@ final class NotificationPreferencesTests: XCTestCase {
 
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         let response = try decoder.decode(NotificationPreferencesResponse.self, from: data)
 
@@ -180,6 +181,7 @@ final class NotificationPreferencesTests: XCTestCase {
 
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         let response = try decoder.decode(NotificationPreferencesResponse.self, from: data)
 
