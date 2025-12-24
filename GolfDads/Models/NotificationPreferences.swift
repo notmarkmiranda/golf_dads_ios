@@ -13,18 +13,8 @@ struct NotificationPreferences: Codable, Equatable {
     var reservationsEnabled: Bool
     var groupActivityEnabled: Bool
     var remindersEnabled: Bool
-    var reminder24hEnabled: Bool
-    var reminder2hEnabled: Bool
-
-    enum CodingKeys: String, CodingKey {
-        case id
-        case userId
-        case reservationsEnabled
-        case groupActivityEnabled
-        case remindersEnabled
-        case reminder24hEnabled = "reminder_24h_enabled"
-        case reminder2hEnabled = "reminder_2h_enabled"
-    }
+    var reminder24HEnabled: Bool
+    var reminder2HEnabled: Bool
 
     // Default preferences (all enabled)
     static var defaultPreferences: NotificationPreferences {
@@ -34,8 +24,8 @@ struct NotificationPreferences: Codable, Equatable {
             reservationsEnabled: true,
             groupActivityEnabled: true,
             remindersEnabled: true,
-            reminder24hEnabled: true,
-            reminder2hEnabled: true
+            reminder24HEnabled: true,
+            reminder2HEnabled: true
         )
     }
 }
@@ -63,14 +53,6 @@ struct NotificationPreferencesUpdate: Codable {
     var reservationsEnabled: Bool?
     var groupActivityEnabled: Bool?
     var remindersEnabled: Bool?
-    var reminder24hEnabled: Bool?
-    var reminder2hEnabled: Bool?
-
-    enum CodingKeys: String, CodingKey {
-        case reservationsEnabled
-        case groupActivityEnabled
-        case remindersEnabled
-        case reminder24hEnabled = "reminder_24h_enabled"
-        case reminder2hEnabled = "reminder_2h_enabled"
-    }
+    var reminder24HEnabled: Bool?
+    var reminder2HEnabled: Bool?
 }

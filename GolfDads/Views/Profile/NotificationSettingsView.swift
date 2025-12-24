@@ -42,9 +42,9 @@ struct NotificationSettingsView: View {
                         Toggle("Reminders", isOn: binding(for: \.remindersEnabled))
 
                         if prefs.remindersEnabled {
-                            Toggle("24 Hour Reminder", isOn: binding(for: \.reminder24hEnabled))
+                            Toggle("24 Hour Reminder", isOn: binding(for: \.reminder24HEnabled))
                                 .padding(.leading, 20)
-                            Toggle("2 Hour Reminder", isOn: binding(for: \.reminder2hEnabled))
+                            Toggle("2 Hour Reminder", isOn: binding(for: \.reminder2HEnabled))
                                 .padding(.leading, 20)
                         }
                     }
@@ -181,8 +181,8 @@ struct NotificationSettingsView: View {
             reservationsEnabled: prefs.reservationsEnabled,
             groupActivityEnabled: prefs.groupActivityEnabled,
             remindersEnabled: prefs.remindersEnabled,
-            reminder24hEnabled: prefs.reminder24hEnabled,
-            reminder2hEnabled: prefs.reminder2hEnabled
+            reminder24HEnabled: prefs.reminder24HEnabled,
+            reminder2HEnabled: prefs.reminder2HEnabled
         )
 
         do {

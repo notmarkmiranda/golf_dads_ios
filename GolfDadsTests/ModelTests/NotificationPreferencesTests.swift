@@ -26,6 +26,8 @@ final class NotificationPreferencesTests: XCTestCase {
 
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
+        // Match NetworkService configuration
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         let preferences = try decoder.decode(NotificationPreferences.self, from: data)
 
@@ -34,8 +36,8 @@ final class NotificationPreferencesTests: XCTestCase {
         XCTAssertTrue(preferences.reservationsEnabled)
         XCTAssertTrue(preferences.groupActivityEnabled)
         XCTAssertTrue(preferences.remindersEnabled)
-        XCTAssertTrue(preferences.reminder24hEnabled)
-        XCTAssertFalse(preferences.reminder2hEnabled)
+        XCTAssertTrue(preferences.reminder24HEnabled)
+        XCTAssertFalse(preferences.reminder2HEnabled)
     }
 
     func testDecodeNotificationPreferencesAllDisabled() throws {
@@ -53,6 +55,7 @@ final class NotificationPreferencesTests: XCTestCase {
 
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         let preferences = try decoder.decode(NotificationPreferences.self, from: data)
 
@@ -61,8 +64,8 @@ final class NotificationPreferencesTests: XCTestCase {
         XCTAssertFalse(preferences.reservationsEnabled)
         XCTAssertFalse(preferences.groupActivityEnabled)
         XCTAssertFalse(preferences.remindersEnabled)
-        XCTAssertFalse(preferences.reminder24hEnabled)
-        XCTAssertFalse(preferences.reminder2hEnabled)
+        XCTAssertFalse(preferences.reminder24HEnabled)
+        XCTAssertFalse(preferences.reminder2HEnabled)
     }
 
     // MARK: - Encoding Tests
@@ -72,11 +75,12 @@ final class NotificationPreferencesTests: XCTestCase {
             reservationsEnabled: true,
             groupActivityEnabled: false,
             remindersEnabled: true,
-            reminder24hEnabled: false,
-            reminder2hEnabled: true
+            reminder24HEnabled: false,
+            reminder2HEnabled: true
         )
 
         let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
         let data = try encoder.encode(update)
         let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
 
@@ -92,8 +96,8 @@ final class NotificationPreferencesTests: XCTestCase {
             reservationsEnabled: nil,
             groupActivityEnabled: true,
             remindersEnabled: nil,
-            reminder24hEnabled: nil,
-            reminder2hEnabled: false
+            reminder24HEnabled: nil,
+            reminder2HEnabled: false
         )
 
         let encoder = JSONEncoder()
@@ -156,8 +160,8 @@ final class NotificationPreferencesTests: XCTestCase {
             reservationsEnabled: true,
             groupActivityEnabled: nil,
             remindersEnabled: false,
-            reminder24hEnabled: nil,
-            reminder2hEnabled: true
+            reminder24HEnabled: nil,
+            reminder2HEnabled: true
         )
 
         let request = NotificationPreferencesUpdateRequest(notificationPreferences: update)
@@ -183,8 +187,8 @@ final class NotificationPreferencesTests: XCTestCase {
             reservationsEnabled: true,
             groupActivityEnabled: true,
             remindersEnabled: true,
-            reminder24hEnabled: true,
-            reminder2hEnabled: false
+            reminder24HEnabled: true,
+            reminder2HEnabled: false
         )
 
         let prefs2 = NotificationPreferences(
@@ -193,8 +197,8 @@ final class NotificationPreferencesTests: XCTestCase {
             reservationsEnabled: true,
             groupActivityEnabled: true,
             remindersEnabled: true,
-            reminder24hEnabled: true,
-            reminder2hEnabled: false
+            reminder24HEnabled: true,
+            reminder2HEnabled: false
         )
 
         XCTAssertEqual(prefs1, prefs2)
@@ -207,8 +211,8 @@ final class NotificationPreferencesTests: XCTestCase {
             reservationsEnabled: true,
             groupActivityEnabled: true,
             remindersEnabled: true,
-            reminder24hEnabled: true,
-            reminder2hEnabled: false
+            reminder24HEnabled: true,
+            reminder2HEnabled: false
         )
 
         let prefs2 = NotificationPreferences(
@@ -217,8 +221,8 @@ final class NotificationPreferencesTests: XCTestCase {
             reservationsEnabled: true,
             groupActivityEnabled: true,
             remindersEnabled: true,
-            reminder24hEnabled: false, // Different
-            reminder2hEnabled: false
+            reminder24HEnabled: false, // Different
+            reminder2HEnabled: false
         )
 
         XCTAssertNotEqual(prefs1, prefs2)
@@ -234,7 +238,7 @@ final class NotificationPreferencesTests: XCTestCase {
         XCTAssertTrue(defaults.reservationsEnabled)
         XCTAssertTrue(defaults.groupActivityEnabled)
         XCTAssertTrue(defaults.remindersEnabled)
-        XCTAssertTrue(defaults.reminder24hEnabled)
-        XCTAssertTrue(defaults.reminder2hEnabled)
+        XCTAssertTrue(defaults.reminder24HEnabled)
+        XCTAssertTrue(defaults.reminder2HEnabled)
     }
 }
