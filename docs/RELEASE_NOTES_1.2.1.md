@@ -1,13 +1,8 @@
-# Three Putt - Version 1.2.1 Build 5
+# Three Putt - Version 1.2.1 Build 6
 
 **Release Date:** December 23, 2025
 
-## Bug Fixes
-
-### Notification Preferences
-- Fixed bug where notification preferences failed to load with decoding error
-- Fixed bug where 24-hour and 2-hour reminder toggles wouldn't turn off
-- All notification preference toggles now work correctly
+## Improvements
 
 ### My Tee Times Screen
 - Automatically hide tee times older than 6 hours
