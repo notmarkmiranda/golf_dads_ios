@@ -71,24 +71,26 @@ struct FavoriteCoursesView: View {
     }
 
     private var favoritesList: some View {
-        List {
-            ForEach(favorites, id: \.id) { course in
-                FavoriteCourseRow(
-                    course: course,
-                    onCreateTeeTime: {
-                        selectedCourse = course
-                        showCreateTeeTime = true
-                    },
-                    onRemove: {
-                        Task {
-                            await removeFavorite(course)
+        GeometryReader { geometry in
+            List {
+                ForEach(favorites, id: \.id) { course in
+                    FavoriteCourseRow(
+                        course: course,
+                        onCreateTeeTime: {
+                            selectedCourse = course
+                            showCreateTeeTime = true
+                        },
+                        onRemove: {
+                            Task {
+                                await removeFavorite(course)
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
+            .listStyle(.insetGrouped)
+            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
         }
-        .listStyle(.insetGrouped)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private func loadFavorites() async {
