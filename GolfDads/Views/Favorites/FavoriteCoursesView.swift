@@ -47,7 +47,10 @@ struct FavoriteCoursesView: View {
     @ViewBuilder
     private var contentView: some View {
         if isLoading {
-            ProgressView("Loading favorites...")
+            VStack {
+                ProgressView("Loading favorites...")
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let errorMessage = errorMessage {
             ContentUnavailableView {
                 Label("Error", systemImage: "exclamationmark.triangle")
@@ -87,6 +90,7 @@ struct FavoriteCoursesView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private func loadFavorites() async {
