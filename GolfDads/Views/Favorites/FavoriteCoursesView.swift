@@ -19,6 +19,7 @@ struct FavoriteCoursesView: View {
         NavigationStack {
             contentView
                 .navigationTitle("Favorite Courses")
+                .navigationBarTitleDisplayMode(.large)
                 .refreshable {
                     await loadFavorites()
                 }
@@ -85,6 +86,7 @@ struct FavoriteCoursesView: View {
                 )
             }
         }
+        .listStyle(.insetGrouped)
     }
 
     private func loadFavorites() async {
