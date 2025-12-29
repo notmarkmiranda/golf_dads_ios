@@ -4,10 +4,11 @@
 
 ## Bug Fixes
 
-### Favorite Courses Screen (iOS 18)
-- Fixed layout issue where table was centered instead of top-aligned
-- Fixed navigation header disappearing on iOS 18
-- Added explicit navigation bar display mode for consistent behavior across iOS versions
+### Favorite Courses Screen (iOS 26)
+- Fixed layout issue where table was centered instead of top-aligned on iOS 26
+- Fixed navigation header disappearing
+- Fixed + button showing blank screen instead of Create Tee Time form
+- Tapping + now properly opens Create Tee Time with the course pre-selected
 
 ## Testing
 
