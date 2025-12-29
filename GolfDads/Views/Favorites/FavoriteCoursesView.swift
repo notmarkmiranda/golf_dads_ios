@@ -21,44 +21,61 @@ struct FavoriteCoursesView: View {
     }
 
     var body: some View {
-        Group {
-            if showCloseButton {
-                NavigationStack {
-                    contentView
-                        .navigationTitle("Favorite Courses")
-                        .navigationBarTitleDisplayMode(.large)
-                        .toolbar {
-                            ToolbarItem(placement: .confirmationAction) {
-                                Button("Done") {
-                                    dismiss()
-                                }
-                            }
-                        }
-                }
-            } else {
+        if showCloseButton {
+            NavigationStack {
                 contentView
                     .navigationTitle("Favorite Courses")
                     .navigationBarTitleDisplayMode(.large)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") {
+                                dismiss()
+                            }
+                        }
+                    }
+                    .refreshable {
+                        await loadFavorites()
+                    }
+                    .sheet(item: $selectedCourse) { course in
+                        CreateTeeTimeView(preselectedCourse: course)
+                    }
+                    .alert("Error", isPresented: $showErrorAlert) {
+                        Button("OK") {
+                            errorMessage = nil
+                            showErrorAlert = false
+                        }
+                    } message: {
+                        if let errorMessage = errorMessage {
+                            Text(errorMessage)
+                        }
+                    }
+                    .task {
+                        await loadFavorites()
+                    }
             }
-        }
-        .refreshable {
-            await loadFavorites()
-        }
-        .sheet(item: $selectedCourse) { course in
-            CreateTeeTimeView(preselectedCourse: course)
-        }
-        .alert("Error", isPresented: $showErrorAlert) {
-            Button("OK") {
-                errorMessage = nil
-                showErrorAlert = false
-            }
-        } message: {
-            if let errorMessage = errorMessage {
-                Text(errorMessage)
-            }
-        }
-        .task {
-            await loadFavorites()
+        } else {
+            contentView
+                .navigationTitle("Favorite Courses")
+                .navigationBarTitleDisplayMode(.large)
+                .refreshable {
+                    await loadFavorites()
+                }
+                .sheet(item: $selectedCourse) { course in
+                    CreateTeeTimeView(preselectedCourse: course)
+                }
+                .alert("Error", isPresented: $showErrorAlert) {
+                    Button("OK") {
+                        errorMessage = nil
+                        showErrorAlert = false
+                    }
+                } message: {
+                    if let errorMessage = errorMessage {
+                        Text(errorMessage)
+                    }
+                }
+                .task {
+                    await loadFavorites()
+                }
         }
     }
 
