@@ -5,13 +5,14 @@
 ## Bug Fixes
 
 ### Favorite Courses Screen
-- Fixed layout issue where table was centered instead of top-aligned on iOS 26
-- Fixed navigation header disappearing
+- Fixed layout issue on iOS 26 where table appeared centered instead of at the top
+- Fixed navigation header disappearing on iOS 26
 - Fixed + button showing blank screen - now properly opens Create Tee Time with course pre-selected
+- Fixed error when dismissing Favorites list from Create Tee Time screen
 
 ## Testing
 
-- All 116 iOS tests passing (12 new NotificationPreferences tests added)
+- 117 iOS tests passing
 - All 604 backend tests passing (2 new notification preferences tests added)
 - Comprehensive test coverage for encoding/decoding
 
