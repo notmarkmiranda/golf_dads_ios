@@ -16,32 +16,30 @@ struct FavoriteCoursesView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            contentView
-                .navigationTitle("Favorite Courses")
-                .navigationBarTitleDisplayMode(.large)
-                .refreshable {
-                    await loadFavorites()
+        contentView
+            .navigationTitle("Favorite Courses")
+            .navigationBarTitleDisplayMode(.large)
+            .refreshable {
+                await loadFavorites()
+            }
+            .sheet(isPresented: $showCreateTeeTime) {
+                if let course = selectedCourse {
+                    CreateTeeTimeView(preselectedCourse: course)
                 }
-                .sheet(isPresented: $showCreateTeeTime) {
-                    if let course = selectedCourse {
-                        CreateTeeTimeView(preselectedCourse: course)
-                    }
+            }
+            .alert("Error", isPresented: $showErrorAlert) {
+                Button("OK") {
+                    errorMessage = nil
+                    showErrorAlert = false
                 }
-                .alert("Error", isPresented: $showErrorAlert) {
-                    Button("OK") {
-                        errorMessage = nil
-                        showErrorAlert = false
-                    }
-                } message: {
-                    if let errorMessage = errorMessage {
-                        Text(errorMessage)
-                    }
+            } message: {
+                if let errorMessage = errorMessage {
+                    Text(errorMessage)
                 }
-                .task {
-                    await loadFavorites()
-                }
-        }
+            }
+            .task {
+                await loadFavorites()
+            }
     }
 
     @ViewBuilder
