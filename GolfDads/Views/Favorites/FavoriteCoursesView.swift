@@ -75,7 +75,6 @@ struct FavoriteCoursesView: View {
                         course: course,
                         onCreateTeeTime: {
                             selectedCourse = course
-                            showCreateTeeTime = true
                         },
                         onRemove: {
                             Task {
