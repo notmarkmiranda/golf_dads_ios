@@ -5,7 +5,6 @@ struct FavoriteCoursesView: View {
     @State private var favorites: [GolfCourse] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
-    @State private var showCreateTeeTime = false
     @State private var selectedCourse: GolfCourse?
     @State private var showErrorAlert = false
 
@@ -22,10 +21,8 @@ struct FavoriteCoursesView: View {
             .refreshable {
                 await loadFavorites()
             }
-            .sheet(isPresented: $showCreateTeeTime) {
-                if let course = selectedCourse {
-                    CreateTeeTimeView(preselectedCourse: course)
-                }
+            .sheet(item: $selectedCourse) { course in
+                CreateTeeTimeView(preselectedCourse: course)
             }
             .alert("Error", isPresented: $showErrorAlert) {
                 Button("OK") {
