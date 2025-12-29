@@ -7,36 +7,59 @@ struct FavoriteCoursesView: View {
     @State private var errorMessage: String?
     @State private var selectedCourse: GolfCourse?
     @State private var showErrorAlert = false
+    @Environment(\.dismiss) private var dismiss
 
     private let favoriteService: FavoriteCourseServiceProtocol
+    private let showCloseButton: Bool
 
-    init(favoriteService: FavoriteCourseServiceProtocol = FavoriteCourseService()) {
+    init(
+        favoriteService: FavoriteCourseServiceProtocol = FavoriteCourseService(),
+        showCloseButton: Bool = false
+    ) {
         self.favoriteService = favoriteService
+        self.showCloseButton = showCloseButton
     }
 
     var body: some View {
-        contentView
-            .navigationTitle("Favorite Courses")
-            .navigationBarTitleDisplayMode(.large)
-            .refreshable {
-                await loadFavorites()
-            }
-            .sheet(item: $selectedCourse) { course in
-                CreateTeeTimeView(preselectedCourse: course)
-            }
-            .alert("Error", isPresented: $showErrorAlert) {
-                Button("OK") {
-                    errorMessage = nil
-                    showErrorAlert = false
+        Group {
+            if showCloseButton {
+                NavigationStack {
+                    contentView
+                        .navigationTitle("Favorite Courses")
+                        .navigationBarTitleDisplayMode(.large)
+                        .toolbar {
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button("Done") {
+                                    dismiss()
+                                }
+                            }
+                        }
                 }
-            } message: {
-                if let errorMessage = errorMessage {
-                    Text(errorMessage)
-                }
+            } else {
+                contentView
+                    .navigationTitle("Favorite Courses")
+                    .navigationBarTitleDisplayMode(.large)
             }
-            .task {
-                await loadFavorites()
+        }
+        .refreshable {
+            await loadFavorites()
+        }
+        .sheet(item: $selectedCourse) { course in
+            CreateTeeTimeView(preselectedCourse: course)
+        }
+        .alert("Error", isPresented: $showErrorAlert) {
+            Button("OK") {
+                errorMessage = nil
+                showErrorAlert = false
             }
+        } message: {
+            if let errorMessage = errorMessage {
+                Text(errorMessage)
+            }
+        }
+        .task {
+            await loadFavorites()
+        }
     }
 
     @ViewBuilder

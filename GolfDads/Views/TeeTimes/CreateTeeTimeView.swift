@@ -336,7 +336,7 @@ struct CreateTeeTimeView: View {
                 )
             }
             .sheet(isPresented: $showFavorites) {
-                FavoriteCoursesView()
+                FavoriteCoursesView(showCloseButton: true)
             }
             .task {
                 await loadGroups()
