@@ -1,13 +1,12 @@
-# Three Putt - Version 1.2.1 Build 5
+# Three Putt - Version 1.2.1 Build 6
 
 **Release Date:** December 23, 2025
 
 ## Bug Fixes
 
-### Notification Preferences
-- Fixed bug where notification preferences failed to load with decoding error
-- Fixed bug where 24-hour and 2-hour reminder toggles wouldn't turn off
-- All notification preference toggles now work correctly
+### Favorite Courses Screen (iOS 18)
+- Fixed layout issue where table was centered instead of top-aligned
+- Fixed navigation header disappearing on iOS 18
 
 ## Testing
 
