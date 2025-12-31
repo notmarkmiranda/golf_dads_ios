@@ -42,6 +42,40 @@ struct LoginView: View {
                         }
                         .padding(.bottom, 20)
 
+                        // Google Sign-In Button
+                        Button(action: handleGoogleSignIn) {
+                            HStack {
+                                Image(systemName: "globe")
+                                Text("Continue with Google")
+                                    .font(.headline)
+                            }
+                            .foregroundColor(.primary)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(Color(uiColor: .systemBackground))
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
+                        }
+                        .padding(.horizontal, 24)
+
+                        // Divider
+                        HStack {
+                            Rectangle()
+                                .frame(height: 1)
+                                .foregroundColor(.gray.opacity(0.3))
+                            Text("OR")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Rectangle()
+                                .frame(height: 1)
+                                .foregroundColor(.gray.opacity(0.3))
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 8)
+
                         // Form
                         VStack(spacing: 16) {
                             // Email Field
@@ -144,40 +178,6 @@ struct LoginView: View {
                         .disabled(!isFormValid || authManager.isLoading)
                         .padding(.horizontal, 24)
                         .padding(.top, 8)
-
-                        // Divider
-                        HStack {
-                            Rectangle()
-                                .frame(height: 1)
-                                .foregroundColor(.gray.opacity(0.3))
-                            Text("OR")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Rectangle()
-                                .frame(height: 1)
-                                .foregroundColor(.gray.opacity(0.3))
-                        }
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 8)
-
-                        // Google Sign-In Button (placeholder)
-                        Button(action: handleGoogleSignIn) {
-                            HStack {
-                                Image(systemName: "globe")
-                                Text("Continue with Google")
-                                    .font(.headline)
-                            }
-                            .foregroundColor(.primary)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 50)
-                            .background(Color(uiColor: .systemBackground))
-                            .cornerRadius(12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                            )
-                        }
-                        .padding(.horizontal, 24)
 
                         Spacer()
                     }

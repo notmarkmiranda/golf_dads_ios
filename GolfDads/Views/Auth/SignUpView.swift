@@ -45,6 +45,40 @@ struct SignUpView: View {
                         }
                         .padding(.bottom, 20)
 
+                        // Google Sign-In Button
+                        Button(action: handleGoogleSignIn) {
+                            HStack {
+                                Image(systemName: "globe")
+                                Text("Continue with Google")
+                                    .font(.headline)
+                            }
+                            .foregroundColor(.primary)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(Color(uiColor: .systemBackground))
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
+                        }
+                        .padding(.horizontal, 24)
+
+                        // Divider
+                        HStack {
+                            Rectangle()
+                                .frame(height: 1)
+                                .foregroundColor(.gray.opacity(0.3))
+                            Text("OR")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Rectangle()
+                                .frame(height: 1)
+                                .foregroundColor(.gray.opacity(0.3))
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 8)
+
                         // Form
                         VStack(spacing: 16) {
                             // Name Field
@@ -260,6 +294,26 @@ struct SignUpView: View {
 
         Task {
             await authManager.signUp(email: email, password: password, name: name)
+        }
+    }
+
+    private func handleGoogleSignIn() {
+        authManager.clearError()
+
+        Task {
+            do {
+                // Create Google Auth Service
+                let googleAuthService = GoogleAuthService()
+
+                // Get ID token from Google
+                let idToken = try await googleAuthService.signIn()
+
+                // Send to backend via AuthenticationManager
+                await authManager.googleSignIn(idToken: idToken)
+            } catch {
+                // Error handling is done in AuthenticationManager
+                print("Google Sign-In error: \(error.localizedDescription)")
+            }
         }
     }
 
