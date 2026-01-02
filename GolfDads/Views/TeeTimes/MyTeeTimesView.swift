@@ -65,7 +65,7 @@ struct MyTeeTimesView: View {
                             .font(.title2)
                             .fontWeight(.medium)
 
-                        Text("Create your first tee time posting to get started")
+                        Text("Create or join a group to get started")
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
 

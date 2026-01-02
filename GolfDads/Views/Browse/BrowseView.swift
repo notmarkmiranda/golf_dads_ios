@@ -12,6 +12,8 @@ struct BrowseView: View {
 
     @StateObject private var locationManager = LocationManager()
     @State private var teeTimePostings: [TeeTimePosting] = []
+    @State private var userGroups: [Group] = []
+    @State private var myReservations: [Reservation] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
 
@@ -23,11 +25,20 @@ struct BrowseView: View {
     @State private var hasLoadedPreferences = false
 
     private let teeTimeService: TeeTimeServiceProtocol
+    private let groupService: GroupServiceProtocol
+    private let reservationService: ReservationServiceProtocol
     let authManager: AuthenticationManager
 
-    init(authManager: AuthenticationManager, teeTimeService: TeeTimeServiceProtocol = TeeTimeService()) {
+    init(
+        authManager: AuthenticationManager,
+        teeTimeService: TeeTimeServiceProtocol = TeeTimeService(),
+        groupService: GroupServiceProtocol = GroupService(),
+        reservationService: ReservationServiceProtocol = ReservationService()
+    ) {
         self.authManager = authManager
         self.teeTimeService = teeTimeService
+        self.groupService = groupService
+        self.reservationService = reservationService
     }
 
     var body: some View {
@@ -59,11 +70,11 @@ struct BrowseView: View {
                             .font(.system(size: 50))
                             .foregroundColor(Color(red: 0.2, green: 0.6, blue: 0.3))
 
-                        Text("No Tee Times Available")
+                        Text("No Available Tee Times")
                             .font(.title2)
                             .fontWeight(.medium)
 
-                        Text("Check back later for available tee times")
+                        Text("Check back later for tee times in your groups")
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                     }
@@ -80,7 +91,7 @@ struct BrowseView: View {
                     }
                 }
             }
-            .navigationTitle("Browse Tee Times")
+            .navigationTitle("Available Tee Times")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -156,26 +167,50 @@ struct BrowseView: View {
         errorMessage = nil
 
         do {
-            if filterMode == .all {
-                // Load all tee times
-                teeTimePostings = try await teeTimeService.getTeeTimePostings()
-            } else {
-                // Load nearby tee times based on location
-                let coordinates = try await getCoordinates()
-                teeTimePostings = try await teeTimeService.getNearbyTeeTimePostings(
-                    latitude: coordinates.latitude,
-                    longitude: coordinates.longitude,
-                    radius: radiusMiles
-                )
+            // Load user's groups and reservations
+            userGroups = try await groupService.getGroups()
+            myReservations = try await reservationService.getMyReservations()
+
+            // If user has no groups, show empty state
+            guard !userGroups.isEmpty else {
+                teeTimePostings = []
+                isLoading = false
+                return
             }
-        } catch LocationError.permissionDenied {
-            errorMessage = "Location permission denied. Please enable location services in Settings or enter a zip code in the filter."
-        } catch LocationError.invalidZipCode {
-            errorMessage = "Invalid zip code. Please enter a 5-digit zip code."
-        } catch LocationError.geocodingFailed {
-            errorMessage = "Could not find location for zip code. Please check the zip code and try again."
-        } catch LocationError.timeout {
-            errorMessage = "Location request timed out. Please try again or enter a zip code."
+
+            // Fetch tee times from all user's groups
+            var allGroupTeeTimes: [TeeTimePosting] = []
+            for group in userGroups {
+                let groupPostings = try await teeTimeService.getGroupTeeTimePostings(groupId: group.id)
+                allGroupTeeTimes.append(contentsOf: groupPostings)
+            }
+
+            // Get current user ID
+            guard let currentUserId = authManager.currentUser?.id else {
+                teeTimePostings = []
+                isLoading = false
+                return
+            }
+
+            // Get set of posting IDs where user has reservations
+            let reservedPostingIds = Set(myReservations.map { $0.teeTimePosting?.id }.compactMap { $0 })
+
+            // Filter: exclude tee times where user is owner or has reservation
+            teeTimePostings = allGroupTeeTimes.filter { posting in
+                posting.userId != currentUserId && !reservedPostingIds.contains(posting.id)
+            }
+
+            // Remove duplicates (same posting in multiple groups)
+            var seen = Set<Int>()
+            teeTimePostings = teeTimePostings.filter { posting in
+                guard !seen.contains(posting.id) else { return false }
+                seen.insert(posting.id)
+                return true
+            }
+
+            // Sort by tee time
+            teeTimePostings.sort { $0.teeTime < $1.teeTime }
+
         } catch {
             errorMessage = "Failed to load tee times: \(error.localizedDescription)"
         }

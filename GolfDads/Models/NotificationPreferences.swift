@@ -44,8 +44,7 @@ struct NotificationPreferencesUpdateRequest: Codable {
     let notificationPreferences: NotificationPreferencesUpdate
 
     enum CodingKeys: String, CodingKey {
-        case notificationPreferences
-        // Note: convertFromSnakeCase decoder strategy automatically handles snake_case -> camelCase
+        case notificationPreferences = "notification_preferences"
     }
 }
 

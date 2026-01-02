@@ -45,6 +45,7 @@ struct MainTabView: View {
 
     @EnvironmentObject private var deepLinkHandler: DeepLinkHandler
     @State private var selectedTab = 0
+    @State private var userGroups: [Group] = []
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -62,10 +63,10 @@ struct MainTabView: View {
                 }
                 .tag(1)
 
-            // Browse Tab
+            // Available Tab
             BrowseView(authManager: authManager)
                 .tabItem {
-                    Label("Browse", systemImage: "flag")
+                    Label("Available", systemImage: "flag")
                 }
                 .tag(2)
 
@@ -83,6 +84,25 @@ struct MainTabView: View {
                 // Switch to Groups tab when a group is joined via deep link
                 selectedTab = 1
             }
+        }
+        .task {
+            await loadGroups()
+
+            // Set default tab based on whether user has groups
+            if userGroups.isEmpty {
+                selectedTab = 1  // Groups tab
+            } else {
+                selectedTab = 0  // My Tee Times tab
+            }
+        }
+    }
+
+    private func loadGroups() async {
+        do {
+            userGroups = try await GroupService().getGroups()
+        } catch {
+            // Handle error silently - defaults to Groups tab
+            print("Error loading groups: \(error)")
         }
     }
 }

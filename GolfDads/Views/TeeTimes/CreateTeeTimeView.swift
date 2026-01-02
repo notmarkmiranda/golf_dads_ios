@@ -18,11 +18,9 @@ struct CreateTeeTimeView: View {
     @State private var totalSpots: Int = 4
     @State private var reserveForMyself: Int = 0
     @State private var notes: String = ""
-    @State private var isPublic: Bool = true
     @State private var selectedGroupIds: Set<Int> = []
     @State private var availableGroups: [Group] = []
     @State private var isLoadingGroups = false
-    @State private var hasInitializedVisibility = false
 
     @State private var isCreating = false
     @State private var errorMessage: String?
@@ -177,66 +175,52 @@ struct CreateTeeTimeView: View {
                     }
                 }
 
-                // Visibility
+                // Group Selection
                 Section {
-                    Picker("Who can see this?", selection: $isPublic) {
-                        Label("Public", systemImage: "globe")
-                            .tag(true)
-                        Label("Private Groups", systemImage: "lock.fill")
-                            .tag(false)
-                    }
-                    .pickerStyle(.segmented)
-
-                    if isPublic {
-                        Text("Anyone can see and reserve this tee time")
+                    if isLoadingGroups {
+                        ProgressView()
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    } else if availableGroups.isEmpty {
+                        Text("You don't have any groups yet. Create or join a group first.")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.orange)
                     } else {
-                        if isLoadingGroups {
-                            ProgressView()
-                                .frame(maxWidth: .infinity, alignment: .center)
-                        } else if availableGroups.isEmpty {
-                            Text("You don't have any groups yet. Create or join a group first.")
+                        ForEach(availableGroups) { group in
+                            HStack {
+                                Button {
+                                    toggleGroupSelection(group.id)
+                                } label: {
+                                    HStack {
+                                        Image(systemName: selectedGroupIds.contains(group.id) ? "checkmark.circle.fill" : "circle")
+                                            .foregroundColor(selectedGroupIds.contains(group.id) ? .blue : .gray)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(group.name)
+                                                .foregroundColor(.primary)
+                                            if let description = group.description {
+                                                Text(description)
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                            }
+                                        }
+                                        Spacer()
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+
+                        if selectedGroupIds.isEmpty {
+                            Text("Select at least one group")
                                 .font(.caption)
                                 .foregroundColor(.orange)
                         } else {
-                            ForEach(availableGroups) { group in
-                                HStack {
-                                    Button {
-                                        toggleGroupSelection(group.id)
-                                    } label: {
-                                        HStack {
-                                            Image(systemName: selectedGroupIds.contains(group.id) ? "checkmark.circle.fill" : "circle")
-                                                .foregroundColor(selectedGroupIds.contains(group.id) ? .blue : .gray)
-                                            VStack(alignment: .leading, spacing: 2) {
-                                                Text(group.name)
-                                                    .foregroundColor(.primary)
-                                                if let description = group.description {
-                                                    Text(description)
-                                                        .font(.caption)
-                                                        .foregroundColor(.secondary)
-                                                }
-                                            }
-                                            Spacer()
-                                        }
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-
-                            if selectedGroupIds.isEmpty {
-                                Text("Select at least one group")
-                                    .font(.caption)
-                                    .foregroundColor(.orange)
-                            } else {
-                                Text("Selected \(selectedGroupIds.count) \(selectedGroupIds.count == 1 ? "group" : "groups")")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
+                            Text("Selected \(selectedGroupIds.count) \(selectedGroupIds.count == 1 ? "group" : "groups")")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                     }
                 } header: {
-                    Text("Visibility")
+                    Text("Select Groups")
                 }
 
                 // Notes
@@ -347,13 +331,6 @@ struct CreateTeeTimeView: View {
                     selectedGolfCourse = preselected
                 }
             }
-            .onChange(of: isPublic) { _, newValue in
-                if !newValue {
-                    Task {
-                        await loadGroups()
-                    }
-                }
-            }
         }
     }
 
@@ -373,8 +350,8 @@ struct CreateTeeTimeView: View {
 
     private var isFormValid: Bool {
         let hasCourse = selectedGolfCourse != nil || !manualCourseName.trimmingCharacters(in: .whitespaces).isEmpty
-        let hasValidVisibility = isPublic || !selectedGroupIds.isEmpty
-        return hasCourse && hasValidVisibility
+        let hasSelectedGroups = !selectedGroupIds.isEmpty
+        return hasCourse && hasSelectedGroups
     }
 
     // MARK: - Private Methods
@@ -384,11 +361,9 @@ struct CreateTeeTimeView: View {
         do {
             availableGroups = try await groupService.getGroups()
 
-            // On first load, if user has groups, default to private and select all groups
-            if !hasInitializedVisibility && !availableGroups.isEmpty {
-                isPublic = false
+            // Default to selecting all groups
+            if !availableGroups.isEmpty && selectedGroupIds.isEmpty {
                 selectedGroupIds = Set(availableGroups.map { $0.id })
-                hasInitializedVisibility = true
             }
         } catch {
             // Silently fail - user will see empty state
@@ -409,7 +384,7 @@ struct CreateTeeTimeView: View {
         errorMessage = nil
 
         do {
-            let groupIds = isPublic ? [] : Array(selectedGroupIds)
+            let groupIds = Array(selectedGroupIds)
 
             // Determine course name and ID
             let courseName: String
