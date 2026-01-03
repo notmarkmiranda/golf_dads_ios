@@ -11,25 +11,31 @@ struct MyTeeTimesView: View {
 
     @State private var teeTimePostings: [TeeTimePosting] = []
     @State private var myReservations: [Reservation] = []
+    @State private var userGroups: [Group] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var showCreateSheet = false
     @State private var postingToDelete: TeeTimePosting?
     @State private var showDeleteAlert = false
+    @State private var showNoGroupsAlert = false
     @State private var currentLoadTask: Task<Void, Never>?
+    @Environment(\.dismiss) private var dismiss
 
     private let teeTimeService: TeeTimeServiceProtocol
     private let reservationService: ReservationServiceProtocol
+    private let groupService: GroupServiceProtocol
 
     // Calendar integration
     @StateObject private var calendarSyncManager = CalendarSyncManager()
 
     init(
         teeTimeService: TeeTimeServiceProtocol = TeeTimeService(),
-        reservationService: ReservationServiceProtocol = ReservationService()
+        reservationService: ReservationServiceProtocol = ReservationService(),
+        groupService: GroupServiceProtocol = GroupService()
     ) {
         self.teeTimeService = teeTimeService
         self.reservationService = reservationService
+        self.groupService = groupService
     }
 
     var body: some View {
@@ -70,7 +76,7 @@ struct MyTeeTimesView: View {
                             .multilineTextAlignment(.center)
 
                         Button {
-                            showCreateSheet = true
+                            handleCreateTeeTimeButtonTap()
                         } label: {
                             Label("Create Tee Time", systemImage: "plus")
                                 .fontWeight(.semibold)
@@ -124,7 +130,7 @@ struct MyTeeTimesView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        showCreateSheet = true
+                        handleCreateTeeTimeButtonTap()
                     } label: {
                         Image(systemName: "plus")
                     }
@@ -148,6 +154,11 @@ struct MyTeeTimesView: View {
                 if let posting = postingToDelete {
                     Text("Are you sure you want to delete the tee time at \(posting.courseName)?")
                 }
+            }
+            .alert("Join or Create a Group", isPresented: $showNoGroupsAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("You need to join or create a group before you can post tee times. Visit the Groups tab to get started.")
             }
             .task(id: "loadData") {
                 startLoadData()
@@ -250,8 +261,21 @@ struct MyTeeTimesView: View {
             }
         }()
 
+        async let groupsResult: [Group] = {
+            do {
+                return try await self.groupService.getGroups()
+            } catch {
+                print("⚠️ Failed to load groups: \(error)")
+                return []
+            }
+        }()
+
         let newPostings = await postingsResult
         let newReservations = await reservationsResult
+        let newGroups = await groupsResult
+
+        // Update groups
+        userGroups = newGroups
 
         // Get IDs of postings where user has a reservation
         let postingIdsWithReservations = Set(newReservations.compactMap { $0.teeTimePosting?.id })
@@ -325,6 +349,14 @@ struct MyTeeTimesView: View {
             postingToDelete = nil
         } catch {
             errorMessage = "Failed to delete tee time: \(error.localizedDescription)"
+        }
+    }
+
+    private func handleCreateTeeTimeButtonTap() {
+        if userGroups.isEmpty {
+            showNoGroupsAlert = true
+        } else {
+            showCreateSheet = true
         }
     }
 }
