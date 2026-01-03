@@ -1,12 +1,12 @@
 # Golf Dads iOS App
 
-A native iOS application built with SwiftUI that connects to the Golf Dads API. Share available tee time spots with your golf groups and the wider community.
+A native iOS application built with SwiftUI that connects to the Golf Dads API. Share available tee time spots with your golf groups.
 
 ## 📱 Project Overview
 
 This iOS app allows golfers to:
-- 🔍 Browse available tee times posted by the community
-- ⛳ Create and manage tee time postings
+- 🔍 Browse available tee times from your golf groups
+- ⛳ Create and manage group tee time postings
 - 👥 Create and join golf groups
 - 📋 Reserve spots on posted tee times
 - 🔐 Authenticate with email/password or Google Sign-In
@@ -87,13 +87,14 @@ This iOS app allows golfers to:
 **Phase 5: Main Features - COMPLETE**
 - ✅ TeeTimeService - Complete service for tee time CRUD operations
 - ✅ ReservationService - Complete service for reservation management
-- ✅ BrowseView - Browse and discover public tee time postings
+- ✅ BrowseView - Browse and discover tee times from your groups
+  - Shows tee times from groups you're a member of
+  - Filters out tee times you own or have reserved
   - Loading, error, and empty states
   - Pull-to-refresh functionality
   - Course info, date/time, available spots
-  - Public/private and past indicators
+  - Past indicators
   - Navigation to detail view
-  - Location-based filtering with distance search
 - ✅ TeeTimeDetailView - Complete reservation management
   - Detailed information display
   - **Create reservations** - Reserve 1-4 spots on available tee times
@@ -118,7 +119,8 @@ This iOS app allows golfers to:
   - Total spots picker (1-4)
   - Optional "Reserve for myself" (0-3 spots)
   - Available spots calculated automatically
-  - Public/private visibility toggle with group selection
+  - Group selection (required - all tee times must be associated with groups)
+  - Alert when user has no groups, directing them to create/join groups
   - Optional notes field
   - Form validation and error handling
   - Success confirmation with auto-dismiss
@@ -198,7 +200,8 @@ This iOS app allows golfers to:
 - Persistent login sessions
 
 **Main App Features:**
-- Tab bar navigation: My Tee Times, Groups, Browse, Profile
+- Tab bar navigation: My Tee Times, Groups, Available, Profile
+- Smart default tab: Shows Groups if you have no groups, My Tee Times otherwise
 - **My Tee Times** - Create and manage your tee time postings
   - View all your posted tee times
   - Create new tee time postings with form
@@ -213,21 +216,23 @@ This iOS app allows golfers to:
   - Total spots picker (1-4)
   - Optional "Reserve for myself" (0-3 spots)
   - Available spots calculated automatically: `total_spots - reservations`
-  - Public/private visibility toggle with group selection
+  - Group selection required - all tee times must be associated with groups
+  - Shows alert if user has no groups, directing them to create/join groups
   - Optional notes field (multiline)
   - Form validation
   - Success confirmation with auto-dismiss
-- **Browse Tee Times** - Discover and filter public tee time postings
+- **Available Tee Times** - Discover tee times from your groups
+  - Shows tee times from all groups you're a member of
+  - Filters out tee times you own or have already reserved
   - Real-time data from production API
-  - Location-based filtering with distance search
   - Pull-to-refresh functionality
   - Loading, error, and empty states
   - Course name, date/time, available spots
-  - Public/private and past indicators
-  - Tap to view details
+  - Past indicators
+  - Tap to view details and reserve spots
 - **Tee Time Details & Reservations** - Complete reservation management
   - Full tee time information display
-  - Visual indicators for status (public/private, past)
+  - Visual indicators for status (past tee times)
   - **Make Reservations:**
     - Spot picker with segmented control (1-4 spots)
     - Reserve button with loading states
@@ -394,7 +399,28 @@ swiftlint
 
 ## 📦 Releases
 
-### Version 1.2.1 Build 4 (Current - December 2025)
+### Version 1.2.2 Build 5 (Current - January 2026)
+**Latest Updates:**
+- 🔒 **Security Enhancement:** Removed public tee times to prevent spam - all tee times now require group membership
+- 👥 **Group-First Experience:** App now defaults to Groups tab if user has no groups
+- 📱 **Smart Navigation:** Available tab now shows tee times from your groups that you can join
+- ⚠️ **User Guidance:** Alert shown when trying to create tee time without groups, directing users to create/join groups first
+- ✅ All tests passing (89/89)
+
+**What Changed:**
+- Before: Anyone could create public tee times visible to all users ❌
+- After: All tee times must be associated with at least one group ✅
+- Better spam prevention and more focused group experience
+- Available tab filters out your own postings and existing reservations
+
+**Technical Details:**
+- Removed `isPublic` state and public/private toggle from CreateTeeTimeView
+- BrowseView repurposed to show group tee times with client-side filtering
+- MainTabView now conditionally sets default tab based on group membership
+- MyTeeTimesView shows alert when user tries to create without groups
+- See [GROUP_PREVIEW_IMPLEMENTATION_PLAN.md](../docs/GROUP_PREVIEW_IMPLEMENTATION_PLAN.md) for implementation details
+
+### Version 1.2.1 Build 4 (December 2025)
 **Latest Updates:**
 - 🐛 **Critical Fix:** Push notifications now display tee times in your local timezone instead of UTC
 - 🌍 **Automatic timezone detection:** App sends device timezone during registration
